@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import ConnectDb from "../../../../middleware/db";
-import Users from "../../../../models/Users";
+import Users from "../../../../models/User";
 import { headers } from "next/headers";
 import AuthorizeMd from "../../../../middleware/AuthorizeMd";
 export const POST = async (req) => {

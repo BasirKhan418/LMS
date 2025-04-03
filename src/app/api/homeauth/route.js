@@ -5,7 +5,7 @@ import ConnectDb from "../../../../middleware/db";
 import Auth from "../../../../models/Auth";
 import Enrollc from "../../../../models/Enrollc";
 import Courses from "../../../../models/Courses";
-import Users from "../../../../models/Users";
+import User from "../../../../models/User";
 import ConnectRedis from "../../../../middleware/ConnectRedis";
 export const POST = async(req,res)=>{
     await ConnectDb();
@@ -33,7 +33,7 @@ if(verify!=null){
         }
         console.log("from db");
         let a = await Enrollc.find({email:verify.email});
-        let user = await Users.findOne({email:verify.email},{password:0,token:0});
+        let user = await User.findOne({email:verify.email},{password:0,token:0});
         let cr = await Courses.populate(a,{path:"courseid"});
         //CACHING ALL DATA IN REDIS
         await client.set(`user:${verify.email}:homeauth`,JSON.stringify(user),{EX:200});

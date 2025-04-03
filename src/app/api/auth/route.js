@@ -1,6 +1,6 @@
 const { NextResponse } = require("next/server")
 import ConnectDb from "../../../../middleware/db";
-import Users from "../../../../models/Users";
+import User from "../../../../models/User";
 import Otp from "../../../../models/Otp";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
@@ -24,7 +24,7 @@ export const POST= async(req,res)=>{
     //getting userdata from request
    
     //checking if user is registered or not
-    let data = await Users.find({email:reqdata.email});
+    let data = await User.find({email:reqdata.email});
     //if user is registered then send otp to email
     if(data.length>0){
       //deleting previous otp if exists
@@ -87,7 +87,7 @@ export const POST= async(req,res)=>{
     if(otpdata!=null){
       console.log("indide")
       //geeting user data
-      let data = await Users.find({email:reqdata.email});
+      let data = await User.find({email:reqdata.email});
       //creating token
       let token  = jwt.sign({email:reqdata.email,id:data[0]._id,name:data[0].name},process.env.JWT_SECRET);
       //deleting previous auth data
