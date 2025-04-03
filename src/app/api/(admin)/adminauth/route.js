@@ -10,7 +10,7 @@ export const POST= async(req,res)=>{
   if(reqdata.type=="send"){
    try{
     const transporter = await nodemailer.createTransport({
-      host: "smtp.gmail.com",
+      host:  process.env.NEXT_PUBLIC_EMAIL_HOST,
       port: 587,
       secure: false,
       auth: {
@@ -35,10 +35,10 @@ export const POST= async(req,res)=>{
     await Otp.create({email:reqdata.email,otp:otp});
     //sending otp to email
     const info = await transporter.sendMail({
-      from: 'team@devsomeware.com', // sender address (correct format)
+      from: '"Infotact Lms Admin Login" <account@infotactlearning.in>',
       to: `${reqdata.email}`, // list of receivers
-      subject: `Your Learn-Devsomeware Admin Login OTP: Secure Access Code Inside`, // Subject line
-      text: "Devsomeware", // plain text body
+      subject: `Your ${process.env.BRAND} Lms Admin Login OTP: Secure Access Code Inside`, // Subject line
+      text: process.env.BRAND, // plain text body
       html: `
       <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); overflow: hidden;">
@@ -51,11 +51,11 @@ export const POST= async(req,res)=>{
                   <div style="font-size: 24px; font-weight: bold; color: #333333; text-align: center; margin: 20px 0;">${otp}</div>
                   <p>This OTP is valid for the next 10 minutes. Please do not share this OTP with anyone for security reasons.</p>
                   <p>If you did not request this OTP, please ignore this email.</p>
-                  <p>Best regards,<br/>The Learn.Devsomeware Team</p>
+                  <p>Best regards,<br/>${process.env.BRAND} Lms Team</p>
               </div>
               <div style="background-color: #f4f4f4; color: #888888; padding: 20px; text-align: center; font-size: 14px;">
-                  <p>© 2024 learn.devsomeware.com, All rights reserved.</p>
-                  <p>If you have any questions, contact us at <a href="mailto:support@devsomeware.com" style="color: #007bff; text-decoration: none;">support@devsomeware.com</a>.</p>
+                  <p>© 2024 ${process.env.DOMAIN}, All rights reserved.</p>
+                  <p>If you have any questions, contact us at <a href="mailto:${process.env.SUPPORT_EMAIL}" style="color: #007bff; text-decoration: none;">${process.env.SUPPORT_EMAIL}</a>.</p>
               </div>
           </div>
       </body>
