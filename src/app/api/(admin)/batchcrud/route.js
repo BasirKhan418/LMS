@@ -49,7 +49,8 @@ export const PUT = async(req,res)=>{
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
-        let batch = await Batch.findByIdAndUpdate(reqdata.id,{
+        console.log(reqdata);
+        let batch = await Batch.findByIdAndUpdate(reqdata._id,{
             name:reqdata.name,
             domain:reqdata.domain,
             date:reqdata.date

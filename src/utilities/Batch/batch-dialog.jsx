@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useEffect } from "react"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -35,32 +36,47 @@ const formSchema = z.object({
 export default function BatchDialog({ open, onOpenChange, onSubmit, title, defaultValues }) {
   const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: defaultValues
-      ? {
-          name: defaultValues.name,
-          domain: defaultValues.domain,
-          date: new Date(defaultValues.date),
-        }
-      : {
-          name: "",
-          domain: "",
-          date: new Date(),
-        },
+    defaultValues: {
+      name: "",
+      domain: "",
+      date: new Date(),
+    },
   })
+
+  // Reset form values when defaultValues change or dialog opens
+  useEffect(() => {
+    if (open && defaultValues) {
+      const date = new Date(defaultValues.date)
+      // Ensure we're using local date without timezone shifts
+      const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+      
+      form.reset({
+        name: defaultValues.name,
+        domain: defaultValues.domain,
+        date: localDate,
+      })
+    } else if (open && !defaultValues) {
+      form.reset({
+        name: "",
+        domain: "",
+        date: new Date(),
+      })
+    }
+  }, [open, defaultValues, form])
 
   function handleSubmit(values) {
     if (defaultValues) {
       onSubmit({
-        id: defaultValues.id,
+        _id: defaultValues._id,  // Use _id instead of id to match API expectations
         name: values.name,
         domain: values.domain,
-        date: values.date.toISOString().split("T")[0],
+        date: values.date.toISOString(),  // Send full ISO date
       })
     } else {
       onSubmit({
         name: values.name,
         domain: values.domain,
-        date: values.date.toISOString().split("T")[0],
+        date: values.date.toISOString(),  // Send full ISO date
       })
     }
   }
@@ -93,21 +109,20 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Domain</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select domain" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="IT">IT</SelectItem>
-                      <SelectItem value="Analytics">Analytics</SelectItem>
-                      <SelectItem value="Design">Design</SelectItem>
-                      <SelectItem value="Marketing">Marketing</SelectItem>
-                      <SelectItem value="Finance">Finance</SelectItem>
-                      <SelectItem value="HR">HR</SelectItem>
-                      <SelectItem value="Operations">Operations</SelectItem>
-                    </SelectContent>
+                   <SelectContent>
+                          <SelectItem value="Web Development">Software Development</SelectItem>
+                          <SelectItem value="Python Development">Python Development</SelectItem>
+                          <SelectItem value="Data Science & Machine Learning">Data Science & Machine Learning</SelectItem>
+                          <SelectItem value="Cyber Security">Cyber Security</SelectItem>
+                          <SelectItem value="UI/UX Design">UI/UX Design</SelectItem>
+                          <SelectItem value="Data Analytics">Data Analytics</SelectItem>
+                        </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
@@ -148,4 +163,3 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
     </Dialog>
   )
 }
-

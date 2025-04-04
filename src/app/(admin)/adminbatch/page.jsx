@@ -8,12 +8,15 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import BatchDialog from "@/utilities/Batch/batch-dialog"
 import UsersDialog from "@/utilities/Batch/users-dialog"
 import { Toaster,toast } from "sonner"
+import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
 export default function BatchManagement() {
   const [batches, setBatches] = useState([
   ])
 //fetch all batches from api
 const fetchBatches = async () => {
+  setBatches([])
   try{
+    setIsLoading(true)
  const data = await fetch("/api/batchcrud", {
     method: "GET",
     headers: {
@@ -22,7 +25,7 @@ const fetchBatches = async () => {
     },
   })
   const res = await data.json()
-  console.log(res)
+setIsLoading(false)
   if (res.success) {
     setBatches(res.batch)
   } else {
@@ -42,6 +45,7 @@ useEffect(() => {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isUsersOpen, setIsUsersOpen] = useState(false)
   const [currentBatch, setCurrentBatch] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
 
   // Mock users data
   const mockUsers = {
@@ -65,38 +69,111 @@ useEffect(() => {
     ],
   }
 
-  const handleCreateBatch = (batch) => {
-    const newBatch = {
-      ...batch,
-      id: (batches.length + 1).toString(),
-    }
-    setBatches([...batches, newBatch])
+  const handleCreateBatch = async(batch) => {
+  try{
+    setIsLoading(true)
+const data = await fetch("/api/batchcrud", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+  },
+  body: JSON.stringify(batch),
+})
+const res = await data.json()
+setIsLoading(false)
+if (res.success) {
+fetchBatches()
     setIsCreateOpen(false)
+    toast.success(res.message)
+}
+else{
+    toast.error(res.message)
+}
+  }
+  catch(err){
+    console.log(err)
+    toast.error("Something went wrong while creating batch")
+  }
   }
 
-  const handleEditBatch = (updatedBatch) => {
-    setBatches(batches.map((batch) => (batch.id === updatedBatch.id ? updatedBatch : batch)))
-    setIsEditOpen(false)
-    setCurrentBatch(null)
-  }
+  const handleEditBatch = async(updatedBatch) => {
+try{
+  setIsLoading(true)
+const data = await fetch("/api/batchcrud", {
+  method: "PUT",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+  },
+  body: JSON.stringify(updatedBatch),
+})
+const res = await data.json()
+console.log(res)
+setIsLoading(false)
+if (res.success) {
+  fetchBatches()
+  setCurrentBatch(null)
+  setIsEditOpen(false)
+  toast.success(res.message)
+}
+else{
+  toast.error(res.message)
+}
+}
+catch(err){
+  toast.error("Something went wrong while updating batch")
+}
+}
 
-  const handleDeleteBatch = (id) => {
-    setBatches(batches.filter((batch) => batch.id !== id))
+  const handleDeleteBatch = async(id) => {
+    try{
+      setIsLoading(true)
+  const data = await fetch("/api/batchcrud", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+    },
+    body: JSON.stringify({ id }),
+  })
+  const res = await data.json()
+  setIsLoading(false)
+  if (res.success) {
+    fetchBatches()
+    toast.success(res.message)
+  }
+  else{
+    toast.error(res.message)
+  }
+    }
+    catch(err){
+      toast.error("Something went wrong while deleting batch")
+    }
   }
 
   const openEditDialog = (batch) => {
-    setCurrentBatch(batch)
-    setIsEditOpen(true)
+    // Create a fresh copy of the batch object to avoid reference issues
+    setCurrentBatch({
+      _id: batch._id,
+      name: batch.name,
+      domain: batch.domain,
+      date: batch.date
+    });
+    setIsEditOpen(true);
   }
 
   const openUsersDialog = (batch) => {
+    
     setCurrentBatch(batch)
     setIsUsersOpen(true)
   }
 
   return (
-    <div className="container mx-auto py-6 px-4 md:px-6">
-      <Toaster richColors position="top-right" closeButton={false} />
+    <>
+    {isLoading?<ProfilePageSkeleton/>:<div className="container mx-auto py-6 px-4 md:px-6">
+      
+      <Toaster richColors position="top-right" />
       <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
           <CardTitle className="text-2xl font-bold">Batch Management</CardTitle>
@@ -126,7 +203,7 @@ useEffect(() => {
                     </TableRow>
                   ) : (
                     batches.map((batch) => (
-                      <TableRow key={batch.id}>
+                      <TableRow key={batch._id}>
                         <TableCell className="font-medium">{batch.name}</TableCell>
                         <TableCell>{batch.domain}</TableCell>
                         <TableCell>{new Date(batch.date).toLocaleDateString()}</TableCell>
@@ -155,7 +232,7 @@ useEffect(() => {
                             <Button
                               variant="outline"
                               size="icon"
-                              onClick={() => handleDeleteBatch(batch.id)}
+                              onClick={() => handleDeleteBatch(batch._id)}
                               className="text-destructive hover:text-destructive"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -197,7 +274,8 @@ useEffect(() => {
           />
         </>
       )}
-    </div>
+    </div>}
+    </>
   )
 }
 
