@@ -12,6 +12,7 @@ import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
 export default function BatchManagement() {
   const [batches, setBatches] = useState([
   ])
+  const [users, setUsers] = useState([])
 //fetch all batches from api
 const fetchBatches = async () => {
   setBatches([])
@@ -68,7 +69,7 @@ useEffect(() => {
       { id: "12", name: "James Thomas", email: "james@example.com" },
     ],
   }
-
+//create batch function
   const handleCreateBatch = async(batch) => {
   try{
     setIsLoading(true)
@@ -96,7 +97,7 @@ else{
     toast.error("Something went wrong while creating batch")
   }
   }
-
+//edit batch function
   const handleEditBatch = async(updatedBatch) => {
 try{
   setIsLoading(true)
@@ -125,6 +126,7 @@ catch(err){
   toast.error("Something went wrong while updating batch")
 }
 }
+//delete batch function
 
   const handleDeleteBatch = async(id) => {
     try{
@@ -152,6 +154,7 @@ catch(err){
     }
   }
 
+  // Function to open the edit dialog with a fresh copy of the batch object
   const openEditDialog = (batch) => {
     // Create a fresh copy of the batch object to avoid reference issues
     setCurrentBatch({
@@ -162,18 +165,43 @@ catch(err){
     });
     setIsEditOpen(true);
   }
-
-  const openUsersDialog = (batch) => {
-    
-    setCurrentBatch(batch)
-    setIsUsersOpen(true)
+// Function to open the users dialog with the selected batch
+  const openUsersDialog = async (batch) => {
+    try{
+      setIsLoading(true)
+    const data = await fetch("/api/batchcrud/getuser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+      },
+      body: JSON.stringify({ batchid: batch._id }),
+    })
+    const res = await data.json()
+    console.log(res)
+    setIsLoading(false)
+    if (res.success) {
+      setUsers(res.users)
+      setCurrentBatch({ ...batch, id: batch._id })
+      setIsUsersOpen(true)
+      toast.success(res.message)
+    } else {
+      toast.error(res.message)
+    }
+    }
+catch(err){
+  toast.error("Something went wrong while fetching users")
+}
+    // setCurrentBatch(batch)
+    // setIsUsersOpen(true)
   }
 
   return (
     <>
+    <Toaster richColors position="top-right" />
     {isLoading?<ProfilePageSkeleton/>:<div className="container mx-auto py-6 px-4 md:px-6">
       
-      <Toaster richColors position="top-right" />
+      
       <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
           <CardTitle className="text-2xl font-bold">Batch Management</CardTitle>
@@ -269,8 +297,8 @@ catch(err){
           <UsersDialog
             open={isUsersOpen}
             onOpenChange={setIsUsersOpen}
-            batchName={currentBatch.name}
-            users={mockUsers[currentBatch.id] || []}
+            batch={currentBatch}
+            users={users}
           />
         </>
       )}

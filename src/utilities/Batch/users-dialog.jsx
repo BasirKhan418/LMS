@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
-export default function UsersDialog({ open, onOpenChange, batchName, users }) {
+export default function UsersDialog({ open, onOpenChange, batch, users }) {
   const [searchQuery, setSearchQuery] = useState("")
 
   const filteredUsers = users.filter(
@@ -20,7 +20,7 @@ export default function UsersDialog({ open, onOpenChange, batchName, users }) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
         <DialogHeader>
-          <DialogTitle>Users in {batchName}</DialogTitle>
+          <DialogTitle>Users in {batch.name}. Domain is {batch.domain}</DialogTitle>
           <DialogDescription>View all users enrolled in this batch.</DialogDescription>
         </DialogHeader>
         <div className="relative">
@@ -36,8 +36,9 @@ export default function UsersDialog({ open, onOpenChange, batchName, users }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>Name ("{users.length}"")</TableHead>
+                <TableHead>Email("{users.length}"")</TableHead>
+                <TableHead>Duration</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -49,9 +50,10 @@ export default function UsersDialog({ open, onOpenChange, batchName, users }) {
                 </TableRow>
               ) : (
                 filteredUsers.map((user) => (
-                  <TableRow key={user.id}>
+                  <TableRow key={user._id}>
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.month.slice(0,1)}</TableCell>
                   </TableRow>
                 ))
               )}
