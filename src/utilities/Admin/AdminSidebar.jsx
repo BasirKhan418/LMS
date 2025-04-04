@@ -116,6 +116,14 @@ export default function AdminSidebar({children}) {
             <span>Manage Trainers</span>
           </Link>
           <Link
+            href="/adminuser"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <UsersRound className="h-5 w-5" />
+            <span>Manage Users</span>
+          </Link>
+          <Link
             href="/adminnotification"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
