@@ -1,20 +1,43 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { PlusCircle, Pencil, Trash2, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import BatchDialog from "@/utilities/Batch/batch-dialog"
 import UsersDialog from "@/utilities/Batch/users-dialog"
-
+import { Toaster,toast } from "sonner"
 export default function BatchManagement() {
   const [batches, setBatches] = useState([
-    { id: "1", name: "Web Development", domain: "IT", date: "2023-04-15" },
-    { id: "2", name: "Data Science", domain: "Analytics", date: "2023-05-20" },
-    { id: "3", name: "UI/UX Design", domain: "Design", date: "2023-06-10" },
   ])
-
+//fetch all batches from api
+const fetchBatches = async () => {
+  try{
+ const data = await fetch("/api/batchcrud", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+    },
+  })
+  const res = await data.json()
+  console.log(res)
+  if (res.success) {
+    setBatches(res.batch)
+  } else {
+    toast.warning(res.message)
+  }
+  }
+  catch(err){
+    console.log(err)
+    toast.error("Something went wrong while fetching batches")
+  }
+}
+//update on all render
+useEffect(() => {
+  fetchBatches()
+},[])
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [isUsersOpen, setIsUsersOpen] = useState(false)
@@ -73,6 +96,7 @@ export default function BatchManagement() {
 
   return (
     <div className="container mx-auto py-6 px-4 md:px-6">
+      <Toaster richColors position="top-right" closeButton={false} />
       <Card>
         <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0 pb-4">
           <CardTitle className="text-2xl font-bold">Batch Management</CardTitle>
