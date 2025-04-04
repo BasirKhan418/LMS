@@ -2,8 +2,10 @@ import { NextRequest,NextResponse } from "next/server";
 import AuthorizeMd from "../../../../../middleware/AuthorizeMd";
 import Batch from "../../../../../models/Batch";
 import { headers } from "next/headers";
+import ConnectDb from "../../../../../middleware/db";
 export const GET = async()=>{
     try{
+        await ConnectDb();
      const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
         if(!data){
@@ -21,6 +23,7 @@ export const GET = async()=>{
 }
 export const POST = async(req,res)=>{
     try{
+        await ConnectDb();
     const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
         if(!data){
@@ -43,6 +46,7 @@ export const POST = async(req,res)=>{
 
 export const PUT = async(req,res)=>{
     try{
+        await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
         if(!data){
@@ -65,6 +69,7 @@ export const PUT = async(req,res)=>{
 
 export const DELETE = async(req,res)=>{
     try{
+        await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
         if(!data){

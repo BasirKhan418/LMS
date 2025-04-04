@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 
-const Home = ({name}) => {
+const Home = ({name,analytics}) => {
   return (
     <div className="min-h-screen bg-gray-100">
      
@@ -18,7 +18,7 @@ const Home = ({name}) => {
               <CardDescription>The total number of courses</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-blue-500">142</div>
+              <div className="text-4xl font-bold text-blue-500">{analytics&&analytics.courses}</div>
             </CardContent>
           </Card>
           <Card>
@@ -27,7 +27,7 @@ const Home = ({name}) => {
               <CardDescription>The number of active students</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-green-500">3,456</div>
+              <div className="text-4xl font-bold text-green-500">{analytics&&analytics.users}</div>
             </CardContent>
           </Card>
           <Card>
@@ -36,16 +36,16 @@ const Home = ({name}) => {
               <CardDescription>The number of new signups</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-orange-500">124</div>
+              <div className="text-4xl font-bold text-orange-500">{analytics&&analytics.newsignupthismonth}</div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Total Products</CardTitle>
-              <CardDescription>The total products</CardDescription>
+              <CardTitle>Total Enrollments</CardTitle>
+              <CardDescription>The total enrollments</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold text-purple-500">42,356</div>
+              <div className="text-4xl font-bold text-purple-500">{analytics&&analytics.totalenrollments}</div>
             </CardContent>
           </Card>
         </div>

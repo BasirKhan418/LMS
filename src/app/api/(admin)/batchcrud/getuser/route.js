@@ -3,8 +3,10 @@ import Batch from "../../../../../../models/Batch";
 import AuthorizeMd from "../../../../../../middleware/AuthorizeMd";
 import { headers } from "next/headers";
 import User from "../../../../../../models/User";
+import ConnectDb from "../../../../../../middleware/db";
 export const POST = async(req,res)=>{
     try{
+        await ConnectDb();
     const headerlist = await headers();
     const token = headerlist.get("dilmsadmintoken");
     let data = await AuthorizeMd(token);
