@@ -1,54 +1,154 @@
 "use client"
 
-import { useState } from "react"
+import { useState,useEffect } from "react"
 import { Search, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import AdminTable from "./admin-table"
 import CreateAdminModal from "./create-admin-modal"
-
+import { Toaster,toast } from "sonner"
+import ProfilePageSkeleton from "../skeleton/ProfilePageSkeleton"
 // Mock data for demonstration
-const initialAdmins = [
-  { id: "1", username: "admin1", name: "John Doe", email: "john@example.com" },
-  { id: "2", username: "admin2", name: "Jane Smith", email: "jane@example.com" },
-  { id: "3", username: "admin3", name: "Robert Johnson", email: "robert@example.com" },
-  { id: "4", username: "admin4", name: "Emily Davis", email: "emily@example.com" },
-  { id: "5", username: "admin5", name: "Michael Wilson", email: "michael@example.com" },
-]
 
 export default function AdminDashboard() {
-  const [admins, setAdmins] = useState(initialAdmins)
+
+  const [admins, setAdmins] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [adminToEdit, setAdminToEdit] = useState(null)
+  const [loading, setLoading] = useState(false)
+//fetch all admins
 
+    const fetchAdmins = async () => {
+        setLoading(true)
+        try{
+const response = await fetch("/api/admincrud",{
+    method:"GET",
+    headers:{
+        "Content-Type":"application/json",
+        "Authorization":`${localStorage.getItem("dilmsadmintoken")}`
+    }
+});
+const data = await response.json()
+console.log(data)
+setLoading(false)
+if(!data.success){
+    toast.error(data.message)
+    return
+}
+else{
+    setAdmins(data.admins)
+    toast.success("Fetched admins successfully")
+}
+        }
+        catch(err){
+toast.error("Error fetching admins")
+        }
+    }
+
+useEffect(() => {
+fetchAdmins()
+},[])
   const filteredAdmins = admins.filter(
     (admin) =>
       admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      admin.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
       admin.email.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
-  const handleCreateAdmin = (newAdmin) => {
-    const id = (Math.max(...admins.map((a) => Number.parseInt(a.id))) + 1).toString()
-    setAdmins([...admins, { ...newAdmin, id }])
+  const handleCreateAdmin = async(newAdmin) => {
+    try{
+        setLoading(true)
+        const response = await fetch("/api/admincrud", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+            },
+            body: JSON.stringify(newAdmin),
+        })
+        const data = await response.json()
+        setLoading(false)
+        if (!data.success) {
+            toast.error(data.message)
+            return
+        } else {
+            fetchAdmins()
+            toast.success("Admin created successfully")
+        }
+    }
+    catch(err){
+        toast.error("Error creating admin")
+    }
   }
 
-  const handleUpdateAdmin = (updatedAdmin) => {
-    setAdmins(admins.map((admin) => (admin.id === updatedAdmin.id ? updatedAdmin : admin)))
+  const handleUpdateAdmin = async(updatedAdmin) => {
+    console.log("updated admin",updatedAdmin)
+    try{
+    const response = await fetch("/api/admincrud", {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({
+            id: updatedAdmin.id,
+            username: updatedAdmin.username,
+            email: updatedAdmin.email,
+            name: updatedAdmin.name,
+        }),
+    })
+    const data = await response.json()
+    setLoading(false)
+    if (!data.success) {
+        toast.error(data.message)
+        return
+    } else {
+        fetchAdmins()
+        toast.success("Admin updated successfully")
+    }
+    }
+    catch(err){
+        toast.error("Error updating admin")
+    }
   }
 
-  const handleDeleteAdmin = (id) => {
-    setAdmins(admins.filter((admin) => admin.id !== id))
+  const handleDeleteAdmin = async(id) => {
+    try{
+setLoading(true)
+        const response = await fetch("/api/admincrud", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+            },
+            body: JSON.stringify({ id }),
+        })
+        const data = await response.json()
+        setLoading(false)
+        if (!data.success) {
+            toast.error(data.message)
+            return
+        } else {
+            fetchAdmins()
+            toast.success("Admin deleted successfully")
+        }
+    }
+    catch(error){
+        toast.error("Error deleting admin")
+    }
   }
 
   const openEditModal = (admin) => {
+    console.log("edfit item",admin)
     setAdminToEdit(admin)
     setIsCreateModalOpen(true)
   }
 
   return (
-    <div className="space-y-6">
+    <>
+     <Toaster richColors position="top-right" closeButton={false} />
+   { loading?<ProfilePageSkeleton/>:<div className="space-y-6">
+       
       <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
         <div className="relative w-full sm:w-[350px]">
           <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
@@ -80,7 +180,8 @@ export default function AdminDashboard() {
         onSubmit={adminToEdit ? handleUpdateAdmin : handleCreateAdmin}
         admin={adminToEdit}
       />
-    </div>
+    </div>}
+    </>
   )
 }
 

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
@@ -31,11 +31,22 @@ export default function CreateAdminModal({ open, onOpenChange, onSubmit, admin }
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: admin?.username || "",
-      name: admin?.name || "",
-      email: admin?.email || "",
+      username: "",
+      name: "",
+      email: "",
     },
   })
+
+  // Update form values when admin data changes
+  useEffect(() => {
+    if (admin) {
+      form.reset({
+        username: admin.username || "",
+        name: admin.name || "",
+        email: admin.email || "",
+      })
+    }
+  }, [admin, form])
 
   const handleSubmit = (values) => {
     setFormData(values)
@@ -45,7 +56,7 @@ export default function CreateAdminModal({ open, onOpenChange, onSubmit, admin }
   const handlePinVerified = () => {
     if (formData) {
       if (admin) {
-        onSubmit({ ...formData, id: admin.id })
+        onSubmit({ ...formData, id: admin._id })
       } else {
         onSubmit(formData)
       }
@@ -146,7 +157,7 @@ export default function CreateAdminModal({ open, onOpenChange, onSubmit, admin }
                   </Button>
                   <Button
                     type="submit"
-                    className="rounded-lg  hover:from-purple-700 hover:to-blue-600"
+                    className="rounded-lg hover:from-purple-700 hover:to-blue-600"
                   >
                     {admin ? "Update Admin" : "Create Admin"}
                   </Button>
@@ -167,4 +178,3 @@ export default function CreateAdminModal({ open, onOpenChange, onSubmit, admin }
     </>
   )
 }
-

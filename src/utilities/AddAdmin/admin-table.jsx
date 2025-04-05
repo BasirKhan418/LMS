@@ -28,7 +28,7 @@ export default function AdminTable({ admins, onEdit, onDelete }) {
     if (actionType === "edit" && selectedAdmin) {
       onEdit(selectedAdmin)
     } else if (actionType === "delete" && selectedAdmin) {
-      onDelete(selectedAdmin.id)
+      onDelete(selectedAdmin._id)
     }
     setIsPinModalOpen(false)
   }
@@ -57,7 +57,7 @@ export default function AdminTable({ admins, onEdit, onDelete }) {
               </TableRow>
             ) : (
               admins.map((admin) => (
-                <TableRow key={admin.id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                <TableRow key={admin._id} className="hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
                   <TableCell className="font-medium">
                     <Badge variant="outline" className="bg-slate-100 dark:bg-slate-800 font-mono text-xs">
                       {admin.username}
