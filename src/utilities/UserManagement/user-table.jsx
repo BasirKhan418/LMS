@@ -59,7 +59,7 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Domain</TableHead>
                 <TableHead className="font-semibold">Paid</TableHead>
-                <TableHead className="font-semibold">ViewOL</TableHead>
+               
                 <TableHead className="font-semibold">Gender</TableHead>
                 <TableHead className="font-semibold">Phone</TableHead>
                 <TableHead className="font-semibold">Duration</TableHead>
@@ -99,7 +99,7 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Domain</TableHead>
                 <TableHead className="font-semibold">Paid</TableHead>
-                <TableHead className="font-semibold">ViewOL</TableHead>
+               
                 <TableHead className="font-semibold">Gender</TableHead>
                 <TableHead className="font-semibold">Phone</TableHead>
                 <TableHead className="font-semibold">Duration</TableHead>
@@ -115,7 +115,7 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
                 </TableRow>
               ) : (
                 users.map((user) => (
-                  <TableRow key={user.id} className="hover:bg-slate-50 transition-colors">
+                  <TableRow key={user._id} className="hover:bg-slate-50 transition-colors">
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
@@ -129,10 +129,9 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
                         {user.ispaid ? "Paid" : "Unpaid"}
                       </Badge>
                     </TableCell>
-                    <TableCell>{user.viewol}</TableCell>
                     <TableCell>{user.gender}</TableCell>
-                    <TableCell>{user.phone}</TableCell>
-                    <TableCell>{user.duration}</TableCell>
+                    <TableCell>{user.number}</TableCell>
+                    <TableCell>{user.month}</TableCell>
                     <TableCell>
                       <div className="flex space-x-2">
                         <Button

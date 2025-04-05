@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,15 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Save, X } from "lucide-react"
 
-export function EditUserModal({ user, isOpen, onClose, onSave }) {
+export function EditUserModal({ user, isOpen, onClose, onSave,users }) {
   const [formData, setFormData] = useState({ ...user })
-
+  const [batches, setBatches] = useState([])
+  useEffect(()=>{
+    const uniqueBatches = Array.from(new Set(users.map((user) => user.domain)))
+    setBatches(uniqueBatches)
+  },[users])
   const handleChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = (e) => {
+
     e.preventDefault()
+    console.log(formData)
     onSave(formData)
   }
 
@@ -67,26 +73,28 @@ export function EditUserModal({ user, isOpen, onClose, onSave }) {
                     <SelectValue placeholder="Select domain" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="example.com">example.com</SelectItem>
-                    <SelectItem value="test.com">test.com</SelectItem>
-                    <SelectItem value="domain.com">domain.com</SelectItem>
+                  {batches.map((batch) => (
+                <SelectItem key={batch} value={batch}>
+                  {batch}
+                </SelectItem>
+              ))}
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="grid gap-3">
                 <Label htmlFor="duration" className="text-slate-700">
-                  Subscription Duration
+                 Duration
                 </Label>
-                <Select value={formData.duration} onValueChange={(value) => handleChange("duration", value)}>
+                <Select value={formData.month} onValueChange={(value) => handleChange("month", value)}>
                   <SelectTrigger id="duration" className="border-slate-300 focus:border-slate-500">
                     <SelectValue placeholder="Select duration" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1 month">1 month</SelectItem>
-                    <SelectItem value="3 months">3 months</SelectItem>
-                    <SelectItem value="6 months">6 months</SelectItem>
-                    <SelectItem value="1 year">1 year</SelectItem>
+                    <SelectItem value="1 Month">1 Month</SelectItem>
+                    <SelectItem value="2 Months">2 Months</SelectItem>
+                    <SelectItem value="3 Months">3 Months</SelectItem>
+                    <SelectItem value="4 Months">4 Months</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -115,8 +123,8 @@ export function EditUserModal({ user, isOpen, onClose, onSave }) {
                 </Label>
                 <Input
                   id="paymentId"
-                  value={formData.paymentId || ""}
-                  onChange={(e) => handleChange("paymentId", e.target.value)}
+                  value={formData.paymentid || ""}
+                  onChange={(e) => handleChange("paymentid", e.target.value)}
                   className="border-slate-300 focus:border-slate-500"
                 />
               </div>
@@ -127,8 +135,8 @@ export function EditUserModal({ user, isOpen, onClose, onSave }) {
                 </Label>
                 <Input
                   id="orderId"
-                  value={formData.orderId || ""}
-                  onChange={(e) => handleChange("orderId", e.target.value)}
+                  value={formData.orderid || ""}
+                  onChange={(e) => handleChange("orderid", e.target.value)}
                   className="border-slate-300 focus:border-slate-500"
                 />
               </div>
@@ -139,8 +147,8 @@ export function EditUserModal({ user, isOpen, onClose, onSave }) {
                 </Label>
                 <Input
                   id="phone"
-                  value={formData.phone}
-                  onChange={(e) => handleChange("phone", e.target.value)}
+                  value={formData.number}
+                  onChange={(e) => handleChange("number", e.target.value)}
                   className="border-slate-300 focus:border-slate-500"
                 />
               </div>

@@ -15,6 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { toast, Toaster } from "sonner"
 
 export default function UserManagement() {
   const [users, setUsers] = useState([])
@@ -29,34 +30,37 @@ export default function UserManagement() {
   const itemsPerPage = 10
 
   // Mock API call to fetch users
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setIsLoading(true)
-      try {
-        // This would be replaced with an actual API call
-        const mockUsers = Array.from({ length: 50 }, (_, i) => ({
-          id: `user-${i + 1}`,
-          name: `User ${i + 1}`,
-          email: `user${i + 1}@example.com`,
-          domain: ["example.com", "test.com", "domain.com"][Math.floor(Math.random() * 3)],
-          ispaid: Math.random() > 0.5,
-          viewol: Math.floor(Math.random() * 100),
-          gender: ["Male", "Female", "Other"][Math.floor(Math.random() * 3)],
-          phone: `+1${Math.floor(Math.random() * 10000000000)}`,
-          duration: ["1 month", "3 months", "6 months", "1 year"][Math.floor(Math.random() * 4)],
-          paymentId: `pay_${Math.random().toString(36).substring(2, 10)}`,
-          orderId: `ord_${Math.random().toString(36).substring(2, 10)}`,
-        }))
-
-        setUsers(mockUsers)
-        setFilteredUsers(mockUsers)
-        setTotalPages(Math.ceil(mockUsers.length / itemsPerPage))
-      } catch (error) {
-        console.error("Failed to fetch users:", error)
-      } finally {
-        setIsLoading(false)
+  const fetchUsers = async () => {
+    setIsLoading(true)
+    try {
+      // This would be replaced with an actual API call
+      const response = await fetch("/api/user-mn",{
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const data = await response.json()
+      setIsLoading(false)
+      console.log(data)
+      if(data.success){
+        setUsers(data.users)
+        setFilteredUsers(data.users)
+        setTotalPages(Math.ceil(data.users.length / itemsPerPage))
       }
+      else{
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      console.error("Failed to fetch users:", error)
+    } finally {
+      setIsLoading(false)
     }
+  }
+  useEffect(() => {
+   
 
     fetchUsers()
   }, [])
@@ -76,11 +80,24 @@ export default function UserManagement() {
 
     // This would be replaced with an actual API call
     try {
-      // Mock API call
-      const updatedUsers = users.filter((user) => user.id !== selectedUser.id)
-      setUsers(updatedUsers)
-      setFilteredUsers(updatedUsers)
-      setTotalPages(Math.ceil(updatedUsers.length / itemsPerPage))
+      setIsLoading(true)
+      const response = await fetch("/api/user-mn", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify(selectedUser),
+      })
+      const data = await response.json()
+      setIsLoading(false)
+      if(data.success){
+        fetchUsers()
+        toast.success(data.message)
+      }
+      else{
+        toast.error(data.message)
+      }
     } catch (error) {
       console.error("Failed to delete user:", error)
     } finally {
@@ -91,10 +108,25 @@ export default function UserManagement() {
 
   const handleSaveUser = async (updatedUser) => {
     // This would be replaced with an actual API call
+    setIsLoading(true)
     try {
-      const updatedUsers = users.map((user) => (user.id === updatedUser.id ? updatedUser : user))
-      setUsers(updatedUsers)
-      setFilteredUsers(updatedUsers)
+     const response = await fetch("/api/user-mn", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify(updatedUser),
+     })
+      const data = await response.json()
+      setIsLoading(false)
+      if(data.success){
+        fetchUsers()
+        toast.success(data.message)
+      }
+      else{
+        toast.error(data.message)
+      }
     } catch (error) {
       console.error("Failed to update user:", error)
     } finally {
@@ -125,6 +157,7 @@ export default function UserManagement() {
 
   return (
     <div className="space-y-8">
+      <Toaster position="top-right" richColors closeButton />
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-gradient-to-r from-slate-50 to-slate-100 p-6 rounded-lg shadow-sm border">
         <h1 className="text-3xl font-bold text-slate-800">LMS User Management</h1>
         <ImportCSV onImport={handleImportCSV} users={users} />
@@ -151,6 +184,7 @@ export default function UserManagement() {
             setSelectedUser(null)
           }}
           onSave={handleSaveUser}
+          users={users}
         />
       )}
 

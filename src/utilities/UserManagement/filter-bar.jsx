@@ -19,22 +19,33 @@ export function FilterBar({ users, onFilter }) {
 
   const applyFilters = () => {
     let result = [...users]
-
+  
     // Apply user type filter
     if (activeFilter === "paid") {
       result = result.filter((user) => user.ispaid)
     }
-
+  
     // Apply batch filter - fixed to use "all" instead of empty string
     if (selectedBatch !== "all") {
       result = result.filter((user) => user.domain === selectedBatch)
     }
-
-    // Apply new users filter (for demo, consider users with viewol < 10 as new)
+  
+    // Apply new users filter - get users created in current month who are paid
     if (newUsersActive) {
-      result = result.filter((user) => user.viewol < 10)
+      const now = new Date()
+      const currentMonth = now.getMonth()
+      const currentYear = now.getFullYear()
+      
+      result = result.filter((user) => {
+        // Make sure createdAt is properly converted to a Date object
+        const createdDate = new Date(user.createdAt)
+        // Check if user was created in current month AND is paid
+        return createdDate.getMonth() === currentMonth && 
+               createdDate.getFullYear() === currentYear &&
+               user.ispaid === true
+      })
     }
-
+  
     onFilter(result)
   }
 
@@ -96,7 +107,7 @@ export function FilterBar({ users, onFilter }) {
               <SelectValue placeholder="Select batch" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Batches</SelectItem>
+              <SelectItem value="all">All Domains</SelectItem>
               {batches.map((batch) => (
                 <SelectItem key={batch} value={batch}>
                   {batch}
