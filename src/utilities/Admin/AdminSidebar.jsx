@@ -9,7 +9,7 @@ import { MdOutlineOndemandVideo } from "react-icons/md";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { MdNavigateNext } from "react-icons/md";
 import { AiOutlineNotification } from "react-icons/ai";
-import {FolderGit2,School,Users,UsersRound} from "lucide-react"
+import {FolderGit2,School,Users,UsersRound,ShieldPlus} from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import Image from "next/image"
 import { useState ,useEffect} from "react"
@@ -122,6 +122,14 @@ export default function AdminSidebar({children}) {
           >
             <UsersRound className="h-5 w-5" />
             <span>Manage Users</span>
+          </Link>
+          <Link
+            href="/adminmanagement"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <ShieldPlus className="h-5 w-5" />
+            <span>Manage Admins</span>
           </Link>
           <Link
             href="/adminnotification"
