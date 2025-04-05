@@ -19,7 +19,24 @@ export const GET = async()=>{
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
-//post
+//handle import
+export const POST = async(req,res)=>{
+    try{
+     await ConnectDb();
+        const headerlist = await headers();
+        let data = AuthorizeMd(headerlist.get("Authorization"));
+        if(!data){
+            return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
+        }
+        const reqdata = await req.json();
+        let users = await User.insertMany(reqdata);
+        return NextResponse.json({message:"Users imported successfully",status:200,success:true})
+    }
+    catch(err){
+        console.log(err);
+        return NextResponse.json({success:false,message:"Something went wrong please try again later"})
+    }
+}
 
 
 export const PUT = async(req,res)=>{

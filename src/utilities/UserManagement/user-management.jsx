@@ -141,12 +141,30 @@ export default function UserManagement() {
     setCurrentPage(1)
   }
 
-  const handleImportCSV = (importedUsers) => {
-    // This would be replaced with an actual API call to save imported users
-    const newUsers = [...users, ...importedUsers]
-    setUsers(newUsers)
-    setFilteredUsers(newUsers)
-    setTotalPages(Math.ceil(newUsers.length / itemsPerPage))
+  const handleImportCSV = async(importedUsers) => {
+    setIsLoading(true)
+ try{
+  const response = await fetch("/api/user-mn", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+    },
+    body: JSON.stringify(importedUsers),
+  })
+  const data = await response.json()
+  setIsLoading(false)
+  if(data.success){
+    fetchUsers()
+    toast.success(data.message)
+  }
+  else{
+    toast.error(data.message)
+  }
+ }
+ catch(error){
+  toast.error(error.message)
+ }
   }
 
   const getCurrentPageData = () => {

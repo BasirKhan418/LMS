@@ -94,10 +94,8 @@ export function ImportCSV({ onImport, users }) {
     onImport(data)
     setIsPreviewOpen(false)
 
-    toast({
-      title: "Import successful",
-      description: `${data.length} users have been imported.`,
-    })
+    toast.success("Users imported successfully")
+    setIsImportDialogOpen(false)
   }
 
   const parseCSV = (csvData) => {
@@ -105,7 +103,7 @@ export function ImportCSV({ onImport, users }) {
     const headers = lines[0].split(",").map((header) => header.trim())
 
     // Validate headers
-    const requiredHeaders = ["name", "email", "domain", "gender", "phone", "duration"]
+    const requiredHeaders = ["name", "email", "domain", "gender", "number", "month","ispaid"]
     const missingHeaders = requiredHeaders.filter((header) => !headers.includes(header))
 
     if (missingHeaders.length > 0) {
@@ -130,16 +128,13 @@ export function ImportCSV({ onImport, users }) {
       headers.forEach((header, index) => {
         if (header === "ispaid") {
           user[header] = values[index].toLowerCase() === "true"
-        } else if (header === "viewol") {
-          user[header] = Number.parseInt(values[index], 10) || 0
-        } else {
+        }  else {
           user[header] = values[index]
         }
       })
 
       // Set default values for missing fields
       if (user.ispaid === undefined) user.ispaid = false
-      if (user.viewol === undefined) user.viewol = 0
 
       users.push(user)
     }
@@ -153,16 +148,15 @@ export function ImportCSV({ onImport, users }) {
       "email",
       "domain",
       "ispaid",
-      "viewol",
       "gender",
-      "phone",
-      "duration",
-      "paymentId",
-      "orderId",
+      "number",
+      "month",
+      "paymentid",
+      "orderid",
     ]
     const sampleData = [
-      "John Doe,john@example.com,example.com,true,5,Male,+1234567890,1 month,pay_123456,ord_123456",
-      "Jane Smith,jane@test.com,test.com,false,0,Female,+0987654321,3 months,pay_654321,ord_654321",
+      "John Doe,john@example.com,example.com,true,Male,+1234567890,1 month,pay_123456,ord_123456",
+      "Jane Smith,jane@test.com,test.com,false,Female,+0987654321,3 months,pay_654321,ord_654321",
     ]
 
     const csvContent = [headers.join(","), ...sampleData].join("\n")
@@ -180,6 +174,7 @@ export function ImportCSV({ onImport, users }) {
 
   return (
     <>
+    <Toaster richColors position="top-right" closeButton={false} />
       <div className="flex gap-2">
         <Button
           onClick={() => setIsImportDialogOpen(true)}
