@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
-const BatchSchema = new mongoose.Schema({
+import { Schema } from "mongoose";
+const TeamSchema = new Schema({
  teamname:{type:String,required:true},
- batchid:{type:ObjectId,required:true,ref:'Batch'},
- teamleaderid:{type:ObjectId,required:true,ref:'Users'},
- team:{type:Array,required:true,ref:'Users'},
+ batchid:{type:Schema.Types.ObjectId,required:true,ref:'Batch'},
+ teamleaderid:{type:Schema.Types.ObjectId,required:true,ref:'Users'},
+ team: [{ type: Schema.Types.ObjectId, ref: 'User' }],
+ month:{type:String,required:true},
 }, { timestamps: true });
-export default mongoose.models.Batch || mongoose.model('Batch', BatchSchema);
+export default mongoose.models.Team || mongoose.model('Team', TeamSchema);
