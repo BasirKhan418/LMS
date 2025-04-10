@@ -16,6 +16,8 @@ import { useState ,useEffect} from "react"
 import Logout from "../dialog/Logout"
 import { usePathname } from "next/navigation"
 import { ValidatesFunc } from "../../../functions/authfunc";
+import { RiTeamLine } from "react-icons/ri";
+import { TbUsersGroup } from "react-icons/tb";
 export default function AdminSidebar({children}) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false)
@@ -76,6 +78,14 @@ export default function AdminSidebar({children}) {
             <span>Manage Batches</span>
           </Link>
           <Link
+            href="/adminteamformation"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <RiTeamLine className="h-5 w-5" />
+            <span>Team Formation</span>
+          </Link>
+          <Link
             href="/adminaddcourse"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
@@ -120,7 +130,7 @@ export default function AdminSidebar({children}) {
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
-            <UsersRound className="h-5 w-5" />
+            <TbUsersGroup className="h-5 w-5" />
             <span>Manage Users</span>
           </Link>
           <Link
