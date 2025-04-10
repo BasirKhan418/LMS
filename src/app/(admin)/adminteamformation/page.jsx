@@ -38,7 +38,7 @@ import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
 import { Toaster,toast } from "sonner"
-
+import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
 
 // Sample data for team members
 const teamMembers = {
@@ -78,15 +78,17 @@ export default function TeamManagement() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
   const [maxTeamSize, setMaxTeamSize] = useState(5)
-  const [currentTeamId, setCurrentTeamId] = useState(null)
+  const [currentBatchId, setCurrentBatchId] = useState(null)
   const [expandedTeam, setExpandedTeam] = useState(null)
   const [selectedMember, setSelectedMember] = useState(null)
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [isTeamLeader, setIsTeamLeader] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [loading, setLoading] = useState(false);
 //fetch all teams from the db
 const fetchTeams = async () => {
   try{
+    setLoading(true)
 const res = await fetch("/api/teamformation", {
   method: "GET",
   headers: {
@@ -95,7 +97,7 @@ const res = await fetch("/api/teamformation", {
   },
 })
 const data = await res.json()
-console.log(data)
+setLoading(false)
 if (data.success) {
   setTeams(data.data)
 }
@@ -114,19 +116,39 @@ fetchTeams()
 
 
   const handleCreateTeam = (teamId) => {
-    setCurrentTeamId(teamId)
+    setCurrentBatchId(teamId)
     setIsCreateModalOpen(true)
   }
 
-  const confirmCreateTeam = () => {
-    if (currentTeamId) {
-      setTeams(teams.map((team) => (team.id === currentTeamId ? { ...team, created: true } : team)))
-      setIsCreateModalOpen(false)
+  const confirmCreateTeam = async() => {
+    setLoading(true);
+    try{
+      const res = await fetch("/api/teamformation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({ batchid: currentBatchId, teamSize: maxTeamSize }),
+      })
+      const data = await res.json()
+      setLoading(false)
+      if (data.success) {
+        toast.success("Team created successfully")
+        setIsCreateModalOpen(false)
+        fetchTeams()
+      } else {
+        toast.error(data.message)
+      }
+     
+    }
+    catch(err){
+      toast.error("Error creating team")
     }
   }
 
   const handleViewTeam = (teamId) => {
-    setCurrentTeamId(teamId)
+    setCurrentBatchId(teamId)
     setIsViewModalOpen(true)
   }
 
@@ -140,10 +162,7 @@ fetchTeams()
   }
 
   const handleUpdateMember = (teamId, member) => {
-    setSelectedMember(member)
-    setSelectedTeam(teamId.toString())
-    setIsTeamLeader(member.isLeader)
-    setIsUpdateModalOpen(true)
+   
   }
 
   const saveUpdatedMember = () => {
@@ -156,7 +175,7 @@ fetchTeams()
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Header */}
-      
+      <Toaster richColors={true} position="top-center" closeIcon={false} />
 
       <main className="container py-8">
         <div className="mb-8 space-y-2">
@@ -171,7 +190,9 @@ fetchTeams()
           </TabsList>
 
           {/* Not Created Teams */}
-          <TabsContent value="not-created" className="space-y-4">
+          <>
+          
+          {loading?<ProfilePageSkeleton/>:<TabsContent value="not-created" className="space-y-4">
             <Card className="overflow-hidden border-none shadow-md">
               <CardHeader className="bg-muted/50">
                 <CardTitle>Not Created Teams</CardTitle>
@@ -216,7 +237,7 @@ fetchTeams()
                               <Button
                                 variant="default"
                                 size="sm"
-                                onClick={() => handleCreateTeam(team.id)}
+                                onClick={() => handleCreateTeam(team._id)}
                                 className="transition-all hover:scale-105"
                               >
                                 <Plus className="h-4 w-4 mr-1" /> Create Team
@@ -229,10 +250,11 @@ fetchTeams()
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent>}
+          </>
 
           {/* Created Teams */}
-          <TabsContent value="created" className="space-y-4">
+         { loading?<ProfilePageSkeleton/>:<TabsContent value="created" className="space-y-4">
             <Card className="overflow-hidden border-none shadow-md">
               <CardHeader className="bg-muted/50">
                 <CardTitle>Created Teams</CardTitle>
@@ -295,7 +317,7 @@ fetchTeams()
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent>}
         </Tabs>
 
         {/* Create Team Modal */}
@@ -307,7 +329,7 @@ fetchTeams()
             </DialogHeader>
             <div className="py-4 space-y-4">
               <div className="flex items-center justify-center p-6 bg-muted/30 rounded-lg">
-                <div className="text-5xl">{teams.find((t) => t.id === currentTeamId)?.icon || "👥"}</div>
+                <div className="text-5xl">{ "👥"}</div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="max-team-size">Maximum Team Size</Label>
@@ -315,9 +337,7 @@ fetchTeams()
                   id="max-team-size"
                   type="number"
                   value={maxTeamSize}
-                  onChange={(e) => setMaxTeamSize(Number.parseInt(e.target.value))}
-                  min={1}
-                  max={10}
+                  onChange={(e) => setMaxTeamSize((e.target.value))}
                 />
               </div>
             </div>
@@ -325,7 +345,7 @@ fetchTeams()
               <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={confirmCreateTeam}>Create Team</Button>
+              <Button onClick={confirmCreateTeam}>{loading?"Creating ...":"Create"}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
