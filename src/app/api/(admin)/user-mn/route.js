@@ -8,7 +8,7 @@ export const GET = async()=>{
      await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("Authorization"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         let users = await User.find({}).sort({createdAt:-1});
@@ -25,7 +25,7 @@ export const POST = async(req,res)=>{
      await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("Authorization"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
@@ -44,7 +44,7 @@ export const PUT = async(req,res)=>{
      await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("Authorization"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
@@ -62,7 +62,7 @@ export const DELETE = async(req,res)=>{
      await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("Authorization"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();

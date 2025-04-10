@@ -8,7 +8,7 @@ export const GET = async()=>{
         await ConnectDb();
      const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         let batch = await Batch.find({}).sort({createdAt:-1});
@@ -26,7 +26,7 @@ export const POST = async(req,res)=>{
         await ConnectDb();
     const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
@@ -49,7 +49,7 @@ export const PUT = async(req,res)=>{
         await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
@@ -57,7 +57,8 @@ export const PUT = async(req,res)=>{
         let batch = await Batch.findByIdAndUpdate(reqdata._id,{
             name:reqdata.name,
             domain:reqdata.domain,
-            date:reqdata.date
+            date:reqdata.date,
+            isteamcreated:false
         })
         return NextResponse.json({message:"Batch updated successfully",status:200,success:true})
     }
@@ -72,7 +73,7 @@ export const DELETE = async(req,res)=>{
         await ConnectDb();
         const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("token"));
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();

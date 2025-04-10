@@ -10,7 +10,7 @@ export const POST = async(req,res)=>{
     const headerlist = await headers();
     const token = headerlist.get("dilmsadmintoken");
     let data = await AuthorizeMd(token);
-        if(!data){
+        if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();

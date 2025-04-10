@@ -11,7 +11,7 @@ export const GET = async (req) => {
     const headersList = await headers()
     const token = headersList.get("authorization")
     const auth = await AuthorizeMd(token)
-    if(!auth){
+    if(!auth.status){
         return NextResponse.json({message:"Unauthorized",success:false},{status:401})
     }
     const admins = await Admin.find({}).sort({createdAt:1})
@@ -33,7 +33,7 @@ export const POST = async(req) => {
         const headersList = await headers()
         const token = headersList.get("authorization")
         const auth = await AuthorizeMd(token)
-        if(!auth){
+        if(!auth.status){
             return NextResponse.json({message:"Unauthorized",success:false},{status:401})
         }
         const body = await req.json()
@@ -63,7 +63,7 @@ await ConnectDb()
         const headersList = await headers()
         const token = headersList.get("authorization")
         const auth = await AuthorizeMd(token)
-        if(!auth){
+        if(!auth.status){
             return NextResponse.json({message:"Unauthorized",success:false},{status:401})
         }
         const body = await req.json()

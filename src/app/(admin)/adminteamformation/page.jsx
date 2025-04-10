@@ -1,10 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getRandomIcon } from "@/utilities/iconPool"
 import {
   Dialog,
   DialogContent,
@@ -36,16 +37,8 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
+import { Toaster,toast } from "sonner"
 
-// Sample data for teams
-const initialTeams = [
-  { id: 1, batchName: "Batch A", domain: "Web Development", date: "2025-04-01", created: false, icon: "🌐" },
-  { id: 2, batchName: "Batch B", domain: "Mobile Development", date: "2025-04-05", created: false, icon: "📱" },
-  { id: 3, batchName: "Batch C", domain: "Data Science", date: "2025-04-10", created: false, icon: "📊" },
-  { id: 4, batchName: "Batch D", domain: "UI/UX Design", date: "2025-04-15", created: true, icon: "🎨" },
-  { id: 5, batchName: "Batch E", domain: "DevOps", date: "2025-04-20", created: true, icon: "⚙️" },
-  { id: 6, batchName: "Batch F", domain: "Blockchain", date: "2025-04-25", created: true, icon: "🔗" },
-]
 
 // Sample data for team members
 const teamMembers = {
@@ -80,7 +73,7 @@ const teamMembers = {
 }
 
 export default function TeamManagement() {
-  const [teams, setTeams] = useState(initialTeams)
+  const [teams, setTeams] = useState([])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isViewModalOpen, setIsViewModalOpen] = useState(false)
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
@@ -91,6 +84,34 @@ export default function TeamManagement() {
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [isTeamLeader, setIsTeamLeader] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+//fetch all teams from the db
+const fetchTeams = async () => {
+  try{
+const res = await fetch("/api/teamformation", {
+  method: "GET",
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+  },
+})
+const data = await res.json()
+console.log(data)
+if (data.success) {
+  setTeams(data.data)
+}
+else{
+  toast.error(data.message)
+}
+  }
+  catch(err){
+    toast.error("Error fetching teams")
+  }
+}
+useEffect(()=>{
+fetchTeams()
+},[])
+//fetch all teams from the db function
+
 
   const handleCreateTeam = (teamId) => {
     setCurrentTeamId(teamId)
@@ -131,11 +152,6 @@ export default function TeamManagement() {
     alert(`Member ${selectedMember.name} updated to team ${selectedTeam} with leader status: ${isTeamLeader}`)
   }
 
-  const filteredTeams = teams.filter(
-    (team) =>
-      team.batchName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      team.domain.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -174,20 +190,23 @@ export default function TeamManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredTeams
-                        .filter((team) => !team.created)
+                      {teams
+                        .filter((team) => !team.isteamcreated)
                         .map((team) => (
-                          <TableRow key={team.id} className="hover:bg-muted/50">
+                          <TableRow key={team._id} className="hover:bg-muted/50">
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
-                                  {team.icon}
+                                {getRandomIcon()}
                                 </div>
-                                {team.batchName}
+                                {team.name}
                               </div>
                             </TableCell>
                             <TableCell>{team.domain}</TableCell>
-                            <TableCell>{team.date}</TableCell>
+                            <TableCell>
+                              {new Date(team.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+                            }
+                            </TableCell>
                             <TableCell>
                               <Badge variant="outline" className="bg-muted">
                                 Not Created
@@ -232,14 +251,14 @@ export default function TeamManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredTeams
-                        .filter((team) => team.created)
+                      {teams
+                        .filter((team) => team.isteamcreated)
                         .map((team) => (
-                          <TableRow key={team.id} className="hover:bg-muted/50">
+                          <TableRow key={team._id} className="hover:bg-muted/50">
                             <TableCell className="font-medium">
                               <div className="flex items-center gap-2">
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
-                                  {team.icon}
+                                  {getRandomIcon()}
                                 </div>
                                 {team.batchName}
                               </div>
@@ -321,7 +340,7 @@ export default function TeamManagement() {
             <ScrollArea className="h-[500px] pr-4">
               <div className="space-y-4">
                 {teams
-                  .filter((team) => team.created)
+                  .filter((team) => team.isteamcreated)
                   .map((team) => (
                     <Collapsible key={team.id} className="border rounded-md overflow-hidden shadow-sm">
                       <CollapsibleTrigger className="flex items-center justify-between p-4 w-full text-left hover:bg-muted/50 transition-colors">
@@ -428,7 +447,7 @@ export default function TeamManagement() {
                       </SelectTrigger>
                       <SelectContent>
                         {teams
-                          .filter((team) => team.created)
+                          .filter((team) => team.isteamcreated)
                           .map((team) => (
                             <SelectItem key={team.id} value={team.id.toString()}>
                               <div className="flex items-center gap-2">
