@@ -85,6 +85,7 @@ export default function TeamManagement() {
   const [isTeamLeader, setIsTeamLeader] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [loading, setLoading] = useState(false);
+  const [fetchedTeams, setFetchedTeams] = useState([])
 //fetch all teams from the db
 const fetchTeams = async () => {
   try{
@@ -147,9 +148,32 @@ fetchTeams()
     }
   }
 
-  const handleViewTeam = (teamId) => {
-    setCurrentBatchId(teamId)
-    setIsViewModalOpen(true)
+  const handleViewTeam = async(teamId) => {
+   try{
+    setLoading(true)
+   const res = await fetch("/api/teamformation/view", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+    },
+    body: JSON.stringify({ batchid: teamId }),
+   })
+    const data = await res.json();
+    console.log(data)
+    setLoading(false)
+    if (data.success) {
+      setIsViewModalOpen(true);
+      setFetchedTeams(data.data);
+    } else {
+      toast.error(data.message)
+    }
+
+   }
+   catch(err){
+    setLoading(false) 
+    toast.error("Error viewing team");
+   }
   }
 
   const toggleTeamView = (teamId) => {
@@ -288,7 +312,7 @@ fetchTeams()
                             <TableCell>{team.domain}</TableCell>
                             <TableCell>{team.date}</TableCell>
                             <TableCell>
-                              <Badge variant="success" className="bg-green-500 hover:bg-green-600">
+                              <Badge variant="success" className="bg-green-500 hover:bg-green-600 text-white">
                                 Yes
                               </Badge>
                             </TableCell>
@@ -296,7 +320,7 @@ fetchTeams()
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleViewTeam(team.id)}
+                                onClick={() => handleViewTeam(team._id)}
                                 className="transition-all hover:scale-105"
                               >
                                 <Eye className="h-4 w-4 mr-1" /> View Team
@@ -357,33 +381,36 @@ fetchTeams()
               <DialogTitle>Team Members</DialogTitle>
               <DialogDescription>View and manage team members</DialogDescription>
             </DialogHeader>
-            <ScrollArea className="h-[500px] pr-4">
+            <ScrollArea className="h-[400px] pr-4">
               <div className="space-y-4">
-                {teams
-                  .filter((team) => team.isteamcreated)
+                {fetchedTeams
                   .map((team) => (
-                    <Collapsible key={team.id} className="border rounded-md overflow-hidden shadow-sm">
+                    <Collapsible key={team._id} className="border rounded-md overflow-hidden shadow-sm">
                       <CollapsibleTrigger className="flex items-center justify-between p-4 w-full text-left hover:bg-muted/50 transition-colors">
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-xl">
-                            {team.icon}
+                            {getRandomIcon()}
                           </div>
                           <div>
-                            <h3 className="text-lg font-medium">{team.batchName}</h3>
-                            <p className="text-sm text-muted-foreground">{team.domain}</p>
+                            <h3 className="text-lg font-medium">{team.teamname}</h3>
+                            <div className="">
+                            <p className="text-sm text-muted-foreground">{team.batchid.domain}</p>
+                            <p className="text-sm text-muted-foreground">{team.month}</p>
+                            </div>
+                            
                           </div>
                         </div>
-                        {expandedTeam === team.id ? (
-                          <ChevronUp className="h-5 w-5" />
+                        {expandedTeam === team._id ? (
+                          <ChevronUp className="h-5 w-5" onClick={()=>{toggleTeamView(team._id)}}/>
                         ) : (
-                          <ChevronDown className="h-5 w-5" />
+                          <ChevronDown className="h-5 w-5" onClick={()=>{toggleTeamView(team._id)}}/>
                         )}
                       </CollapsibleTrigger>
                       <CollapsibleContent>
                         <div className="space-y-2 p-4 border-t bg-muted/20">
-                          {teamMembers[team.id]?.map((member) => (
+                          {team.team.map((member) => (
                             <div
-                              key={member.id}
+                              key={member._id}
                               className="flex items-center justify-between p-3 border rounded-md bg-background hover:bg-muted/30 transition-colors"
                             >
                               <div className="flex items-center gap-3">
@@ -392,12 +419,12 @@ fetchTeams()
                                     src={`/placeholder.svg?height=40&width=40&text=${member.avatar}`}
                                     alt={member.name}
                                   />
-                                  <AvatarFallback>{member.avatar}</AvatarFallback>
+                                  <AvatarFallback>{member.name[0]}</AvatarFallback>
                                 </Avatar>
                                 <div>
                                   <div className="flex items-center gap-2">
                                     <p className="font-medium">{member.name}</p>
-                                    {member.isLeader && (
+                                    {team.teamleaderid._id==member._id && (
                                       <Badge variant="outline" className="bg-primary/10 text-primary">
                                         Team Lead
                                       </Badge>
