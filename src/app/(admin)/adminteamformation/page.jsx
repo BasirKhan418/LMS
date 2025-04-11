@@ -42,38 +42,6 @@ import { Separator } from "@/components/ui/separator"
 import { Toaster,toast } from "sonner"
 import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
 
-// Sample data for team members
-const teamMembers = {
-  4: [
-    { id: 1, name: "John Doe", email: "john@example.com", role: "Team Lead", avatar: "JD", isLeader: true },
-    { id: 2, name: "Jane Smith", email: "jane@example.com", role: "Developer", avatar: "JS", isLeader: false },
-    { id: 3, name: "Mike Johnson", email: "mike@example.com", role: "Designer", avatar: "MJ", isLeader: false },
-    { id: 4, name: "Sarah Williams", email: "sarah@example.com", role: "QA Engineer", avatar: "SW", isLeader: false },
-    { id: 5, name: "David Brown", email: "david@example.com", role: "Product Manager", avatar: "DB", isLeader: false },
-  ],
-  5: [
-    { id: 6, name: "Alex Turner", email: "alex@example.com", role: "Team Lead", avatar: "AT", isLeader: true },
-    { id: 7, name: "Emily Clark", email: "emily@example.com", role: "Developer", avatar: "EC", isLeader: false },
-    { id: 8, name: "Ryan Lewis", email: "ryan@example.com", role: "Designer", avatar: "RL", isLeader: false },
-    { id: 9, name: "Olivia Martin", email: "olivia@example.com", role: "QA Engineer", avatar: "OM", isLeader: false },
-    {
-      id: 10,
-      name: "Daniel Wilson",
-      email: "daniel@example.com",
-      role: "Product Manager",
-      avatar: "DW",
-      isLeader: false,
-    },
-  ],
-  6: [
-    { id: 11, name: "Sophie Taylor", email: "sophie@example.com", role: "Team Lead", avatar: "ST", isLeader: true },
-    { id: 12, name: "James Anderson", email: "james@example.com", role: "Developer", avatar: "JA", isLeader: false },
-    { id: 13, name: "Emma Davis", email: "emma@example.com", role: "Designer", avatar: "ED", isLeader: false },
-    { id: 14, name: "Lucas Moore", email: "lucas@example.com", role: "QA Engineer", avatar: "LM", isLeader: false },
-    { id: 15, name: "Ava Robinson", email: "ava@example.com", role: "Product Manager", avatar: "AR", isLeader: false },
-  ],
-}
-
 export default function TeamManagement() {
   const [teams, setTeams] = useState([])
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -85,7 +53,8 @@ export default function TeamManagement() {
   const [selectedMember, setSelectedMember] = useState(null)
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [isTeamLeader, setIsTeamLeader] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
+ const [currentTeamleader, setCurrentTeamLeader] = useState(null)
+ const [teamId, setTeamId] = useState(null)
   const [loading, setLoading] = useState(false);
   const [fetchedTeams, setFetchedTeams] = useState([])
 //fetch all teams from the db
@@ -251,14 +220,47 @@ worksheet.eachRow((row, rowNumber) => {
      }
   }
 
-  const handleUpdateMember = (teamId, member) => {
-   
+  const handleUpdateMember = (teamId, member, teamlead) => {
+    setSelectedMember(member);
+    setTeamId(teamId);
+    // Pre-select the current team
+    setSelectedTeam(teamId);
+    // Check if this member is the team leader
+    setIsTeamLeader(member._id === teamlead._id);
+    setCurrentTeamLeader(teamlead);
+    setIsUpdateModalOpen(true);
   }
 
-  const saveUpdatedMember = () => {
-    // In a real application, this would update the member in the database
-    setIsUpdateModalOpen(false)
-    alert(`Member ${selectedMember.name} updated to team ${selectedTeam} with leader status: ${isTeamLeader}`)
+  const saveUpdatedMember = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch("/api/teamformation", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({ 
+          teamId: selectedTeam, 
+          memberId: selectedMember._id, 
+          isTeamLeader: isTeamLeader 
+        }),
+      });
+      
+      const data = await res.json();
+      setLoading(false);
+      
+      if (data.success) {
+        toast.success("Member updated successfully");
+        setIsUpdateModalOpen(false);
+        setIsViewModalOpen(false);
+      } else {
+        toast.error(data.message || "Failed to update member");
+      }
+    } catch (err) {
+      setLoading(false);
+      toast.error("Error updating team member");
+    }
   }
 
 
@@ -503,14 +505,12 @@ worksheet.eachRow((row, rowNumber) => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleUpdateMember(team.id, member)}
+                                  onClick={() => handleUpdateMember(team._id, member,team.teamleaderid)}
                                   className="transition-all hover:scale-105"
                                 >
                                   <Pencil className="h-4 w-4 mr-1" /> Update
                                 </Button>
-                                <Button variant="destructive" size="sm" className="transition-all hover:scale-105">
-                                  <Trash2 className="h-4 w-4 mr-1" /> Delete
-                                </Button>
+                               
                               </div>
                             </div>
                           ))}
@@ -528,69 +528,77 @@ worksheet.eachRow((row, rowNumber) => {
 
         {/* Update Member Modal */}
         <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
-          <DialogContent className="sm:max-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>Update Team Member</DialogTitle>
-              <DialogDescription>Change team assignment and role</DialogDescription>
-            </DialogHeader>
-            {selectedMember && (
-              <div className="py-4 space-y-6">
-                <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage
-                      src={`/placeholder.svg?height=64&width=64&text=${selectedMember.avatar}`}
-                      alt={selectedMember.name}
-                    />
-                    <AvatarFallback className="text-lg">{selectedMember.avatar}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="text-xl font-medium">{selectedMember.name}</h3>
-                    <p className="text-sm text-muted-foreground">{selectedMember.email}</p>
-                  </div>
-                </div>
-
-                <Separator />
-
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="team-select">Assign to Team</Label>
-                    <Select value={selectedTeam} onValueChange={setSelectedTeam}>
-                      <SelectTrigger id="team-select">
-                        <SelectValue placeholder="Select a team" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teams
-                          .filter((team) => team.isteamcreated)
-                          .map((team) => (
-                            <SelectItem key={team.id} value={team.id.toString()}>
-                              <div className="flex items-center gap-2">
-                                <span>{team.icon}</span>
-                                <span>{team.batchName}</span>
-                              </div>
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex items-center justify-between space-x-2">
-                    <Label htmlFor="team-leader" className="flex items-center gap-2 cursor-pointer">
-                      Make Team Leader
-                      {isTeamLeader && <CheckCircle2 className="h-4 w-4 text-green-500" />}
-                    </Label>
-                    <Switch id="team-leader" checked={isTeamLeader} onCheckedChange={setIsTeamLeader} />
-                  </div>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Update Team Member</DialogTitle>
+            <DialogDescription>Change team assignment and role</DialogDescription>
+          </DialogHeader>
+          {selectedMember && (
+            <div className="py-4 space-y-6">
+              <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
+                <Avatar className="h-16 w-16">
+                  <AvatarImage
+                    src={`/placeholder.svg?height=64&width=64&text=${selectedMember.avatar}`}
+                    alt={selectedMember.name}
+                  />
+                  <AvatarFallback className="text-lg">{selectedMember.name[0]}</AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="text-xl font-medium">{selectedMember.name}</h3>
+                  <p className="text-sm text-muted-foreground">{selectedMember.email}</p>
                 </div>
               </div>
-            )}
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button variant="outline" onClick={() => setIsUpdateModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={saveUpdatedMember}>Save Changes</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="team-select">Assign to Team</Label>
+                  <Select 
+                    value={selectedTeam} 
+                    onValueChange={setSelectedTeam}
+                    defaultValue={teamId}
+                  >
+                    <SelectTrigger id="team-select">
+                      <SelectValue placeholder="Select a team" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fetchedTeams.map((team) => (
+                        <SelectItem key={team._id} value={team._id}>
+                          <div className="flex items-center gap-2">
+                            <span>{getRandomIcon()}</span>
+                            <span>{team.teamname}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center justify-between space-x-2">
+                  <Label htmlFor="team-leader" className="flex items-center gap-2 cursor-pointer">
+                    Make Team Leader
+                    {isTeamLeader && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                  </Label>
+                  <Switch 
+                    id="team-leader" 
+                    checked={isTeamLeader} 
+                    onCheckedChange={setIsTeamLeader}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button variant="outline" onClick={() => setIsUpdateModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={saveUpdatedMember}>
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       </main>
 
      

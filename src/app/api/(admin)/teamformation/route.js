@@ -138,3 +138,148 @@ export const POST = async (req) => {
         return NextResponse.json({message: "Internal Server Error", status: 500, success: false});
     }
 }
+
+export const PUT = async (req) => {
+    try {
+        await ConnectDb();
+        let headersList = await headers();
+        let auth = headersList.get('authorization');
+        let data = await AuthorizeMd(auth);
+        
+        if (!data.status) {
+            return NextResponse.json({
+                message: "You are not authorized", 
+                status: data.status, 
+                success: false
+            });
+        }
+
+        // Get request data
+        const reqData = await req.json();
+        const { teamId, memberId, isTeamLeader } = reqData;
+        
+        if (!teamId || !memberId) {
+            return NextResponse.json({
+                message: "Team ID and Member ID are required", 
+                status: 400, 
+                success: false
+            });
+        }
+
+        // Find the current team where the member exists
+        const oldTeam = await Team.findOne({ team: memberId });
+        if (!oldTeam) {
+            return NextResponse.json({
+                message: "Member not found in any team", 
+                status: 404, 
+                success: false
+            });
+        }
+
+        // Find the target team
+        const newTeam = await Team.findById(teamId);
+        if (!newTeam) {
+            return NextResponse.json({
+                message: "Target team not found", 
+                status: 404, 
+                success: false
+            });
+        }
+
+        // If moving to a different team
+        if (oldTeam._id.toString() !== teamId.toString()) {
+            // MEMBER SWAPPING LOGIC:
+            // 1. Remove the moving member from old team
+            oldTeam.team = oldTeam.team.filter(member => 
+                member.toString() !== memberId.toString()
+            );
+            
+            // 2. Pick a random member from new team who isn't the team leader
+            // to swap back to the old team (to maintain team size)
+            const availableMembersForSwap = newTeam.team.filter(member => 
+                member.toString() !== newTeam.teamleaderid.toString()
+            );
+            
+            let swappedMemberId = null;
+            
+            // Only do the swap if there are available members to swap
+            if (availableMembersForSwap.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableMembersForSwap.length);
+                swappedMemberId = availableMembersForSwap[randomIndex];
+                
+                // Remove the randomly selected member from new team
+                newTeam.team = newTeam.team.filter(member => 
+                    member.toString() !== swappedMemberId.toString()
+                );
+                
+                // Add the randomly selected member to old team
+                oldTeam.team.push(swappedMemberId);
+            }
+            
+            // 3. If the moving member was team leader of old team, assign a new random leader
+            if (oldTeam.teamleaderid.toString() === memberId.toString() && oldTeam.team.length > 0) {
+                // Pick a random member from the remaining team to be the new leader
+                const randomIndex = Math.floor(Math.random() * oldTeam.team.length);
+                oldTeam.teamleaderid = oldTeam.team[randomIndex];
+            }
+            
+            // 4. Add the moving member to new team
+            newTeam.team.push(memberId);
+            
+            // If old team becomes empty, delete it
+            if (oldTeam.team.length === 0) {
+                await Team.findByIdAndDelete(oldTeam._id);
+            } else {
+                await oldTeam.save();
+            }
+        }
+
+        // Handle team leader status in the new/current team
+        if (isTeamLeader) {
+            // If this member will be the new team leader
+            // Find the current leader
+            const currentLeaderId = newTeam.teamleaderid.toString();
+            
+            // Update the team leader ID
+            newTeam.teamleaderid = memberId;
+            
+            // The old leader remains a team member
+        } else if (newTeam.teamleaderid.toString() === memberId.toString()) {
+            // If this member is currently the team leader but should no longer be
+            // We need to assign a new random team leader
+            if (newTeam.team.length > 1) {
+                // Get all members except the current one
+                const otherMembers = newTeam.team.filter(member => 
+                    member.toString() !== memberId.toString()
+                );
+                
+                // Pick a random member to be the new leader
+                const randomIndex = Math.floor(Math.random() * otherMembers.length);
+                newTeam.teamleaderid = otherMembers[randomIndex];
+            } else {
+                return NextResponse.json({
+                    message: "Cannot remove team leader status from the only team member", 
+                    status: 400, 
+                    success: false
+                });
+            }
+        }
+
+        // Save changes to the new/current team
+        await newTeam.save();
+
+        return NextResponse.json({
+            message: "Team member updated successfully",
+            status: 200,
+            success: true
+        });
+        
+    } catch (err) {
+        console.error(err);
+        return NextResponse.json({
+            message: "Internal Server Error", 
+            status: 500, 
+            success: false
+        });
+    }
+}
