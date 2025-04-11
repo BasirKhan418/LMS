@@ -5,7 +5,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { getRandomIcon } from "@/utilities/iconPool"
+import { getRandomIcon } from "@/utilities/iconPool";
+import { saveAs } from 'file-saver';
+import excel from 'exceljs'
 import {
   Dialog,
   DialogContent,
@@ -180,9 +182,73 @@ fetchTeams()
     setExpandedTeam(expandedTeam === teamId ? null : teamId)
   }
 
-  const exportTeam = (teamId) => {
-    // In a real application, this would generate and download a file
-    alert(`Exporting team data for Batch ${teams.find((t) => t.id === teamId)?.batchName}`)
+  const exportTeam = async(teamId) => {
+    try{
+      setLoading(true)
+     const res = await fetch("/api/teamformation/view", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+      },
+      body: JSON.stringify({ batchid: teamId }),
+     })
+      const data = await res.json();
+      console.log(data)
+      setLoading(false)
+      if (data.success) {
+        const workbook = new excel.Workbook();
+        const worksheet = workbook.addWorksheet("TeamsList");
+        worksheet.columns = [
+          { header: "Team Name", key: "name", width: 30 },
+          { header: "Batch Name", key: "batchname", width: 30 },
+          { header: "Domain", key: "domain", width: 30 },
+          { header: "Duration", key: "duration", width: 30 },
+          { header: "Team Leader Name", key: "leader", width: 30 },
+          { header: "Members", key: "member", width: 60,height:200 },         
+      ];
+      data.data.forEach((team) => {
+        worksheet.addRow({
+          name: team.teamname,
+          batchname: team.batchid.name,
+          domain: team.batchid.domain,
+          duration: team.month,
+          leader: team.teamleaderid.name,
+          member: team.team.map((member) => member.name).join("\n"),
+        });
+      });
+      // Apply styling to all rows in the Members column
+worksheet.eachRow((row, rowNumber) => {
+  // Get the cell in the members column (column 6)
+  const cell = row.getCell(6);
+  
+  // Apply text wrapping and alignment
+  cell.alignment = {
+    wrapText: true,
+    vertical: 'top'
+  };
+  
+  // Set row height to accommodate multiple lines (adjust as needed)
+  if (rowNumber > 1) { // Skip header row
+    row.height = 20 * Math.max(1, (cell.value?.split('\n').length || 1));
+  }
+});
+      worksheet.getRow(1).eachCell((cell) => {
+        cell.font = { bold: true };
+    });
+    const buf = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buf]), `teamslist${new Date().toISOString().split('T')[0]}.xlsx`);
+
+      } else {
+        toast.error(data.message)
+      }
+  
+     }
+     catch(err){
+      setLoading(false) 
+      console.log(err)
+      toast.error("Error exporting team");
+     }
   }
 
   const handleUpdateMember = (teamId, member) => {
@@ -328,7 +394,7 @@ fetchTeams()
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => exportTeam(team.id)}
+                                onClick={() => exportTeam(team._id)}
                                 className="transition-all hover:scale-105"
                               >
                                 <Download className="h-4 w-4 mr-1" /> Export

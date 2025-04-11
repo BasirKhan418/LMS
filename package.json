@@ -31,6 +31,8 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
+    "exceljs": "^4.4.0",
+    "file-saver": "^2.0.5",
     "firebase": "^11.0.2",
     "firebase-admin": "^13.0.1",
     "input-otp": "^1.2.4",
