@@ -156,7 +156,7 @@ export const PUT = async (req) => {
 
         // Get request data
         const reqData = await req.json();
-        const { teamId, memberId, isTeamLeader } = reqData;
+        const { teamId, memberId, isTeamLeader, originalTeamId, swapMemberId } = reqData;
         
         if (!teamId || !memberId) {
             return NextResponse.json({
@@ -166,11 +166,11 @@ export const PUT = async (req) => {
             });
         }
 
-        // Find the current team where the member exists
-        const oldTeam = await Team.findOne({ team: memberId });
+        // Find the original team where the member exists
+        const oldTeam = await Team.findById(originalTeamId);
         if (!oldTeam) {
             return NextResponse.json({
-                message: "Member not found in any team", 
+                message: "Original team not found", 
                 status: 404, 
                 success: false
             });
@@ -187,36 +187,36 @@ export const PUT = async (req) => {
         }
 
         // If moving to a different team
-        if (oldTeam._id.toString() !== teamId.toString()) {
-            // MEMBER SWAPPING LOGIC:
+        if (originalTeamId.toString() !== teamId.toString()) {
             // 1. Remove the moving member from old team
             oldTeam.team = oldTeam.team.filter(member => 
                 member.toString() !== memberId.toString()
             );
             
-            // 2. Pick a random member from new team who isn't the team leader
-            // to swap back to the old team (to maintain team size)
-            const availableMembersForSwap = newTeam.team.filter(member => 
-                member.toString() !== newTeam.teamleaderid.toString()
-            );
-            
-            let swappedMemberId = null;
-            
-            // Only do the swap if there are available members to swap
-            if (availableMembersForSwap.length > 0) {
-                const randomIndex = Math.floor(Math.random() * availableMembersForSwap.length);
-                swappedMemberId = availableMembersForSwap[randomIndex];
-                
-                // Remove the randomly selected member from new team
+            // 2. Handle the swap if a specific member was selected
+            if (swapMemberId) {
+                // Remove the selected swap member from the new team
                 newTeam.team = newTeam.team.filter(member => 
-                    member.toString() !== swappedMemberId.toString()
+                    member.toString() !== swapMemberId.toString()
                 );
                 
-                // Add the randomly selected member to old team
-                oldTeam.team.push(swappedMemberId);
+                // Add the swap member to the old team
+                oldTeam.team.push(swapMemberId);
+                
+                // If the swap member was the team leader of the new team, assign a new leader
+                if (newTeam.teamleaderid.toString() === swapMemberId.toString()) {
+                    // If there are remaining members, pick one as the new leader
+                    if (newTeam.team.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * newTeam.team.length);
+                        newTeam.teamleaderid = newTeam.team[randomIndex];
+                    } else {
+                        // If no members left (unlikely), the moving member will become leader
+                        newTeam.teamleaderid = memberId;
+                    }
+                }
             }
             
-            // 3. If the moving member was team leader of old team, assign a new random leader
+            // 3. If the moving member was team leader of old team, assign a new leader
             if (oldTeam.teamleaderid.toString() === memberId.toString() && oldTeam.team.length > 0) {
                 // Pick a random member from the remaining team to be the new leader
                 const randomIndex = Math.floor(Math.random() * oldTeam.team.length);
@@ -237,16 +237,10 @@ export const PUT = async (req) => {
         // Handle team leader status in the new/current team
         if (isTeamLeader) {
             // If this member will be the new team leader
-            // Find the current leader
-            const currentLeaderId = newTeam.teamleaderid.toString();
-            
-            // Update the team leader ID
             newTeam.teamleaderid = memberId;
-            
-            // The old leader remains a team member
         } else if (newTeam.teamleaderid.toString() === memberId.toString()) {
             // If this member is currently the team leader but should no longer be
-            // We need to assign a new random team leader
+            // We need to assign a new team leader
             if (newTeam.team.length > 1) {
                 // Get all members except the current one
                 const otherMembers = newTeam.team.filter(member => 

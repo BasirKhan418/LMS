@@ -31,6 +31,7 @@ import {
   Moon,
   Sun,
   CheckCircle2,
+  ArrowRightLeft,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -53,39 +54,44 @@ export default function TeamManagement() {
   const [selectedMember, setSelectedMember] = useState(null)
   const [selectedTeam, setSelectedTeam] = useState(null)
   const [isTeamLeader, setIsTeamLeader] = useState(false)
- const [currentTeamleader, setCurrentTeamLeader] = useState(null)
- const [teamId, setTeamId] = useState(null)
+  const [currentTeamleader, setCurrentTeamLeader] = useState(null)
+  const [teamId, setTeamId] = useState(null)
+  const [originalTeamId, setOriginalTeamId] = useState(null)
+  const [availableMembersToSwap, setAvailableMembersToSwap] = useState([])
+  const [selectedMemberToSwap, setSelectedMemberToSwap] = useState(null)
+  const [showSwapSelect, setShowSwapSelect] = useState(false)
   const [loading, setLoading] = useState(false);
   const [fetchedTeams, setFetchedTeams] = useState([])
-//fetch all teams from the db
-const fetchTeams = async () => {
-  try{
-    setLoading(true)
-const res = await fetch("/api/teamformation", {
-  method: "GET",
-  headers: {
-    "Content-Type": "application/json",
-    Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
-  },
-})
-const data = await res.json()
-setLoading(false)
-if (data.success) {
-  setTeams(data.data)
-}
-else{
-  toast.error(data.message)
-}
+  
+  //fetch all teams from the db
+  const fetchTeams = async () => {
+    try{
+      setLoading(true)
+      const res = await fetch("/api/teamformation", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const data = await res.json()
+      setLoading(false)
+      if (data.success) {
+        setTeams(data.data)
+      }
+      else{
+        toast.error(data.message)
+      }
+    }
+    catch(err){
+      toast.error("Error fetching teams")
+    }
   }
-  catch(err){
-    toast.error("Error fetching teams")
-  }
-}
-useEffect(()=>{
-fetchTeams()
-},[])
-//fetch all teams from the db function
-
+  
+  useEffect(()=>{
+    fetchTeams()
+  },[])
+  //fetch all teams from the db function
 
   const handleCreateTeam = (teamId) => {
     setCurrentBatchId(teamId)
@@ -120,31 +126,30 @@ fetchTeams()
   }
 
   const handleViewTeam = async(teamId) => {
-   try{
-    setLoading(true)
-   const res = await fetch("/api/teamformation/view", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
-    },
-    body: JSON.stringify({ batchid: teamId }),
-   })
-    const data = await res.json();
-    console.log(data)
-    setLoading(false)
-    if (data.success) {
-      setIsViewModalOpen(true);
-      setFetchedTeams(data.data);
-    } else {
-      toast.error(data.message)
+    try{
+      setLoading(true)
+      const res = await fetch("/api/teamformation/view", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({ batchid: teamId }),
+      })
+      const data = await res.json();
+      console.log(data)
+      setLoading(false)
+      if (data.success) {
+        setIsViewModalOpen(true);
+        setFetchedTeams(data.data);
+      } else {
+        toast.error(data.message)
+      }
     }
-
-   }
-   catch(err){
-    setLoading(false) 
-    toast.error("Error viewing team");
-   }
+    catch(err){
+      setLoading(false) 
+      toast.error("Error viewing team");
+    }
   }
 
   const toggleTeamView = (teamId) => {
@@ -154,14 +159,14 @@ fetchTeams()
   const exportTeam = async(teamId) => {
     try{
       setLoading(true)
-     const res = await fetch("/api/teamformation/view", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
-      },
-      body: JSON.stringify({ batchid: teamId }),
-     })
+      const res = await fetch("/api/teamformation/view", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({ batchid: teamId }),
+      })
       const data = await res.json();
       console.log(data)
       setLoading(false)
@@ -175,60 +180,94 @@ fetchTeams()
           { header: "Duration", key: "duration", width: 30 },
           { header: "Team Leader Name", key: "leader", width: 30 },
           { header: "Members", key: "member", width: 60,height:200 },         
-      ];
-      data.data.forEach((team) => {
-        worksheet.addRow({
-          name: team.teamname,
-          batchname: team.batchid.name,
-          domain: team.batchid.domain,
-          duration: team.month,
-          leader: team.teamleaderid.name,
-          member: team.team.map((member) => member.name).join("\n"),
+        ];
+        data.data.forEach((team) => {
+          worksheet.addRow({
+            name: team.teamname,
+            batchname: team.batchid.name,
+            domain: team.batchid.domain,
+            duration: team.month,
+            leader: team.teamleaderid.name,
+            member: team.team.map((member) => member.name).join("\n"),
+          });
         });
-      });
-      // Apply styling to all rows in the Members column
-worksheet.eachRow((row, rowNumber) => {
-  // Get the cell in the members column (column 6)
-  const cell = row.getCell(6);
-  
-  // Apply text wrapping and alignment
-  cell.alignment = {
-    wrapText: true,
-    vertical: 'top'
-  };
-  
-  // Set row height to accommodate multiple lines (adjust as needed)
-  if (rowNumber > 1) { // Skip header row
-    row.height = 20 * Math.max(1, (cell.value?.split('\n').length || 1));
-  }
-});
-      worksheet.getRow(1).eachCell((cell) => {
-        cell.font = { bold: true };
-    });
-    const buf = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buf]), `teamslist${new Date().toISOString().split('T')[0]}.xlsx`);
-
+        // Apply styling to all rows in the Members column
+        worksheet.eachRow((row, rowNumber) => {
+          // Get the cell in the members column (column 6)
+          const cell = row.getCell(6);
+          
+          // Apply text wrapping and alignment
+          cell.alignment = {
+            wrapText: true,
+            vertical: 'top'
+          };
+          
+          // Set row height to accommodate multiple lines (adjust as needed)
+          if (rowNumber > 1) { // Skip header row
+            row.height = 20 * Math.max(1, (cell.value?.split('\n').length || 1));
+          }
+        });
+        worksheet.getRow(1).eachCell((cell) => {
+          cell.font = { bold: true };
+        });
+        const buf = await workbook.xlsx.writeBuffer();
+        saveAs(new Blob([buf]), `teamslist${new Date().toISOString().split('T')[0]}.xlsx`);
       } else {
         toast.error(data.message)
       }
-  
-     }
-     catch(err){
+    }
+    catch(err){
       setLoading(false) 
       console.log(err)
       toast.error("Error exporting team");
-     }
+    }
   }
 
   const handleUpdateMember = (teamId, member, teamlead) => {
     setSelectedMember(member);
     setTeamId(teamId);
+    setOriginalTeamId(teamId); // Store the original team ID
     // Pre-select the current team
     setSelectedTeam(teamId);
     // Check if this member is the team leader
     setIsTeamLeader(member._id === teamlead._id);
     setCurrentTeamLeader(teamlead);
     setIsUpdateModalOpen(true);
+    // Reset swap-related states
+    setShowSwapSelect(false);
+    setSelectedMemberToSwap(null);
+  }
+
+  // Handle team selection change in update modal
+  const handleTeamChange = (newTeamId) => {
+    setSelectedTeam(newTeamId);
+    
+    // If the selected team is different from the original team, show swap options
+    if (newTeamId !== originalTeamId) {
+      // Find the target team
+      const targetTeam = fetchedTeams.find(team => team._id === newTeamId);
+      
+      if (targetTeam) {
+        // Filter out the team leader if this is a regular member move
+        // (We don't want to swap with the team leader of the target team)
+        const swapCandidates = targetTeam.team.filter(member => 
+          !isTeamLeader || member._id !== targetTeam.teamleaderid._id
+        );
+        
+        setAvailableMembersToSwap(swapCandidates);
+        setShowSwapSelect(true);
+        // Default select the first member if available
+        if (swapCandidates.length > 0) {
+          setSelectedMemberToSwap(swapCandidates[0]._id);
+        } else {
+          setSelectedMemberToSwap(null);
+        }
+      }
+    } else {
+      // Same team, no need for swap
+      setShowSwapSelect(false);
+      setSelectedMemberToSwap(null);
+    }
   }
 
   const saveUpdatedMember = async () => {
@@ -243,7 +282,9 @@ worksheet.eachRow((row, rowNumber) => {
         body: JSON.stringify({ 
           teamId: selectedTeam, 
           memberId: selectedMember._id, 
-          isTeamLeader: isTeamLeader 
+          isTeamLeader: isTeamLeader,
+          originalTeamId: originalTeamId,
+          swapMemberId: selectedMemberToSwap 
         }),
       });
       
@@ -253,6 +294,12 @@ worksheet.eachRow((row, rowNumber) => {
       if (data.success) {
         toast.success("Member updated successfully");
         setIsUpdateModalOpen(false);
+        setSelectedMember(null);
+        setSelectedTeam(null);
+        setOriginalTeamId(null);
+        setAvailableMembersToSwap([]);
+        setShowSwapSelect(false);
+        setSelectedMemberToSwap(null);
         setIsViewModalOpen(false);
       } else {
         toast.error(data.message || "Failed to update member");
@@ -262,7 +309,6 @@ worksheet.eachRow((row, rowNumber) => {
       toast.error("Error updating team member");
     }
   }
-
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
@@ -346,7 +392,7 @@ worksheet.eachRow((row, rowNumber) => {
           </>
 
           {/* Created Teams */}
-         { loading?<ProfilePageSkeleton/>:<TabsContent value="created" className="space-y-4">
+          { loading?<ProfilePageSkeleton/>:<TabsContent value="created" className="space-y-4">
             <Card className="overflow-hidden border-none shadow-md">
               <CardHeader className="bg-muted/50">
                 <CardTitle>Created Teams</CardTitle>
@@ -378,7 +424,8 @@ worksheet.eachRow((row, rowNumber) => {
                               </div>
                             </TableCell>
                             <TableCell>{team.domain}</TableCell>
-                            <TableCell>{team.date}</TableCell>
+                            <TableCell> {new Date(team.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+                            }</TableCell>
                             <TableCell>
                               <Badge variant="success" className="bg-green-500 hover:bg-green-600 text-white">
                                 Yes
@@ -528,80 +575,112 @@ worksheet.eachRow((row, rowNumber) => {
 
         {/* Update Member Modal */}
         <Dialog open={isUpdateModalOpen} onOpenChange={setIsUpdateModalOpen}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Update Team Member</DialogTitle>
-            <DialogDescription>Change team assignment and role</DialogDescription>
-          </DialogHeader>
-          {selectedMember && (
-            <div className="py-4 space-y-6">
-              <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
-                <Avatar className="h-16 w-16">
-                  <AvatarImage
-                    src={`/placeholder.svg?height=64&width=64&text=${selectedMember.avatar}`}
-                    alt={selectedMember.name}
-                  />
-                  <AvatarFallback className="text-lg">{selectedMember.name[0]}</AvatarFallback>
-                </Avatar>
-                <div>
-                  <h3 className="text-xl font-medium">{selectedMember.name}</h3>
-                  <p className="text-sm text-muted-foreground">{selectedMember.email}</p>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Update Team Member</DialogTitle>
+              <DialogDescription>Change team assignment and role</DialogDescription>
+            </DialogHeader>
+            {selectedMember && (
+              <div className="py-4 space-y-6">
+                <div className="flex items-center gap-4 p-4 bg-muted/30 rounded-lg">
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage
+                      src={`/placeholder.svg?height=64&width=64&text=${selectedMember.avatar}`}
+                      alt={selectedMember.name}
+                    />
+                    <AvatarFallback className="text-lg">{selectedMember.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="text-xl font-medium">{selectedMember.name}</h3>
+                    <p className="text-sm text-muted-foreground">{selectedMember.email}</p>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="team-select">Assign to Team</Label>
+                    <Select 
+                      value={selectedTeam} 
+                      onValueChange={handleTeamChange}
+                      defaultValue={teamId}
+                    >
+                      <SelectTrigger id="team-select">
+                        <SelectValue placeholder="Select a team" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fetchedTeams.map((team) => (
+                          <SelectItem key={team._id} value={team._id}>
+                            <div className="flex items-center gap-2">
+                              <span>{getRandomIcon()}</span>
+                              <span>{team.teamname}</span>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Member Swap Selection - only show if changing teams */}
+                  {showSwapSelect && (
+                    <div className="space-y-2 mt-4 p-3 border rounded-md bg-muted/30">
+                      <div className="flex items-center gap-2 mb-2">
+                        <ArrowRightLeft className="h-4 w-4 text-primary" />
+                        <Label htmlFor="swap-member" className="font-medium">Select Member to Swap With</Label>
+                      </div>
+                      <Select 
+                        value={selectedMemberToSwap} 
+                        onValueChange={setSelectedMemberToSwap}
+                        defaultValue={availableMembersToSwap.length > 0 ? availableMembersToSwap[0]._id : null}
+                      >
+                        <SelectTrigger id="swap-member">
+                          <SelectValue placeholder="Select member to swap" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {availableMembersToSwap.map((member) => (
+                            <SelectItem key={member._id} value={member._id}>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-6 w-6">
+                                  <AvatarFallback>{member.name[0]}</AvatarFallback>
+                                </Avatar>
+                                <span>{member.name}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        The selected member will be moved to the original team to maintain team balance.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="team-leader" className="flex items-center gap-2 cursor-pointer">
+                      Make Team Leader
+                      {isTeamLeader && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                    </Label>
+                    <Switch 
+                      id="team-leader" 
+                      checked={isTeamLeader} 
+                      onCheckedChange={setIsTeamLeader}
+                    />
+                  </div>
                 </div>
               </div>
-
-              <Separator />
-
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="team-select">Assign to Team</Label>
-                  <Select 
-                    value={selectedTeam} 
-                    onValueChange={setSelectedTeam}
-                    defaultValue={teamId}
-                  >
-                    <SelectTrigger id="team-select">
-                      <SelectValue placeholder="Select a team" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fetchedTeams.map((team) => (
-                        <SelectItem key={team._id} value={team._id}>
-                          <div className="flex items-center gap-2">
-                            <span>{getRandomIcon()}</span>
-                            <span>{team.teamname}</span>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="flex items-center justify-between space-x-2">
-                  <Label htmlFor="team-leader" className="flex items-center gap-2 cursor-pointer">
-                    Make Team Leader
-                    {isTeamLeader && <CheckCircle2 className="h-4 w-4 text-green-500" />}
-                  </Label>
-                  <Switch 
-                    id="team-leader" 
-                    checked={isTeamLeader} 
-                    onCheckedChange={setIsTeamLeader}
-                  />
-                </div>
-              </div>
-            </div>
-          )}
-          <DialogFooter className="gap-2 sm:gap-0">
-            <Button variant="outline" onClick={() => setIsUpdateModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={saveUpdatedMember}>
-              {loading ? "Saving..." : "Save Changes"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            )}
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button variant="outline" onClick={() => setIsUpdateModalOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={saveUpdatedMember}>
+                {loading ? "Saving..." : "Save Changes"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
-
-     
     </div>
   )
 }
