@@ -38,7 +38,7 @@ export default function UserManagement() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
         },
       })
       const data = await response.json()
@@ -85,7 +85,7 @@ export default function UserManagement() {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
         },
         body: JSON.stringify(selectedUser),
       })
@@ -114,7 +114,7 @@ export default function UserManagement() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
         },
         body: JSON.stringify(updatedUser),
      })
@@ -148,7 +148,7 @@ export default function UserManagement() {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+      "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
     },
     body: JSON.stringify(importedUsers),
   })
