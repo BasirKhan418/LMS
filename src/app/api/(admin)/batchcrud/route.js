@@ -7,7 +7,8 @@ export const GET = async()=>{
     try{
         await ConnectDb();
      const headerlist = await headers();
-        let data = AuthorizeMd(headerlist.get("token"));
+        let data = AuthorizeMd(headerlist.get("authorization"));
+        console.log(data)
         if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
@@ -25,7 +26,7 @@ export const POST = async(req,res)=>{
     try{
         await ConnectDb();
     const headerlist = await headers();
-        let data = AuthorizeMd(headerlist.get("token"));
+        let data = AuthorizeMd(headerlist.get("authorization"));
         if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
@@ -48,7 +49,7 @@ export const PUT = async(req,res)=>{
     try{
         await ConnectDb();
         const headerlist = await headers();
-        let data = AuthorizeMd(headerlist.get("token"));
+        let data = AuthorizeMd(headerlist.get("Authorization"));
         if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
@@ -72,7 +73,7 @@ export const DELETE = async(req,res)=>{
     try{
         await ConnectDb();
         const headerlist = await headers();
-        let data = AuthorizeMd(headerlist.get("token"));
+        let data = AuthorizeMd(headerlist.get("Authorization"));
         if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }

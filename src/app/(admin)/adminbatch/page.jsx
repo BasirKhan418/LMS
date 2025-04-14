@@ -22,7 +22,7 @@ const fetchBatches = async () => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+      "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
     },
   })
   const res = await data.json()
@@ -47,28 +47,6 @@ useEffect(() => {
   const [isUsersOpen, setIsUsersOpen] = useState(false)
   const [currentBatch, setCurrentBatch] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
-
-  // Mock users data
-  const mockUsers = {
-    1: [
-      { id: "1", name: "John Doe", email: "john@example.com" },
-      { id: "2", name: "Jane Smith", email: "jane@example.com" },
-      { id: "3", name: "Mike Johnson", email: "mike@example.com" },
-      { id: "4", name: "Sarah Williams", email: "sarah@example.com" },
-      { id: "5", name: "Alex Brown", email: "alex@example.com" },
-      { id: "6", name: "Emily Davis", email: "emily@example.com" },
-      { id: "7", name: "Chris Wilson", email: "chris@example.com" },
-    ],
-    2: [
-      { id: "8", name: "Robert Taylor", email: "robert@example.com" },
-      { id: "9", name: "Lisa Anderson", email: "lisa@example.com" },
-    ],
-    3: [
-      { id: "10", name: "David Miller", email: "david@example.com" },
-      { id: "11", name: "Emma Wilson", email: "emma@example.com" },
-      { id: "12", name: "James Thomas", email: "james@example.com" },
-    ],
-  }
 //create batch function
   const handleCreateBatch = async(batch) => {
   try{
@@ -77,7 +55,7 @@ const data = await fetch("/api/batchcrud", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+    "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
   },
   body: JSON.stringify(batch),
 })
@@ -105,7 +83,7 @@ const data = await fetch("/api/batchcrud", {
   method: "PUT",
   headers: {
     "Content-Type": "application/json",
-    Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+    "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
   },
   body: JSON.stringify(updatedBatch),
 })
@@ -135,7 +113,7 @@ catch(err){
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+      "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
     },
     body: JSON.stringify({ id }),
   })
@@ -173,7 +151,7 @@ catch(err){
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("dilmsadmintoken")}`,
+        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
       },
       body: JSON.stringify({ batchid: batch._id }),
     })
