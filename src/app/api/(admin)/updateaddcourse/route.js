@@ -3,11 +3,12 @@ import ConnectDb from "../../../../../middleware/db";
 import Courses from "../../../../../models/Courses";
 import Admin from "../../../../../models/Admin";
 import AuthorizeMd from "../../../../../middleware/AuthorizeMd";
+import ConnectRedis from "../../../../../middleware/ConnectRedis";
 import { headers } from "next/headers";
 export const POST = async (req, res) => {
     try{
         await ConnectDb();
-
+        let redis = await ConnectRedis();
    const reqdata = await req.json();
    console.log(reqdata);
    const headerlist = await headers();
@@ -27,6 +28,7 @@ export const POST = async (req, res) => {
     if(newCourse==null){
         return NextResponse.json({message:"Course not found",success:false});
     }
+    await redis.del(`allcourses`);
     return NextResponse.json({message:"Course updated successfully",success:true});
 
     }

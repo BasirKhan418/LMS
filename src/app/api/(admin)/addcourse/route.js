@@ -15,7 +15,7 @@ export const POST = async (req, res) => {
    const headerlist = await headers();
    let data = AuthorizeMd(headerlist.get("token"));
    console.log(data);
-    if(!data){
+    if(!data.status){
      return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
     }
     console.log(data.email)

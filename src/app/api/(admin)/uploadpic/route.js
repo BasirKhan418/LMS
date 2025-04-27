@@ -18,8 +18,13 @@ export async function POST(request) {
   try {
     // Check if the request is authorized
     const headerlist = await headers();
-    const token = headerlist.get('token');
-    const auth = AuthorizeMd(token);
+    let data = AuthorizeMd(headerlist.get('token'));
+    if (!data.status) {
+      return NextResponse.json(
+        { message: 'You are not authorized to access this route', status: 401, success: false },
+        { status: 401 }
+      );
+    }
     const formData = await request.formData();
     const file = formData.get('image');
     
