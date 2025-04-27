@@ -11,11 +11,13 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import Chat from "@/utilities/Ai/Chat"
 import { Toaster,toast } from "sonner"
 import HomePageSkl from "@/utilities/skeleton/HomePageSkl"
+import { ProjectDialog } from "@/utilities/dialog/project-dialog"
 export default function Page({params}) {
   const tdata = use(params)
   console.log("param is",tdata.add)
   const [activeTab, setActiveTab] = useState("create")
   const [aiopen,setaiopen] = useState(false)
+  const [modalOpendata,setModalOpendata] = useState({})
   //project state's
   const [title,setTitle]= useState("");
   const [link,setLink]= useState("");
@@ -25,7 +27,7 @@ export default function Page({params}) {
   const [loading,setLoading]= useState(false); //loading state for addinf project on db
   const [submittedProjectData,setSubmittedProjectData]= useState([]); //state for getting project data from db
   //state for addinf project on db
-
+  const [open, setOpen] = useState(false)
 
   //handle submit function
   const handleSubmit = async (e) => {
@@ -151,13 +153,13 @@ const res = await fetch("/api/project", {
             >
               Projects Submitted
             </Button>
-            <Button
+            {/* <Button
               variant={activeTab === "evaluated" ? "primary" : "outline"}
               onClick={() => setActiveTab("evaluated")}
               className="px-4 py-2 rounded-md text-sm font-medium"
             >
               Projects Evaluated
-            </Button>
+            </Button> */}
           </div>
         </div>
         {activeTab === "create" && (
@@ -262,12 +264,15 @@ const res = await fetch("/api/project", {
                     <TableCell>{new Date(data.createdAt).toLocaleDateString('en-IN', {day: '2-digit', month: '2-digit', year: 'numeric'})}</TableCell>
                   
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm" >
+                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm" onClick={()=>{
+                        setModalOpendata(data)
+                        setOpen(true)
+                      }} >
                         View
                       </Button>
-                      <Button variant="outline" size="sm" className="ml-2 px-2 py-1 rounded-md text-sm">
+                      {/* <Button variant="outline" size="sm" className="ml-2 px-2 py-1 rounded-md text-sm">
                         Grade
-                      </Button>
+                      </Button> */}
                     </TableCell>
                   </TableRow>))}
                   
@@ -276,7 +281,7 @@ const res = await fetch("/api/project", {
             </CardContent>
           </Card>
         )}
-        {activeTab === "evaluated" && (
+        {/* {activeTab === "evaluated" && (
           <Card className="shadow-lg rounded-lg">
             <CardHeader className="bg-card p-6">
               <CardTitle className="text-lg font-bold">Projects Evaluated</CardTitle>
@@ -320,7 +325,7 @@ const res = await fetch("/api/project", {
                       <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">B</div>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm">
+                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm" >
                         View
                       </Button>
                       <Button variant="outline" size="sm" className="ml-2 px-2 py-1 rounded-md text-sm">
@@ -332,7 +337,7 @@ const res = await fetch("/api/project", {
               </Table>
             </CardContent>
           </Card>
-        )}
+        )} */}
       </div>
       <Button className="flex items-center gap-2 fixed lg:bottom-4 lg:right-4 md:bottom-4 md:right-4 bottom-2 right-2 rounded-full lg:py-8 md:py-8 py-8 " size="lg" onClick={()=>{
       setaiopen(!aiopen)
@@ -342,6 +347,15 @@ const res = await fetch("/api/project", {
     </Button>
    
 <Chat aiopen={aiopen} setaiopen={setaiopen}/>
+<ProjectDialog 
+initialProject={{
+  title: modalOpendata.title,
+  description: modalOpendata.desc,
+  link: modalOpendata.link,
+  extraLink: modalOpendata.link2,
+  evaluation: modalOpendata.mark,
+}}
+open={open} setOpen={setOpen} />
     </div>}
     </>
   )
