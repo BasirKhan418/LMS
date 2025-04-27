@@ -8,12 +8,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { PlusCircle, Upload } from 'lucide-react'
+import { PlusCircle, Upload, Copy } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
 import { Toaster, toast } from 'sonner'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-export default function CourseCreationModal({ course, onSave, open, setOpen, id, setid, handleUpdate }) {
+export default function CourseCreationModal({ course, onSave, open, setOpen, id, setid, handleUpdate, batches, isCopying }) {
   const [loading, setLoading] = useState(false)
   
   const [courseData, setCourseData] = useState({
@@ -30,7 +30,7 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
     feature: '',
     ytvideo: '',
     startdate: '',
-    batch: 'Morning', // Default batch value
+    batch: '',
     content: []
   })
 
@@ -40,7 +40,7 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
       setCourseData(prevData => ({
         ...prevData,
         ...course,
-        batch: course.batch || 'Morning' // Ensure batch has a default value if not present
+        batch: course.batch || '' // Ensure batch has a default value if not present
       }))
     } else if (!open && !course) {
       // Reset form when closing without a course
@@ -58,7 +58,7 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
         feature: '',
         ytvideo: '',
         startdate: '',
-        batch: 'Morning',
+        batch: '',
         content: []
       })
     }
@@ -131,7 +131,14 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
       </Button>
       <DialogContent className="sm:max-w-[90vw] w-full max-w-3xl">
         <DialogHeader>
-          <DialogTitle>{id ? 'Edit Course' : 'Create New Course'}</DialogTitle>
+          <DialogTitle>
+            {isCopying ? (
+              <div className="flex items-center">
+                <Copy className="mr-2 h-5 w-5" />
+                Copy Course
+              </div>
+            ) : id ? 'Edit Course' : 'Create New Course'}
+          </DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[75vh] overflow-y-auto pr-4">
           <div className="grid gap-6 py-4">
@@ -225,10 +232,9 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
                   <SelectValue placeholder="Select Batch" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Morning">Morning (6:00 AM - 9:00 AM)</SelectItem>
-                  <SelectItem value="Afternoon">Afternoon (12:00 PM - 3:00 PM)</SelectItem>
-                  <SelectItem value="Evening">Evening (6:00 PM - 9:00 PM)</SelectItem>
-                  <SelectItem value="Weekend">Weekend (Sat-Sun)</SelectItem>
+                  {batches && batches.map((data) => (
+                    <SelectItem value={data._id} key={data._id}>{data.name}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -297,18 +303,26 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
               <div className="border p-4 rounded-md">
                 <h4 className="text-xl font-bold mb-2">{courseData.title || 'Course Title'}</h4>
                 {courseData.img && (
-                  <img src={courseData.img} alt="Course Preview" className="w-96 h-96 object-cover rounded-md mb-2" />
+                  <img src={courseData.img} alt="Course Preview" className="w-96 h-auto object-cover rounded-md mb-2" />
                 )}
                 <p className="text-sm text-gray-600">{courseData.desc || 'Course description will appear here'}</p>
-                <p className="text-sm text-gray-600 mt-2">Batch: {courseData.batch}</p>
+                <p className="text-sm text-gray-600 mt-2">Batch: {courseData.batch ? 'Selected' : 'Not selected'}</p>
               </div>
             </div>
           </div>
         </ScrollArea>
         <div className="mt-4 flex justify-end">
-          <Button variant={"destructive"} onClick={handleCancelClick} className="mx-2">Cancel</Button>
-          {id === "" && <Button type="submit" onClick={handleSubmit}>Create Course</Button>}
-          {id !== "" && <Button type="submit" onClick={() => handleUpdate(courseData, id)}>Update Course</Button>}
+          <Button variant="destructive" onClick={handleCancelClick} className="mx-2">Cancel</Button>
+          {isCopying ? (
+            <Button type="submit" onClick={handleSubmit} className="bg-green-600 hover:bg-green-700">
+              <Copy className="mr-2 h-4 w-4" />
+              Create Copy
+            </Button>
+          ) : id === "" ? (
+            <Button type="submit" onClick={handleSubmit}>Create Course</Button>
+          ) : (
+            <Button type="submit" onClick={() => handleUpdate(courseData, id)}>Update Course</Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-
+import mongoose, { Schema } from "mongoose";
 const CoursesSchema = new mongoose.Schema({
   title: { type: String, required: true },
   desc: { type: String, required: true },
@@ -14,7 +13,8 @@ const CoursesSchema = new mongoose.Schema({
   feature: { type: String },
   ytvideo: { type: String },
   startdate: { type: String },
-  content: { type: Array }
+  content: { type: Array },
+  batch:  { type: Schema.Types.ObjectId, ref: 'Batch' }
 }, { timestamps: true });
 
 export default mongoose.models.Courses || mongoose.model('Courses', CoursesSchema);

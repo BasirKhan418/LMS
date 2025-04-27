@@ -230,13 +230,14 @@ export default function Component() {
       </Collapsible>
       <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
    
-            {videodata&&videodata.map((item)=>(<div
+            {videodata&&videodata.map((item,index)=>(<div
              
               className="relative group overflow-hidden rounded-lg cursor-pointer"
               onClick={()=>{
                 setPreviewModal(true)
                 setPreviewVideo(item)
               }}
+              key={index}
             >
               <img
                 src={`https://image.mux.com/${item.playbackid}/thumbnail.png?width=214&height=121&time=2&fit_mode=preserve`}
@@ -313,6 +314,9 @@ export default function Component() {
     </>}
     {/* preview video */}
     <Dialog open={previewModal}>
+    <DialogTitle>
+      {}
+      </DialogTitle>
       <DialogContent className="sm:max-w-[700px] p-0">
         <div className="flex flex-col h-full">
           <div className="flex-1 overflow-hidden rounded-t-xl">

@@ -13,6 +13,67 @@ export default function Home() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
   const [editingCourse, setEditingCourse] = useState(null);
+  const [batches, setBatches] = useState([]);
+  const [isCopying, setIsCopying] = useState(false);
+  
+  //fetching all courses
+  const fetchBatches = async () => {
+    setBatches([])
+    try{
+      setLoading(true)
+      const data = await fetch("/api/batchcrud", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const res = await data.json()
+      setLoading(false)
+      if (res.success) {
+        setBatches(res.batch)
+      } else {
+        toast.warning(res.message)
+      }
+    }
+    catch(err){
+      console.log(err)
+      toast.error("Something went wrong while fetching batches")
+    }
+  }
+  
+  //update on all render
+  useEffect(() => {
+    fetchBatches()
+  },[])
+  
+  // Filter out meeting objects from content recursively
+  const filterMeetings = (contentArray) => {
+    if (!Array.isArray(contentArray)) return [];
+    
+    return contentArray.map(item => {
+      const newItem = {...item};
+      
+      // If this item has a content array, filter it recursively
+      if (Array.isArray(newItem.content)) {
+        newItem.content = newItem.content.filter(subItem => {
+          // If the subItem is an object with a type property of "meeting", filter it out
+          return !(subItem && typeof subItem === 'object' && subItem.type === 'meeting');
+        }).map(subItem => {
+          // If the subItem has its own content array, filter that too
+          if (subItem && typeof subItem === 'object' && Array.isArray(subItem.content)) {
+            return {
+              ...subItem,
+              content: filterMeetings(subItem.content)
+            };
+          }
+          return subItem;
+        });
+      }
+      
+      return newItem;
+    });
+  }
 
   const handleSaveCourse = async(course) => {
     // Add batch field check to the validation
@@ -99,6 +160,29 @@ export default function Home() {
       setEditingCourse(courseToEdit);
       setid(id);
       setOpen(true);
+      setIsCopying(false);
+    } else {
+      toast.error("Course not found");
+    }
+  }
+
+  const handleCopyCourse = (id) => {
+    const courseToCopy = courses.find(course => course._id === id);
+    if (courseToCopy) {
+      // Create a copy of the course and filter meetings
+      const courseCopy = {
+        ...courseToCopy,
+        content: filterMeetings(courseToCopy.content),
+        title: `Copy of ${courseToCopy.title}`
+      };
+      
+      // Remove the _id field to create a new course
+      delete courseCopy._id;
+      
+      setEditingCourse(courseCopy);
+      setid(""); // Empty ID indicates new course
+      setOpen(true);
+      setIsCopying(true);
     } else {
       toast.error("Course not found");
     }
@@ -169,6 +253,8 @@ export default function Home() {
           id={id} 
           setid={setid} 
           handleUpdate={handleUpdate} 
+          batches={batches}
+          isCopying={isCopying}
         />
       </div>
       
@@ -188,6 +274,7 @@ export default function Home() {
             batch={course.batch || "Not specified"}
             onEdit={handleEditCourse}
             onDelete={handleDeleteCourse}
+            onCopy={handleCopyCourse}
           />
         ))}
       </div>
