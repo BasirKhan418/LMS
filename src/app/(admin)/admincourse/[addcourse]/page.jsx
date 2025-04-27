@@ -486,9 +486,8 @@ fetchallcoursedata()
             </Label>
             <Input
               id="name"
-              defaultValue=""
-              onChange={handlecreateformchnage}
               value={createweekform.name}
+              onChange={handlecreateformchnage}
               className="col-span-3"
               placeholder="Week 1"
             />
@@ -550,7 +549,6 @@ fetchallcoursedata()
             </Label>
             <Input
               id="name"
-              defaultValue=""
               onChange={handlecreatecontentformchnage}
               value={createcontentform.name}
               className="col-span-3"

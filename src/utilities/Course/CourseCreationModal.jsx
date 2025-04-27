@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -10,10 +10,12 @@ import { Switch } from "@/components/ui/switch"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { PlusCircle, Upload } from 'lucide-react'
 import { Loader2 } from 'lucide-react'
-import { Toaster,toast } from 'sonner'
-export default function CourseCreationModal({ course, onSave ,open,setOpen,id,setid,handleUpdate}) {
-    const [loading,setLoading] =useState(false)
-    
+import { Toaster, toast } from 'sonner'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
+export default function CourseCreationModal({ course, onSave, open, setOpen, id, setid, handleUpdate }) {
+  const [loading, setLoading] = useState(false)
+  
   const [courseData, setCourseData] = useState({
     title: '',
     desc: '',
@@ -28,13 +30,39 @@ export default function CourseCreationModal({ course, onSave ,open,setOpen,id,se
     feature: '',
     ytvideo: '',
     startdate: '',
+    batch: 'Morning', // Default batch value
     content: []
   })
-  useEffect(()=>{
-   if(course){
-    setCourseData(course)
-   }
-  },[course])
+
+  // Update courseData when course prop changes or when modal opens
+  useEffect(() => {
+    if (course && open) {
+      setCourseData(prevData => ({
+        ...prevData,
+        ...course,
+        batch: course.batch || 'Morning' // Ensure batch has a default value if not present
+      }))
+    } else if (!open && !course) {
+      // Reset form when closing without a course
+      setCourseData({
+        title: '',
+        desc: '',
+        skills: '',
+        price: 0,
+        img: '',
+        grouplink: '',
+        seats: 0,
+        duration: '',
+        isopen: true,
+        discount: 0,
+        feature: '',
+        ytvideo: '',
+        startdate: '',
+        batch: 'Morning',
+        content: []
+      })
+    }
+  }, [course, open])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -45,12 +73,19 @@ export default function CourseCreationModal({ course, onSave ,open,setOpen,id,se
     setCourseData(prev => ({ ...prev, isopen: checked }))
   }
 
+  const handleBatchChange = (value) => {
+    setCourseData(prev => ({ ...prev, batch: value }))
+  }
+
   const handleImageUpload = async(e) => {
     const file = e.target.files?.[0]
-        setLoading(true);
-        const data = new FormData();
-        data.append("image", file);
-       const res = await fetch("/api/uploadpic", {
+    if (!file) return
+        
+    setLoading(true);
+    const data = new FormData();
+    data.append("image", file);
+    try {
+      const res = await fetch("/api/uploadpic", {
         method: "POST",
         body: data,
         headers: {
@@ -58,33 +93,45 @@ export default function CourseCreationModal({ course, onSave ,open,setOpen,id,se
         }
       });
       const result = await res.json();
-      console.log(result);
       if (result.success) {
         setCourseData(prev => ({ ...prev, img: result.url }))
         toast.success("Image uploaded successfully")
       } else {
         toast.error("Image upload failed")
       }
+    } catch (error) {
+      toast.error("Error uploading image")
+      console.error(error)
+    } finally {
       setLoading(false);
+    }
   }
 
   const handleSubmit = () => {
     onSave(courseData)
   }
 
+  const handleCancelClick = () => {
+    setOpen(false)
+    setid("")
+  }
+
   return (
     <>
     <Toaster richColors/>
-    <Dialog open={open}>
-      <Button onClick={()=>{
-        setOpen(!open);
-      }}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          {course ? 'Edit Course' : 'Create Course'}
-        </Button>
+    <Dialog open={open} onOpenChange={(openState) => {
+      if (!openState) {
+        handleCancelClick()
+      }
+      setOpen(openState)
+    }}>
+      <Button onClick={() => setOpen(true)}>
+        <PlusCircle className="mr-2 h-4 w-4" />
+        Create Course
+      </Button>
       <DialogContent className="sm:max-w-[90vw] w-full max-w-3xl">
         <DialogHeader>
-          <DialogTitle>{course ? 'Edit Course' : 'Create New Course'}</DialogTitle>
+          <DialogTitle>{id ? 'Edit Course' : 'Create New Course'}</DialogTitle>
         </DialogHeader>
         <ScrollArea className="max-h-[75vh] overflow-y-auto pr-4">
           <div className="grid gap-6 py-4">
@@ -169,6 +216,23 @@ export default function CourseCreationModal({ course, onSave ,open,setOpen,id,se
               </div>
             </div>
             <div className="grid gap-2">
+              <Label htmlFor="batch">Batch</Label>
+              <Select 
+                value={courseData.batch} 
+                onValueChange={handleBatchChange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Batch" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Morning">Morning (6:00 AM - 9:00 AM)</SelectItem>
+                  <SelectItem value="Afternoon">Afternoon (12:00 PM - 3:00 PM)</SelectItem>
+                  <SelectItem value="Evening">Evening (6:00 PM - 9:00 PM)</SelectItem>
+                  <SelectItem value="Weekend">Weekend (Sat-Sun)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid gap-2">
               <Label htmlFor="grouplink">Group Link</Label>
               <Input
                 id="grouplink"
@@ -224,7 +288,7 @@ export default function CourseCreationModal({ course, onSave ,open,setOpen,id,se
                 onChange={handleImageUpload}
                 accept="image/*"
               />
-              {loading&&<div className='flex justify-center items-center mx-2'>
+              {loading && <div className='flex justify-center items-center mx-2'>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading.....
                 </div>}
             </div>
@@ -236,39 +300,18 @@ export default function CourseCreationModal({ course, onSave ,open,setOpen,id,se
                   <img src={courseData.img} alt="Course Preview" className="w-96 h-96 object-cover rounded-md mb-2" />
                 )}
                 <p className="text-sm text-gray-600">{courseData.desc || 'Course description will appear here'}</p>
+                <p className="text-sm text-gray-600 mt-2">Batch: {courseData.batch}</p>
               </div>
             </div>
           </div>
         </ScrollArea>
         <div className="mt-4 flex justify-end">
-        <Button variant={"destructive"} onClick={()=>{
-            setOpen(false)
-            setCourseData({
-                title: '',
-                desc: '',
-                skills: '',
-                price: 0,
-                img: '',
-                grouplink: '',
-                seats: 0,
-                duration: '',
-                isopen: true,
-                discount: 0,
-                feature: '',
-                ytvideo: '',
-                startdate: '',
-                content: []
-            })
-            setid("")
-        }} className="mx-2" >Cancel</Button>
-          {id==""&&<Button type="submit" onClick={handleSubmit}> Create Course</Button>}
-          {id!=""&&<Button type="submit" onClick={()=>{
-            handleUpdate(courseData,id)
-          }}> Update Course</Button>}
+          <Button variant={"destructive"} onClick={handleCancelClick} className="mx-2">Cancel</Button>
+          {id === "" && <Button type="submit" onClick={handleSubmit}>Create Course</Button>}
+          {id !== "" && <Button type="submit" onClick={() => handleUpdate(courseData, id)}>Update Course</Button>}
         </div>
       </DialogContent>
     </Dialog>
     </>
   )
 }
-
