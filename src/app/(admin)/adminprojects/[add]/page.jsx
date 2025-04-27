@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState } from "react"
+import { useState,use } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -10,8 +10,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import Chat from "@/utilities/Ai/Chat"
 export default function Page({params}) {
+  const tdata = use(params)
+  console.log("param is",tdata.add)
   const [activeTab, setActiveTab] = useState("create")
   const [aiopen,setaiopen] = useState(false)
+  //project state's
+  const [title,setTitle]= useState("");
   return (
     <div className="w-full min-h-screen bg-background text-foreground">
       <div className="container mx-auto px-4 md:px-6 py-8">
@@ -24,13 +28,6 @@ export default function Page({params}) {
               className="px-4 py-2 rounded-md text-sm font-medium"
             >
               Create Project
-            </Button>
-            <Button
-              variant={activeTab === "created" ? "primary" : "outline"}
-              onClick={() => setActiveTab("created")}
-              className="px-4 py-2 rounded-md text-sm font-medium"
-            >
-              Projects Created
             </Button>
             <Button
               variant={activeTab === "submitted" ? "primary" : "outline"}
@@ -60,21 +57,21 @@ export default function Page({params}) {
               <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="grid gap-2">
                   <Label htmlFor="title" className="text-sm font-medium">
-                    Title
+                    Project Title
                   </Label>
                   <Input
                     id="title"
-                    placeholder="Assignment Title"
+                    placeholder="Title"
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="due-date" className="text-sm font-medium">
-                    Due Date
+                  <Label htmlFor="link" className="text-sm font-medium">
+                    Link (Pdf,docs,github,figma)
                   </Label>
                   <Input
-                    id="due-date"
-                    type="date"
+                    id="link"
+                    placeholder="link://"
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
@@ -91,12 +88,11 @@ export default function Page({params}) {
                 </div>
                 <div className="grid gap-2 col-span-1 md:col-span-2">
                   <Label htmlFor="attachments" className="text-sm font-medium">
-                    Attachments
+                    Extra Attachments
                   </Label>
                   <Input
                     id="attachments"
-                    type="file"
-                    multiple
+                    placeholder="Any other relvant links"
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
@@ -106,70 +102,11 @@ export default function Page({params}) {
               <Button type="submit" className="px-4 py-2 rounded-md text-sm font-medium">
                 Create Project
               </Button>
-              <Button type="submit" className="px-4 py-2 rounded-md text-sm font-medium mx-2">
-                Create by DI-Nxt Ai
-              </Button>
+             
             </CardFooter>
           </Card>
         )}
-        {activeTab === "created" && (
-          <Card className="shadow-lg rounded-lg">
-            <CardHeader className="bg-card p-6">
-              <CardTitle className="text-lg font-bold">Projects Created</CardTitle>
-              <CardDescription className="text-muted-foreground">
-                View and manage the projects you have created.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="p-6">
-              <Table className="w-full">
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-sm font-medium">Title</TableHead>
-                    <TableHead className="text-sm font-medium">Due Date</TableHead>
-                    <TableHead className="text-sm font-medium">Status</TableHead>
-                    <TableHead className="text-sm font-medium text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">Midterm Exam</TableCell>
-                    <TableCell>2023-05-15</TableCell>
-                    <TableCell>
-                      <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Published
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm" className="ml-2 px-2 py-1 rounded-md text-sm">
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Final Project</TableCell>
-                    <TableCell>2023-06-30</TableCell>
-                    <TableCell>
-                      <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">
-                        Draft
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm">
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm" className="ml-2 px-2 py-1 rounded-md text-sm">
-                        Delete
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
+        
         {activeTab === "submitted" && (
           <Card className="shadow-lg rounded-lg">
             <CardHeader className="bg-card p-6">

@@ -263,7 +263,9 @@ export default function Component() {
             }
       <Dialog open={showModal} >
   <DialogContent className={"  "}>
-      
+      <DialogTitle>
+      {}
+      </DialogTitle>
       
         <div className="flex justify-center items-center ">
           <div className="bg-background p-6 rounded-lg shadow-lg">

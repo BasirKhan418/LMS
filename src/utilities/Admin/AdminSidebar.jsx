@@ -1,7 +1,7 @@
 
 import Link from "next/link"
 import { Fragment } from "react"
-import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
+import { Sheet, SheetTrigger, SheetContent ,SheetTitle} from "@/components/ui/sheet"
 import { MdOutlineAssignmentTurnedIn } from "react-icons/md";
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
@@ -51,13 +51,13 @@ export default function AdminSidebar({children}) {
         <Link href="/admin" className="flex items-center gap-2 font-semibold">
               <div>
                 <Image 
-                  src="https://res.cloudinary.com/db0x5vhbk/image/upload/v1733634184/x0vx8af6jmxfpp5tjjjk.png" 
+                  src="/9.png" 
                   alt="My Image"
-                  width={30} // Specify the width of the image
-                  height={30} // Specify the height of the image
+                  width={120} // Specify the width of the image
+                  height={80} // Specify the height of the image
                 />
               </div>
-              <span className="">Devsomeware</span>
+              
             </Link>
         </div>
         <nav className="flex flex-col space-y-1 px-4 py-6">
@@ -164,7 +164,11 @@ export default function AdminSidebar({children}) {
         <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center border-b bg-background px-4 shadow-sm md:px-6">
           <div className="mr-auto flex items-center gap-4">
             <Sheet>
+            <SheetTitle>
+                  {}
+                </SheetTitle>
               <SheetTrigger asChild>
+                
                 <Button variant="ghost" size="icon" className="md:hidden">
                   <MenuIcon className="h-5 w-5" />
                   <span className="sr-only">Toggle menu</span>
@@ -174,24 +178,40 @@ export default function AdminSidebar({children}) {
                 <nav className="grid gap-6 text-lg font-medium">
                 <Link href="/" className="flex items-center gap-2 font-semibold mx-3">
               <div>
-                <Image 
-                  src="https://res.cloudinary.com/db0x5vhbk/image/upload/v1733634184/x0vx8af6jmxfpp5tjjjk.png" 
+              <Image 
+                  src="/9.png" 
                   alt="My Image"
-                  width={25} // Specify the width of the image
-                  height={25} // Specify the height of the image
+                  width={120} // Specify the width of the image
+                  height={80} // Specify the height of the image
                 />
               </div>
-              <span className="">Devsomeware</span>
+              
             </Link>
-                  <Link
-                    href="/admin"
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    prefetch={false}
-                  >
-                    <LayoutGridIcon className="h-5 w-5" />
-                    Dashboard
-                  </Link>
-                  <Link
+            <Link
+            href="/admin"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <LayoutGridIcon className="h-5 w-5" />
+            <span>Dashboard</span>
+          </Link>
+          <Link
+            href="/adminbatch"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <Users className="h-5 w-5" />
+            <span>Manage Batches</span>
+          </Link>
+          <Link
+            href="/adminteamformation"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <RiTeamLine className="h-5 w-5" />
+            <span>Team Formation</span>
+          </Link>
+          <Link
             href="/adminaddcourse"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
@@ -199,23 +219,23 @@ export default function AdminSidebar({children}) {
             <School className="h-5 w-5" />
             <span>Add Course</span>
           </Link>
-                  <Link
-                    href="/admincourse"
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    prefetch={false}
-                  >
-                    <BookIcon className="h-5 w-5" />
-                    Courses
-                  </Link>
-                  <Link
-                    href="/adminassignment"
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    prefetch={false}
-                  >
-                    <MdOutlineAssignmentTurnedIn className="h-5 w-5" />
-                    Assignments
-                  </Link>
-                  <Link
+          <Link
+            href="/admincourse"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <BookIcon className="h-5 w-5" />
+            <span>Courses</span>
+          </Link>
+          <Link
+            href="/adminassignment"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <MdOutlineAssignmentTurnedIn className="h-5 w-5" />
+            <span>Assignments</span>
+          </Link>
+          <Link
             href="/adminprojects"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
@@ -224,6 +244,39 @@ export default function AdminSidebar({children}) {
             <span>Projects</span>
           </Link>
           <Link
+            href="/admintrainer"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <UsersRound className="h-5 w-5" />
+            <span>Manage Trainers</span>
+          </Link>
+          <Link
+            href="/adminuser"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <TbUsersGroup className="h-5 w-5" />
+            <span>Manage Users</span>
+          </Link>
+          <Link
+            href="/adminmanagement"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <ShieldPlus className="h-5 w-5" />
+            <span>Manage Admins</span>
+          </Link>
+          <Link
+            href="/adminnotification"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <AiOutlineNotification className="h-5 w-5" />
+            <span>Send Notification</span>
+          </Link>
+          
+          <Link
             href="/adminvideogallery"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
@@ -231,14 +284,6 @@ export default function AdminSidebar({children}) {
             <MdOutlineOndemandVideo className="h-5 w-5" />
             <span>Video Gallery</span>
           </Link>
-                  <Link
-                    href="#"
-                    className="flex items-center gap-4 px-2.5 text-muted-foreground hover:text-foreground"
-                    prefetch={false}
-                  >
-                    <SettingsIcon className="h-5 w-5" />
-                    Settings
-                  </Link>
                 </nav>
               </SheetContent>
             </Sheet>
