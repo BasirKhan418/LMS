@@ -45,31 +45,27 @@ export default function CourseCreationModal({ course, onSave ,open,setOpen,id,se
     setCourseData(prev => ({ ...prev, isopen: checked }))
   }
 
-  const handleImageUpload = (e) => {
+  const handleImageUpload = async(e) => {
     const file = e.target.files?.[0]
         setLoading(true);
         const data = new FormData();
-        data.append("file", file);
-        data.append("upload_preset", "ml_default");
-        data.append("cloud_name", "db0x5vhbk");
-    
-        fetch("https://api.cloudinary.com/v1_1/db0x5vhbk/image/upload", {
-          method: "post",
-          body: data,
-        })
-          .then((resp) => resp.json())
-          .then((data) => {
-            toast.success("Image uploaded successfully");
-            setCourseData({
-                ...courseData,img:data.url
-            })
-            setLoading(false)
-          })
-          .catch((err) => {
-            console.error(err);
-            setLoading(false);
-            toast.error("Error while uploading image");
-          });
+        data.append("image", file);
+       const res = await fetch("/api/uploadpic", {
+        method: "POST",
+        body: data,
+        headers: {
+          "token": localStorage.getItem("dilmsadmintoken")
+        }
+      });
+      const result = await res.json();
+      console.log(result);
+      if (result.success) {
+        setCourseData(prev => ({ ...prev, img: result.url }))
+        toast.success("Image uploaded successfully")
+      } else {
+        toast.error("Image upload failed")
+      }
+      setLoading(false);
   }
 
   const handleSubmit = () => {

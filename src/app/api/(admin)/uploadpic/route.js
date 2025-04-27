@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { v4 as uuidv4 } from 'uuid';
-
+import AuthorizeMd from '../../../../../middleware/AuthorizeMd';
+import { headers } from 'next/headers';
 // Initialize S3 client
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -15,6 +16,10 @@ const s3Client = new S3Client({
 
 export async function POST(request) {
   try {
+    // Check if the request is authorized
+    const headerlist = await headers();
+    const token = headerlist.get('token');
+    const auth = AuthorizeMd(token);
     const formData = await request.formData();
     const file = formData.get('image');
     
