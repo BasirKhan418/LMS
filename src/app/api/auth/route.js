@@ -24,7 +24,7 @@ export const POST= async(req,res)=>{
     //getting userdata from request
    
     //checking if user is registered or not
-    let data = await User.find({email:reqdata.email});
+    let data = await User.find({email:reqdata.email,ispaid:true});
     //if user is registered then send otp to email
     if(data.length>0){
       //deleting previous otp if exists

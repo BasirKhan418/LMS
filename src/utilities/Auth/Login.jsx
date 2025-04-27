@@ -9,159 +9,176 @@ import { useRouter } from "next/navigation"
 import ProfielSpinner from "../Spinner/ProfielSpinner"
 import { useState } from "react"
 import {
-    InputOTP,
-    InputOTPGroup,
-    InputOTPSeparator,
-    InputOTPSlot,
-  } from "@/components/ui/input-otp"
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 import axios from "axios"
   
 export function Login() {
-    const [email,setEmail] = useState("");
-    const [otp,setOtp] = useState("");
-    const [isOtpsent,setIsOtpsent]=useState(false);
-    const [loading,setLoading] = useState(false);
-    const router = useRouter();
-    const handleChange = (e)=>{
-    if(e.target.name=="email"){
-        setEmail(e.target.value);
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  
+  const handleChange = (e) => {
+    if(e.target.name === "email") {
+      setEmail(e.target.value);
     }
-    else if(e.target.name=="otp"){
-        setOtp(e.target.value); 
-    }
-}
-const handleOtpSend = async(e)=>{
-  e.preventDefault();
-  if(email==""){
-    toast.error("Please enter your email");
-    return
   }
-  setLoading(true);
-   let data = await axios.post("/api/auth",{email:email.toLowerCase(),type:"send"})
-   setLoading(false)
-    if(data.data.success){
-        setIsOtpsent(true);
-        toast.success(data.data.message)
-         
+  
+  const handleOtpSend = async(e) => {
+    e.preventDefault();
+    if(email === "") {
+      toast.error("Please enter your email");
+      return;
     }
-    else{
-      toast.error(data.data.message);
-       console.log(data)
+    setLoading(true);
+    try {
+      let data = await axios.post("/api/auth", {email: email.toLowerCase(), type: "send"});
+      setLoading(false);
+      if(data.data.success) {
+        setIsOtpSent(true);
+        toast.success(data.data.message);
+      } else {
+        toast.error(data.data.message);
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("An error occurred. Please try again.");
+      console.error(error);
     }
-}
-const hanldeVerifyOtp = async()=>{ 
-if(otp==""){
-  toast.error("Please enter otp");
-  return
-}
-setLoading(true);
-let data = await axios.post("/api/auth",{email:email.toLowerCase(),type:"verify",otp:otp})
-   setLoading(false)
-    if(data.data.success){
-        setIsOtpsent(true);
-        toast.success(data.data.message)
-        localStorage.setItem("dilmstoken",data.data.token);
-        router.push("/")
+  }
+  
+  const handleVerifyOtp = async() => { 
+    if(otp === "") {
+      toast.error("Please enter OTP");
+      return;
     }
-    else{
-      toast.error(data.data.message);
-       console.log(data)
+    setLoading(true);
+    try {
+      let data = await axios.post("/api/auth", {email: email.toLowerCase(), type: "verify", otp: otp})
+      setLoading(false);
+      if(data.data.success) {
+        toast.success(data.data.message);
+        localStorage.setItem("dilmstoken", data.data.token);
+        router.push("/");
+      } else {
+        toast.error(data.data.message);
+      }
+    } catch (error) {
+      setLoading(false);
+      toast.error("An error occurred. Please try again.");
+      console.error(error);
     }
+  }
 
-}
-console.log(otp);
   return (
     <>
-     <Toaster position="top-center"  expand={false}/>
-    {loading?<div className="absolute flex justify-center items-center h-full w-full"><ProfielSpinner/></div>:""}
-    <div className={`w-full lg:grid  lg:grid-cols-2  ${loading?"opacity-30":""}`}>
-     
-      <div className="flex items-center justify-center py-12">
-        <div className="mx-auto grid w-[350px] gap-6">
-          <div className="grid gap-2 text-center">
-          <div className="flex justify-center items-center my-4">
-      <img
-        src="https://res.cloudinary.com/db0x5vhbk/image/upload/v1733634184/x0vx8af6jmxfpp5tjjjk.png" 
-        alt="My Image"
-      className="lg:h-16 lg:w-48 lg:absolute w-48 h-16"
-      />
-    </div>
-            <h1 className="text-3xl font-bold mt-8">Login to Learn-Devsomeware</h1>
-            <p className="text-balance text-muted-foreground ">
-              Enter your email to login to your account
-            </p>
+      <Toaster position="top-center" expand={false} />
+      
+      <div className="min-h-screen relative flex flex-col lg:flex-row w-full">
+        {loading && (
+          <div className="absolute inset-0 flex justify-center items-center bg-white/70 dark:bg-black/70 z-50">
+            <ProfielSpinner />
           </div>
-          <div className="grid gap-4">
-            {!isOtpsent&&<div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                name="email"
-                placeholder="m@example.com"
-                onChange={handleChange}
-                value={email}
-                required
+        )}
+        
+        {/* Login Form Section */}
+        <div className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12">
+          <div className="w-full max-w-md mx-auto">
+            {/* Logo Container */}
+            <div className="flex justify-center mb-8 relative h-24 sm:h-32">
+              <img
+                src="/9.png" 
+                alt="Logo"
+                className="h-full object-contain"
               />
-            </div>}
-            {isOtpsent&&<div className="grid gap-2 flex justify-center">
-              <Label htmlFor="email">Otp (One Time Password)</Label>
-              <InputOTP maxLength={6} onChange={(value)=>{setOtp(value)}}>
-  <InputOTPGroup className="text-4xl">
-    <InputOTPSlot index={0}  />
-    <InputOTPSlot index={1} />
-    <InputOTPSlot index={2} />
-    </InputOTPGroup>
-    <InputOTPSeparator/>
-    <InputOTPGroup>
-    <InputOTPSlot index={3} />
-    <InputOTPSlot index={4} />
-    <InputOTPSlot index={5} />
-    </InputOTPGroup>
-
-</InputOTP>
-
-            </div>}
-            {/* <div className="grid gap-2">
-              <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
-                <Link
-                  href="/forgot-password"
-                  className="ml-auto inline-block text-sm underline"
-                >
-                  Forgot your password?
-                </Link>
+            </div>
+            
+            <div className="text-center mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold">Login to Infotact Learning</h1>
+              <p className="text-sm sm:text-base text-muted-foreground mt-2">
+                Enter your email to login to your account
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              {!isOtpSent ? (
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    name="email"
+                    placeholder="m@example.com"
+                    onChange={handleChange}
+                    value={email}
+                    className="w-full"
+                    required
+                  />
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <Label htmlFor="otp" className="text-sm font-medium block text-center">
+                    Enter OTP (One Time Password)
+                  </Label>
+                  <div className="flex justify-center">
+                    <InputOTP maxLength={6} onChange={(value) => setOtp(value)}>
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                        <InputOTPSlot index={2} />
+                      </InputOTPGroup>
+                      <InputOTPSeparator />
+                      <InputOTPGroup>
+                        <InputOTPSlot index={3} />
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  </div>
+                </div>
+              )}
+              
+              <div className="pt-2">
+                {!isOtpSent ? (
+                  <Button 
+                    type="submit" 
+                    className="w-full h-10 text-white bg-green-600 hover:bg-green-700" 
+                    onClick={handleOtpSend}
+                  >
+                    {loading ? "Sending..." : "Send OTP"}
+                  </Button>
+                ) : (
+                  <Button 
+                    type="submit" 
+                    className="w-full h-10 text-white bg-green-600 hover:bg-green-700" 
+                    onClick={handleVerifyOtp}
+                  >
+                    {loading ? "Verifying..." : "Login"}
+                  </Button>
+                )}
               </div>
-              <Input id="password" type="password" required />
-            </div> */}
-            {!isOtpsent&&<Button type="submit" className="w-full" variant="devsindia" onClick={handleOtpSend}>
-              {loading?"Sending...":"Send OTP"}
-            </Button>}
-            {isOtpsent&&<Button type="submit" className="w-full" variant="devsindia" onClick={hanldeVerifyOtp}>
-              {loading?"Verifying...":"Login"}
-            </Button>}
-            {/* <Button variant="outline" className="w-full">
-              Login with Google
-            </Button> */}
+            </div>
           </div>
-          {/* <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
-            <Link href="#" className="underline">
-              Sign up
-            </Link>
-          </div> */}
+        </div>
+        
+        {/* Image Section */}
+        <div className="hidden lg:block lg:flex-1">
+          <div className="h-full w-full relative">
+            <Image
+              src="/lms.png"
+              alt="Login Image"
+              fill
+              className="object-cover dark:brightness-75"
+              priority
+            />
+          </div>
         </div>
       </div>
-      <div className="hidden bg-muted lg:block md:block">
-        <Image
-          src="https://res.cloudinary.com/db0x5vhbk/image/upload/v1733758106/sp4p5jakzob6dxjxvlhw.png"
-          alt="Image"
-          width="1920"
-          height="1080"
-          className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
-      </div>
-    </div>
     </>
   )
 }

@@ -22,6 +22,16 @@ const nextConfig = {
         hostname: 'd1vamwx4eg4oha.cloudfront.net',
         port: '',
       },
+      {
+        protocol: 'https',
+        hostname: 'infotact-assets.s3.us-east-1.amazonaws.com',
+        port: '',
+      },
+      {
+        protocol: 'http',
+        hostname: 'infotact-assets.s3.us-east-1.amazonaws.com',
+        port: '',
+      },
      ],
    },
  };

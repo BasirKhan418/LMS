@@ -87,12 +87,12 @@ console.log(otp);
           <div className="grid gap-2 text-center">
           <div className="flex justify-center items-center my-4">
           <img
-        src="https://res.cloudinary.com/db0x5vhbk/image/upload/v1733634184/x0vx8af6jmxfpp5tjjjk.png" 
+        src="/9.png" 
         alt="My Image"
-      className="lg:h-16 lg:w-48 lg:absolute w-48 h-16"
+      className="lg:h-48 lg:w-48 lg:absolute w-48 h-16"
       />
     </div>
-            <h1 className="text-3xl font-bold mt-16">Admin Login to Learn-Devsomeware</h1>
+            <h1 className="text-3xl font-bold mt-16">Admin Login to Infotact-Learning</h1>
             <p className="text-balance text-muted-foreground ">
               Enter your email to login to your admin account.
             </p>
@@ -140,10 +140,10 @@ console.log(otp);
               </div>
               <Input id="password" type="password" required />
             </div> */}
-            {!isOtpsent&&<Button type="submit" className="w-full" variant="devsindia" onClick={handleOtpSend}>
+            {!isOtpsent&&<Button type="submit" className="w-full" variant="" onClick={handleOtpSend}>
               {loading?"Sending...":"Send OTP"}
             </Button>}
-            {isOtpsent&&<Button type="submit" className="w-full" variant="devsindia" onClick={hanldeVerifyOtp}>
+            {isOtpsent&&<Button type="submit" className="w-full" variant="" onClick={hanldeVerifyOtp}>
               {loading?"Verifying...":"Login"}
             </Button>}
             {/* <Button variant="outline" className="w-full">
@@ -160,7 +160,7 @@ console.log(otp);
       </div>
       <div className="hidden bg-muted lg:block">
         <Image
-          src="https://res.cloudinary.com/db0x5vhbk/image/upload/v1733758106/sp4p5jakzob6dxjxvlhw.png"
+          src="/lms.png"
           alt="Image"
           width="1920"
           height="1080"
