@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnroll }) {
+export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnroll ,batchdetails,onDirectEnroll}) {
   const [loading, setLoading] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
@@ -422,7 +422,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
               </div>
               
               {/* Enrollment button */}
-              <Button 
+             { course&&batchdetails&&course.batch!=batchdetails._id&&<Button 
                 className="w-full mb-4"
                 size="lg"
                 onClick={handlePayment}
@@ -436,8 +436,29 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                     <ArrowRight className="ml-2 w-4 h-4" />
                   </div>
                 )}
-              </Button>
-              
+              </Button>}
+              { course&&batchdetails&&course.batch==batchdetails._id&&<Button 
+                className="w-full mb-4"
+                size="lg"
+                onClick={()=>{
+                  setLoading(true)
+                  onDirectEnroll()
+                  setTimeout(()=>{
+                    setLoading(false)
+                    onClose()
+                  },2000)
+                }}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>Enrolling...</>
+                ) : (
+                  <div className="flex items-center">
+                    Enroll For Free
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </div>
+                )}
+              </Button>}
               {/* Course includes */}
               <div className="text-sm">
                 <p className="font-medium mb-2">This course includes:</p>

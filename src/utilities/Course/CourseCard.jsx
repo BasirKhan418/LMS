@@ -7,19 +7,14 @@ import { toast } from "sonner"
 import { Clock, Users, BookOpen, Check, CheckCircle2, Loader2, Tag } from 'lucide-react'
 import { useState, useEffect } from "react"
 import CourseEnrollmentDialog from "../dialog/course-dialog"
-export function CourseCard({ course, user, data }) {
+export function CourseCard({ course, user, data,batchdetails }) {
   const [loading, setLoading] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [showDialog, setShowDialog] = useState(false); // State to control dialog visibility
 
   const handleEnrollment = async() => {
-    // If the course has a price (not free), show the dialog
-    if (course.price !== 'Free' && course.price > 0) {
+    
       setShowDialog(true);
-    } else {
-      // For free courses, directly enroll
-      handleDirectEnroll();
-    }
   }
 
   const handleDirectEnroll = async() => {
@@ -57,7 +52,7 @@ export function CourseCard({ course, user, data }) {
   const handlePaymentSuccess = async () => {
     // Here you would implement the actual payment processing
     // Then call the enrollment API
-    handleDirectEnroll();
+    // handleDirectEnroll();
   }
 
   useEffect(() => {
@@ -198,8 +193,10 @@ export function CourseCard({ course, user, data }) {
       <CourseEnrollmentDialog 
         course={course}
         isOpen={showDialog}
+        batchdetails={batchdetails}
         onClose={() => setShowDialog(false)}
         onEnroll={handlePaymentSuccess}
+        onDirectEnroll={handleDirectEnroll} // Pass the direct enroll function to the dialog
       />
     </>
   )

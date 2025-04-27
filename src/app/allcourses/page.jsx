@@ -16,6 +16,7 @@ const Page = () => {
   const [data, setData] = useState(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filter, setFilter] = useState('all')
+  const [batchdetails,setBatchdetails] = useState(null)
   const router = useRouter()
 
   const validateUser = async () => {
@@ -29,11 +30,13 @@ const Page = () => {
         }
       })
       const res = await response.json()
+      console.log("basir reg is ",res)
       setLoading(false)
       
       if (res.success) {
         setUser(res.user)
         setData(res.data)
+        setBatchdetails(res.batch)
         if (res.user == null) {
           router.push("/login")
         }
@@ -174,7 +177,7 @@ const Page = () => {
             {filteredCourses.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredCourses.map((course, index) => (
-                  <CourseCard key={index} course={course} user={user} data={data} />
+                  <CourseCard key={index} course={course} user={user} data={data} batchdetails={batchdetails}/>
                 ))}
               </div>
             ) : (
