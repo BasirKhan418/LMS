@@ -420,7 +420,7 @@ export default function TeamManagement() {
                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
                                   {getRandomIcon()}
                                 </div>
-                                {team.batchName}
+                                {team.name}
                               </div>
                             </TableCell>
                             <TableCell>{team.domain}</TableCell>
@@ -436,7 +436,7 @@ export default function TeamManagement() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => handleViewTeam(team._id)}
-                                className="transition-all hover:scale-105"
+                                className="transition-all hover:scale-105 m-2"
                               >
                                 <Eye className="h-4 w-4 mr-1" /> View Team
                               </Button>
@@ -444,9 +444,9 @@ export default function TeamManagement() {
                                 variant="outline"
                                 size="sm"
                                 onClick={() => exportTeam(team._id)}
-                                className="transition-all hover:scale-105"
+                                className="transition-all hover:scale-105 m-2"
                               >
-                                <Download className="h-4 w-4 mr-1" /> Export
+                                <Download className="h-4 w-4 mr-1 " /> Export
                               </Button>
                             </TableCell>
                           </TableRow>
