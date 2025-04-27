@@ -197,6 +197,7 @@ export function CourseCard({ course, user, data,batchdetails }) {
         onClose={() => setShowDialog(false)}
         onEnroll={handlePaymentSuccess}
         onDirectEnroll={handleDirectEnroll} // Pass the direct enroll function to the dialog
+        user={user}
       />
     </>
   )

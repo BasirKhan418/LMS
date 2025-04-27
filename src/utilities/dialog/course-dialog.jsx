@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
+import { toast ,Toaster} from "sonner";
 import { 
   CheckCircle2, Calendar, Clock, Users, Tag, Play, 
   ChevronRight, ArrowRight, Lock, Monitor, FileText, 
@@ -13,7 +14,7 @@ import {
 } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
-export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnroll ,batchdetails,onDirectEnroll}) {
+export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnroll ,batchdetails,onDirectEnroll,user}) {
   const [loading, setLoading] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
   const [showVideo, setShowVideo] = useState(false);
@@ -37,14 +38,65 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
   const handlePayment = async () => {
     setLoading(true);
     try {
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      onEnroll();
-      onClose();
-    } catch (error) {
-      console.error("Payment error:", error);
-    } finally {
+      const response = await fetch("/api/payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "token": localStorage.getItem("dilmstoken")
+        },
+        body: JSON.stringify({
+          price: discountedPrice
+        })
+      });
+      const data = await response.json();
+      console.log("Payment data:", data);
       setLoading(false);
+      if (data.success) {
+        //handle payment
+
+        var options = {
+          "key": process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // Enter the Key ID generated from the Dashboard
+          "amount": data.order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+          "currency": "INR",
+          "name": "Infotact Learning", //your business name
+          "description": `Payment for ${course.title}`, //Product description
+          "image": "https://example.com/your_logo",
+          "order_id": data.order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+          "handler": function (response){
+              console.log(response.razorpay_payment_id);
+              console.log(response.razorpay_order_id);
+              console.log(response.razorpay_signature)
+          },
+          "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+              "name": user.name, //your customer's name
+              "email": user.email, 
+              "contact": user.phone  //Provide the customer's phone number for better conversion rates 
+          },
+          "notes": {
+              "address": "Razorpay Corporate Office"
+          },
+          "theme": {
+              "color": "#3399cc"
+          }
+      };
+      var rzp1 = new Razorpay(options);
+      rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+});
+rzp1.open();
+      } else {
+        toast.error(data.message || "Payment failed");
+      }
+    } catch (error) {
+      console.error("Error during payment:", error);
+      setLoading(false);
+      toast.error("Error processing payment");
     }
   };
 
@@ -86,6 +138,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose} className="overflow-hidden">
+      <Toaster richColors position="top-center" closeButton={false} />
         <DialogTitle className="hidden">Course Details</DialogTitle>
       <DialogContent className="sm:max-w-4xl max-h-[95vh] p-0 overflow-hidden flex flex-col">
         {/* Mobile-only header */}

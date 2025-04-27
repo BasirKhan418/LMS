@@ -6,7 +6,7 @@ import { NoCoursesBanner } from '@/utilities/Course/NoCoursesBanner'
 import { CourseCard } from '@/utilities/Course/CourseCard'
 import HomePageSkl from '@/utilities/skeleton/HomePageSkl'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
+import RazorpayIntegration from '../../../hooks/razorpayint'
 
 const Page = () => {
   const [courses, setCourses] = useState([])
@@ -111,9 +111,11 @@ const Page = () => {
 
 
   return (
+    <>
+      <RazorpayIntegration>
     <div className=" bg-gray-50">
       <Toaster position="top-center" />
-      
+    
       {/* Hero Section with Better Gradient and Logo */}
       <header className="bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white  relative overflow-hidden py-6 mb-10">
         <div className="absolute inset-0 bg-pattern opacity-10"></div>
@@ -205,6 +207,8 @@ const Page = () => {
       
       
     </div>
+    </RazorpayIntegration>
+    </>
   )
 }
 
