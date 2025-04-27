@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState,use } from "react"
+import { useState,use,useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import Chat from "@/utilities/Ai/Chat"
+import { Toaster,toast } from "sonner"
+import HomePageSkl from "@/utilities/skeleton/HomePageSkl"
 export default function Page({params}) {
   const tdata = use(params)
   console.log("param is",tdata.add)
@@ -16,8 +18,121 @@ export default function Page({params}) {
   const [aiopen,setaiopen] = useState(false)
   //project state's
   const [title,setTitle]= useState("");
+  const [link,setLink]= useState("");
+  const [description,setDescription]= useState("");
+  const [attachments,setAttachments]= useState("");
+  const [projectData,setProjectData]= useState([]); //state for getting project data from db
+  const [loading,setLoading]= useState(false); //loading state for addinf project on db
+  const [submittedProjectData,setSubmittedProjectData]= useState([]); //state for getting project data from db
+  //state for addinf project on db
+
+
+  //handle submit function
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    const projectData = {
+      title: title,
+      link: link,
+      desc: description,
+      link2: attachments,
+      crid:tdata.add
+    }
+    try{
+      setLoading(true)
+const res = await fetch("/api/project", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Token: `${localStorage.getItem("dilmsadmintoken")}`,
+      },
+      body: JSON.stringify(projectData),
+    })
+    const data = await res.json()
+    setLoading(false)
+    if (data.success) {
+      toast.success(data.message)
+      setTitle("")
+      setLink("")
+      setDescription("")
+      setAttachments("")
+      fetchProjects()
+    } else {
+      toast.error(data.message)
+    }
+  }
+
+    catch(err){
+      console.log(err)
+      toast.error("Some thing went wrong please try again after some time")
+    }
+    
+  }
+  ///fetch all the projects of the course
+
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch(`/api/project?id=${tdata.add}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Token: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const data = await res.json()
+      if (data.success) {
+        setTitle(data.data[0].title)
+        setLink(data.data[0].link)
+        setDescription(data.data[0].desc)
+        setAttachments(data.data[0].link2)
+        setProjectData(data.data)
+        toast.success(data.message)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (err) {
+      console.log(err)
+      toast.error("Some thing went wrong please try again after some time")
+    }
+  }
+
+
+  //fetch all the projects of the course
+
+  const fetchSubmittedProjects = async () => {
+    try {
+      setLoading(true)
+      const res = await fetch(`/api/project/submitted?id=${tdata.add}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Token: `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const data = await res.json()
+      console.log("submitted data is  0",data)
+      setLoading(false)
+      if (data.success) {
+        setSubmittedProjectData(data.data)
+        toast.success(data.message)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (err) {
+      console.log(err)
+      toast.error("Some thing went wrong please try again after some time")
+    }
+  }
+
+    //useEffet to fetch the projects when the component mounts
+    useEffect(() => {
+      fetchProjects()
+      fetchSubmittedProjects()
+    }, [])
   return (
-    <div className="w-full min-h-screen bg-background text-foreground">
+    <>
+    <Toaster richColors position="top-center" closeButton={false} expand={false} />
+    {loading?<HomePageSkl/>:<div className="w-full min-h-screen bg-background text-foreground">
+      
       <div className="container mx-auto px-4 md:px-6 py-8">
         <div className="flex flex-col md:flex-row items-center justify-between mb-6">
           <h1 className="text-3xl font-bold">Projects</h1>
@@ -62,6 +177,9 @@ export default function Page({params}) {
                   <Input
                     id="title"
                     placeholder="Title"
+                    name="title"
+                    onChange={(e) => setTitle(e.target.value)}
+                    value={title}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
@@ -72,6 +190,9 @@ export default function Page({params}) {
                   <Input
                     id="link"
                     placeholder="link://"
+                    name="link"
+                    onChange={(e) => setLink(e.target.value)}
+                    value={link}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
@@ -82,7 +203,10 @@ export default function Page({params}) {
                   <Textarea
                     id="description"
                     rows={4}
+                    name="description"
                     placeholder="Assignment Description"
+                    onChange={(e) => setDescription(e.target.value)}  
+                    value={description}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
@@ -92,15 +216,18 @@ export default function Page({params}) {
                   </Label>
                   <Input
                     id="attachments"
+                    name="attachments"
                     placeholder="Any other relvant links"
+                 onChange={(e) => setAttachments(e.target.value)}
+                    value={attachments}
                     className="rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm transition-colors focus:outline-none focus:ring-1 focus:ring-ring"
                   />
                 </div>
               </form>
             </CardContent>
             <CardFooter className="bg-card p-6">
-              <Button type="submit" className="px-4 py-2 rounded-md text-sm font-medium">
-                Create Project
+              <Button type="submit" className="px-4 py-2 rounded-md text-sm font-medium" onClick={handleSubmit}>
+                {projectData.length > 0 ? "Update Project" : "Create Project"}
               </Button>
              
             </CardFooter>
@@ -120,45 +247,30 @@ export default function Page({params}) {
                 <TableHeader>
                   <TableRow>
                     <TableHead className="text-sm font-medium">Student</TableHead>
-                    <TableHead className="text-sm font-medium">Assignment</TableHead>
-                    <TableHead className="text-sm font-medium">Submitted</TableHead>
-                    <TableHead className="text-sm font-medium">Grade</TableHead>
+                    <TableHead className="text-sm font-medium">Domain</TableHead>
+                    <TableHead className="text-sm font-medium">Duration</TableHead>
+                    <TableHead className="text-sm font-medium">Submitted Date</TableHead>
+                    
                     <TableHead className="text-sm font-medium text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  <TableRow>
-                    <TableCell className="font-medium">John Doe</TableCell>
-                    <TableCell>Midterm Exam</TableCell>
-                    <TableCell>2023-05-14</TableCell>
-                    <TableCell>
-                      <div className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">A</div>
-                    </TableCell>
+                  {submittedProjectData.map((data)=>(<TableRow key={data._id}>
+                    <TableCell className="font-medium">{data.userid.name}</TableCell>
+                    <TableCell className="font-medium">{data.userid.domain}</TableCell>
+                    <TableCell className="font-medium">{data.userid.month}</TableCell>
+                    <TableCell>{new Date(data.createdAt).toLocaleDateString('en-IN', {day: '2-digit', month: '2-digit', year: 'numeric'})}</TableCell>
+                  
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm">
+                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm" >
                         View
                       </Button>
                       <Button variant="outline" size="sm" className="ml-2 px-2 py-1 rounded-md text-sm">
                         Grade
                       </Button>
                     </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="font-medium">Jane Smith</TableCell>
-                    <TableCell>Final Project</TableCell>
-                    <TableCell>2023-06-29</TableCell>
-                    <TableCell>
-                      <div className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs font-medium">B</div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="outline" size="sm" className="px-2 py-1 rounded-md text-sm">
-                        View
-                      </Button>
-                      <Button variant="outline" size="sm" className="ml-2 px-2 py-1 rounded-md text-sm">
-                        Grade
-                      </Button>
-                    </TableCell>
-                  </TableRow>
+                  </TableRow>))}
+                  
                 </TableBody>
               </Table>
             </CardContent>
@@ -230,7 +342,8 @@ export default function Page({params}) {
     </Button>
    
 <Chat aiopen={aiopen} setaiopen={setaiopen}/>
-    </div>
+    </div>}
+    </>
   )
 }
 function MessageCircleIcon(props) {
