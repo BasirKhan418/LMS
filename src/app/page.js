@@ -2,14 +2,14 @@
 import Home from "@/utilities/Home";
 
 export const metadata = {
-  title: "Learn - DevSomeWare",
+  title: "Learn - Infotact | Infotact Learning Platform",
   description:
-    "DevSomeWare's Learning Platform offers a comprehensive online learning experience. Explore a wide range of courses, build your skills, and collaborate with expert mentors in various fields.",
+    "Infotact's Learning Platform offers a comprehensive online learning experience. Explore a wide range of courses, build your skills, and collaborate with expert mentors in various fields.",
   keywords: [
-    "DevSomeWare Learning Platform",
+    "Infotact Learning Platform",
     "Online Learning",
     "LMS Platform",
-    "Learn DevSomeWare",
+    "Learn Infotact",
     "Tech Courses Online",
     "Skill Development",
     "Developer Learning",
@@ -21,9 +21,9 @@ export const metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Learn - DevSomeWare",
+    title: "Learn - Infotact | Infotact Learning Platform",
     description:
-      "Join DevSomeWare's Learning Platform to enhance your skills with curated courses. Learn from industry experts, collaborate with peers, and boost your career with quality online education.",
+      "Join Infotact's Learning Platform to enhance your skills with curated courses. Learn from industry experts, collaborate with peers, and boost your career with quality online education.",
     url: "https://learn.devsomeware.com",
     type: "website",
     images: [
@@ -31,16 +31,16 @@ export const metadata = {
         url: "/alogo.png",
         width: 1200,
         height: 630,
-        alt: "DevSomeWare Learning Platform",
+        alt: "Infotact Learning Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     site: "@DevSomeware",
-    title: "Learn - DevSomeWare",
+    title: "Learn - Infotact | Infotact Learning Platform",
     description:
-      "Explore DevSomeWare's LMS to start your learning journey. Access expert-led courses, build skills, and advance your career in tech.",
+      "Explore Infotact's LMS to start your learning journey. Access expert-led courses, build skills, and advance your career in tech.",
     images: "/alogo.png",
   },
   robots: "index, follow",
