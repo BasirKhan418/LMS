@@ -8,18 +8,31 @@ import { Separator } from "@/components/ui/separator";
 import { 
   CheckCircle2, Calendar, Clock, Users, Tag, Play, 
   ChevronRight, ArrowRight, Lock, Monitor, FileText, 
-  Award, PlayCircle, MessageCircle, ChevronDown
+  Award, PlayCircle, MessageCircle, ChevronDown,
+  X
 } from "lucide-react";
 import { DialogTitle } from "@radix-ui/react-dialog";
 
 export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnroll }) {
   const [loading, setLoading] = useState(false);
   const [expandedSection, setExpandedSection] = useState(null);
+  const [showVideo, setShowVideo] = useState(false);
+  const [showSidebarVideo, setShowSidebarVideo] = useState(false);
   
   // Calculate the discounted price if applicable
   const originalPrice = course.price;
   const discountPercent = course.discount || 0;
   const discountedPrice = originalPrice - (originalPrice * (discountPercent / 100));
+  
+  // Extract YouTube video ID from URL
+  const getYoutubeVideoId = (url) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+  
+  const youtubeVideoId = getYoutubeVideoId(course.ytvideo) || "dQw4w9WgXcQ"; // Default fallback
   
   const handlePayment = async () => {
     setLoading(true);
@@ -38,6 +51,16 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
   // Toggle section expansion
   const toggleSection = (index) => {
     setExpandedSection(expandedSection === index ? null : index);
+  };
+  
+  // Toggle video preview
+  const handlePreviewClick = () => {
+    setShowVideo(!showVideo);
+  };
+  
+  // Toggle sidebar video preview
+  const handleSidebarPreviewClick = () => {
+    setShowSidebarVideo(!showSidebarVideo);
   };
   
   // Function to get icon based on content type
@@ -63,7 +86,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose} className="overflow-hidden">
-        <DialogTitle  className="hidden">Course Details</DialogTitle>
+        <DialogTitle className="hidden">Course Details</DialogTitle>
       <DialogContent className="sm:max-w-4xl max-h-[95vh] p-0 overflow-hidden flex flex-col">
         {/* Mobile-only header */}
         <div className="block md:hidden p-4 bg-slate-50 border-b">
@@ -207,17 +230,46 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                     </h3>
                     
                     <div className="aspect-video bg-slate-800 rounded-lg flex items-center justify-center relative overflow-hidden">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Button variant="outline" size="lg" className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white">
-                          <Play className="w-6 h-6 mr-2" />
-                          Watch Preview
-                        </Button>
-                      </div>
-                      <img 
-                        src={course.img} 
-                        alt="Video thumbnail" 
-                        className="w-full h-full object-cover opacity-60"
-                      />
+                      {showVideo ? (
+                        <div className="w-full h-full relative">
+                          <div className="absolute top-3 right-3 z-10">
+                            <Button 
+                              variant="secondary" 
+                              size="icon" 
+                              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full"
+                              onClick={() => setShowVideo(false)}
+                            >
+                              <X className="w-4 h-4 text-white" />
+                            </Button>
+                          </div>
+                          <iframe
+                            className="w-full h-full"
+                            src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1`}
+                            title="YouTube video player"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          ></iframe>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Button 
+                              variant="outline" 
+                              size="lg" 
+                              className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white"
+                              onClick={handlePreviewClick}
+                            >
+                              <Play className="w-6 h-6 mr-2" />
+                              Watch Preview
+                            </Button>
+                          </div>
+                          <img 
+                            src={course.img} 
+                            alt="Video thumbnail" 
+                            className="w-full h-full object-cover opacity-60"
+                          />
+                        </>
+                      )}
                     </div>
                     
                     <div className="mt-2 text-sm text-center">
@@ -317,17 +369,34 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
               {/* Course card preview */}
               <div className="rounded-lg border overflow-hidden mb-6">
                 <div className="aspect-video relative">
-                  <img 
-                    src={course.img} 
-                    alt={course.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <Button variant="outline" size="sm" className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white">
-                      <Play className="w-4 h-4 mr-1" />
-                      Preview
-                    </Button>
-                  </div>
+                  {showSidebarVideo ? (
+                    <iframe
+                      className="w-full h-full"
+                      src={`https://www.youtube.com/embed/${youtubeVideoId}?autoplay=1`}
+                      title="YouTube video player"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    ></iframe>
+                  ) : (
+                    <>
+                      <img 
+                        src={course.img} 
+                        alt={course.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="bg-white/20 backdrop-blur-sm hover:bg-white/30 text-white"
+                          onClick={handleSidebarPreviewClick}
+                        >
+                          <Play className="w-4 h-4 mr-1" />
+                          Preview
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               

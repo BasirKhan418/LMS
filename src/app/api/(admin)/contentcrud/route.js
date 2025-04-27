@@ -61,6 +61,7 @@ export const POST = async (req, res) => {
                 { new: true }
             );
             await redis.del(`course:${reqdata.id}`);
+            await redis.del("allcourses");
             return NextResponse.json({ message: "Course updated successfully", success: true, data: data });
         }
     } catch (err) {
