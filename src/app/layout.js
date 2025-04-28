@@ -13,8 +13,8 @@ import Head from "next/head";
 
 export default function RootLayout({ children }) {
   const [aiopen, setaiopen] = useState(false);
-const pathname = usePathname();
-console.log(pathname);
+  const pathname = usePathname();
+  console.log(pathname);
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -23,28 +23,26 @@ console.log(pathname);
       showSpinner={false}
       />
       {pathname === "/adminlogin" ? (
-  children
-) : pathname.startsWith("/admin") ? (
-  <AdminSidebar>{children}</AdminSidebar>
-) : pathname === "/login" || pathname.startsWith("/course/detail") ? (
-  children
-) : (
-  // Optionally handle other paths if needed
-  
-  <Sidebar>
-    {children}
-    <button 
-      className="flex items-center justify-center fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
-      onClick={() => setaiopen(true)}
-    >
-      <div className="absolute inset-0 rounded-full bg-white opacity-20 animate-pulse"></div>
-      <MessageCircleIcon className="h-6 w-6 text-white" />
-    </button>
-    <Chat aiopen={aiopen} setaiopen={setaiopen}/>
-  </Sidebar>
-)}
-
-        </body>
+        children
+      ) : pathname.startsWith("/admin") ? (
+        <AdminSidebar>{children}</AdminSidebar>
+      ) : pathname === "/login" || pathname.startsWith("/course/detail") ? (
+        children
+      ) : (
+        // Optionally handle other paths if needed
+        <Sidebar>
+          {children}
+          <button 
+            className="flex items-center justify-center fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+            onClick={() => setaiopen(true)}
+          >
+            <div className="absolute inset-0 rounded-full bg-white opacity-20 animate-pulse"></div>
+            <MessageCircleIcon className="h-6 w-6 text-white" />
+          </button>
+          <Chat aiopen={aiopen} setaiopen={setaiopen}/>
+        </Sidebar>
+      )}
+      </body>
     </html>
   );
 }
