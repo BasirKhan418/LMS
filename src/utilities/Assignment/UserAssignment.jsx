@@ -18,6 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 const AssignmentCard = ({ assignment, type, onClick,id }) => {
+  console.log("id om user",id)
   const statusColors = {
     pending: "bg-amber-100 text-amber-700",
     submitted: "bg-blue-100 text-blue-700",
@@ -83,13 +84,12 @@ const AssignmentCard = ({ assignment, type, onClick,id }) => {
                 <span className="font-semibold">{assignment.marks}%</span>
               </div>
               <Progress 
-                value={assignment.marks} 
-                className="h-2 bg-gray-100" 
-                indicatorClassName={`${
-                  assignment.marks >= 80 ? "bg-emerald-500" : 
-                  assignment.marks >= 60 ? "bg-amber-500" : "bg-rose-500"
-                }`}
-              />
+  value={assignment.marks} 
+  className={`h-2 bg-gray-100 [&>div]:${
+    assignment.marks >= 80 ? "bg-emerald-500" : 
+    assignment.marks >= 60 ? "bg-amber-500" : "bg-rose-500"
+  }`}
+/>
             </div>
           )}
         </CardContent>
@@ -277,13 +277,12 @@ const AssignmentsSummaryCard = ({ assignments }) => {
               <span>{averageScore}%</span>
             </div>
             <Progress 
-              value={averageScore} 
-              className="h-2" 
-              indicatorClassName={`${
-                averageScore >= 80 ? "bg-emerald-500" : 
-                averageScore >= 60 ? "bg-amber-500" : "bg-rose-500"
-              }`}
-            />
+  value={averageScore} 
+  className={`h-2 [&>div]:${
+    averageScore >= 80 ? "bg-emerald-500" : 
+    averageScore >= 60 ? "bg-amber-500" : "bg-rose-500"
+  }`}
+/>
           </div>
         )}
       </CardContent>
@@ -432,6 +431,7 @@ export default function UserAssignment({ id, userid }) {
                       key={assignment._id} 
                       assignment={assignment}
                       type="pending"
+                      id={id}
                     />
                   ))}
                   

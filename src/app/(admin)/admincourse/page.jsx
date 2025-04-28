@@ -55,7 +55,7 @@ const Page = () => {
    { loading?<HomePageSkl/>:<div className='flex flex-wrap'>
        
     {coursesData&&coursesData.map((item)=>(
-        <Link href={`/admincourse/${item._id}`} key={item._id}><Card title={item.title} description={item.desc} duration={item.duration} validity={"1"} progress={20} img={item.img} skills={item.skills} isadmin={true} /></Link>
+        <Link href={`/admincourse/${item._id}`} key={item._id} className='mx-2 my-2'><Card title={item.title} description={item.desc} duration={item.duration} validity={"1"} progress={20} img={item.img} skills={item.skills} isadmin={true} isBestseller={item.coursetype=="live"?false:true} course={{coursetype:item.coursetype}}/></Link>
       ))}
     </div>}
     </>

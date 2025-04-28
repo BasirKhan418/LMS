@@ -621,10 +621,10 @@ export default function SubmitAssignment({ aid, crid, id }) {
                       </div>
                       
                       <div className="relative mb-3">
+                        {/* Fixed Progress component - removed indicatorClassName prop */}
                         <Progress 
                           value={progressPercentage} 
-                          className="h-1" 
-                          indicatorClassName={wordCount >= wordLimit.min ? "bg-emerald-500" : "bg-amber-500"}
+                          className={`h-1 ${wordCount >= wordLimit.min ? "bg-emerald-500" : "bg-green-200"}`}
                         />
                       </div>
                       
@@ -653,7 +653,7 @@ export default function SubmitAssignment({ aid, crid, id }) {
                           </Button>
                           <Button 
                             onClick={handleSubmit}
-                            disabled={loading || wordCount < wordLimit.min}
+                            disabled={loading}
                             className="relative overflow-hidden"
                           >
                             {loading ? (
