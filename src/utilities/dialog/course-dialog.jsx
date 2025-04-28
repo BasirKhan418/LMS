@@ -563,7 +563,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                 </div>
                 
                 {/* Enrollment buttons */}
-                {course && batchdetails && course.batch !== batchdetails._id && (
+                {user&&course && batchdetails && course.batch !== batchdetails._id &&user.domain!=course.domain&& (
                   <Button 
                     className="w-full mb-4"
                     size="lg"
@@ -581,7 +581,31 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                   </Button>
                 )}
                 
-                {course && batchdetails && course.batch === batchdetails._id && (
+                {user&& course && batchdetails && course.batch === batchdetails._id && (
+                  <Button 
+                    className="w-full mb-4"
+                    size="lg"
+                    onClick={() => {
+                      setLoading(true);
+                      onDirectEnroll();
+                      setTimeout(() => {
+                        setLoading(false);
+                        onClose();
+                      }, 2000);
+                    }}
+                    disabled={loading}
+                  >
+                    {loading ? (
+                      <>Enrolling...</>
+                    ) : (
+                      <div className="flex items-center">
+                        Enroll For Free
+                        <ArrowRight className="ml-2 w-4 h-4" />
+                      </div>
+                    )}
+                  </Button>
+                )}
+                {user&& course && course.domain === user.domain && (
                   <Button 
                     className="w-full mb-4"
                     size="lg"
