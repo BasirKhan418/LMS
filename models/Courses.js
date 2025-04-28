@@ -14,7 +14,9 @@ const CoursesSchema = new mongoose.Schema({
   ytvideo: { type: String },
   startdate: { type: String },
   content: { type: Array },
-  batch:  { type: Schema.Types.ObjectId, ref: 'Batch' }
+  batch:  { type: Schema.Types.ObjectId, ref: 'Batch',required:false },
+  domain: { type: String, required: false},
+  coursetype: { type: String,required:true, enum: ['live', 'recorded'] },
 }, { timestamps: true });
 
 export default mongoose.models.Courses || mongoose.model('Courses', CoursesSchema);

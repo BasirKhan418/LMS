@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { LiaCertificateSolid } from "react-icons/lia";
 import {
   Accordion,
   AccordionItem,
@@ -37,7 +38,8 @@ import {
   Folder,
   ArrowLeft,
   CheckCircle,
-  ChevronDown
+  ChevronDown,
+  GraduationCap
 } from "lucide-react";
 
 // Component imports
@@ -296,15 +298,15 @@ export default function CourseSidebar({
     validateUser();
   }, []);
 
-  // Content type icons mapping
+  // Content type icons with custom colors
   const contentTypeIcons = {
-    video: <Video className="h-5 w-5 flex-shrink-0" />,
-    ytvideo: <Video className="h-5 w-5 flex-shrink-0" />,
-    note: <NotebookPen className="h-5 w-5 flex-shrink-0" />,
-    assignment: <ClipboardList className="h-5 w-5 flex-shrink-0" />,
-    project: <FolderGit2 className="h-5 w-5 flex-shrink-0" />,
-    meeting: <TvMinimalPlay className="h-5 w-5 flex-shrink-0" />,
-    test: <BookCheck className="h-5 w-5 flex-shrink-0" />,
+    video: <Video className="h-5 w-5 flex-shrink-0 text-blue-500" />,
+    ytvideo: <Video className="h-5 w-5 flex-shrink-0 text-red-500" />,
+    note: <NotebookPen className="h-5 w-5 flex-shrink-0 text-purple-500" />,
+    assignment: <ClipboardList className="h-5 w-5 flex-shrink-0 text-amber-500" />,
+    project: <FolderGit2 className="h-5 w-5 flex-shrink-0 text-emerald-500" />,
+    meeting: <TvMinimalPlay className="h-5 w-5 flex-shrink-0 text-pink-500" />,
+    test: <BookCheck className="h-5 w-5 flex-shrink-0 text-indigo-500" />,
   };
 
   return (
@@ -312,6 +314,14 @@ export default function CourseSidebar({
       <Toaster position="top-center" expand={false} richColors />
 
       <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900">
+        {/* Mobile Overlay */}
+        {isMenuOpen && window.innerWidth < 768 && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setIsMenuOpen(false)}
+          />
+        )}
+        
         {/* Sidebar */}
         <div
           className={`fixed inset-y-0 left-0 z-50 w-72 transform bg-white dark:bg-gray-800 shadow-lg transition-transform duration-300 ease-in-out ${
@@ -320,19 +330,15 @@ export default function CourseSidebar({
         >
           <div className="flex h-full flex-col">
             {/* Sidebar Header */}
-            <div className="flex items-center justify-between p-4 border-b">
+            <div className="flex items-center justify-between p-4 border-b bg-gray-300">
               <div className="flex items-center space-x-2">
-                <img
-                  src="/9.png"
-                  alt="Logo"
-                  className="h-10 w-10 rounded-md"
-                  onClick={() => setActiveFolder("overview")}
-                />
-                <h2 className="text-lg font-semibold truncate">Learning Portal</h2>
+                <div className="flex items-center justify-center  h-10 w-48">
+                  <img src="/9.png" alt="Logo" className="h-36 w-36 absolute" />
+                </div>
               </div>
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 md:hidden"
+                className="p-1 rounded-md bg-white/20 text-white hover:bg-white/30 md:hidden"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -344,55 +350,64 @@ export default function CourseSidebar({
                 <div className="flex-grow">
                   <div className="flex justify-between mb-1">
                     <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Course Progress</span>
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
                       {progress || 0}%
                     </span>
                   </div>
-                  <Progress value={progress || 0} className="h-2" />
+                  <Progress 
+                    value={progress || 0} 
+                    className="h-2.5 bg-blue-100 dark:bg-gray-700" 
+                  />
                 </div>
               </div>
             </div>
 
             {/* Sidebar Menu */}
-            <div className="flex-1 overflow-y-auto py-2 px-1">
+            <div className="flex-1 overflow-y-auto py-2 px-2">
               <Accordion
                 type="single"
                 collapsible
                 value={menuWeek}
                 onValueChange={setMenuWeek}
-                className="space-y-1"
+                className="space-y-2"
               >
                 {weeksdata &&
                   weeksdata.map((week, weekIndex) => (
                     <AccordionItem
                       value={week.name}
                       key={weekIndex}
-                      className="border-none"
+                      className="border rounded-lg overflow-hidden shadow-sm"
                     >
-                      <AccordionTrigger className="flex items-center justify-between py-2 px-3 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 text-left">
+                      <AccordionTrigger className="flex items-center justify-between py-3 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 text-left bg-white dark:bg-gray-800">
                         <div className="flex items-center gap-2">
-                          <Folder className="h-4 w-4 text-blue-500" />
-                          <span className="font-medium text-sm">{week.name}</span>
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-medium text-sm">
+                            {weekIndex + 1}
+                          </div>
+                          <span className="font-medium text-sm truncate">{week.name}</span>
                         </div>
                         <ChevronDown className="h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200" />
                       </AccordionTrigger>
-                      <AccordionContent className="pt-1 pb-2">
+                      <AccordionContent className="pt-1 pb-2 bg-gray-50 dark:bg-gray-850">
                         <div className="ml-2 space-y-1">
                           {week.content.map((item, index) => (
                             <button
                               key={index}
-                              className={`flex w-full items-center gap-2 rounded-md py-2 px-3 text-sm transition-colors ${
+                              className={`flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-colors ${
                                 activemenu === item.name
-                                  ? "bg-blue-50 text-blue-700 dark:bg-gray-700 dark:text-blue-300"
+                                  ? "bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
                                   : "hover:bg-gray-100 dark:hover:bg-gray-700"
                               }`}
                               onClick={() => handleContentSelection(item, weekIndex, index)}
                             >
+                              <div className={`rounded-full p-1.5 ${
+                                isContentCompleted(item.name) ? "bg-green-100 dark:bg-green-900/30" : "bg-gray-100 dark:bg-gray-800"
+                              }`}>
+                                {contentTypeIcons[item.type] || <Folder className="h-4 w-4" />}
+                              </div>
+                              <span className="truncate text-left flex-1">{item.name}</span>
                               {isContentCompleted(item.name) && (
                                 <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
                               )}
-                              {contentTypeIcons[item.type] || <Folder className="h-4 w-4" />}
-                              <span className="truncate text-left">{item.name}</span>
                             </button>
                           ))}
                         </div>
@@ -400,6 +415,17 @@ export default function CourseSidebar({
                     </AccordionItem>
                   ))}
               </Accordion>
+            </div>
+            
+            {/* Help Button */}
+            <div className="p-4 border-t">
+              <Button
+                variant="outline"
+                className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <LiaCertificateSolid className="h-4 w-4 mr-2" />
+                Certificate
+              </Button>
             </div>
           </div>
         </div>
@@ -420,6 +446,16 @@ export default function CourseSidebar({
               
               <div className="hidden md:block">
                 <h1 className="text-lg font-semibold">{alldata?.title}</h1>
+                {activemenu && (
+                  <div className="flex items-center text-sm text-gray-500">
+                    <span className="truncate">{activemenu}</span>
+                    {activeFolder && (
+                      <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+                        {activeFolder}
+                      </Badge>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -458,7 +494,7 @@ export default function CourseSidebar({
                   variant="primary"
                   size="sm"
                   onClick={handleNavigationNext}
-                  className="flex items-center gap-1"
+                  className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
                   <span className="hidden md:inline">Complete & Next</span>
                   <ChevronRight className="h-4 w-4" />
@@ -480,7 +516,7 @@ export default function CourseSidebar({
                     <section className="mb-12">
                       <div className="grid md:grid-cols-2 gap-8 items-center">
                         <div>
-                          <h1 className="text-3xl md:text-4xl font-bold mb-4">
+                          <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                             Welcome to {alldata?.title}
                           </h1>
                           <p className="text-gray-700 dark:text-gray-300 mb-6">
@@ -500,6 +536,7 @@ export default function CourseSidebar({
                                 setMenuWeek(weeksdata[0].name);
                                 setIsSidebarOpen(true);
                               }}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
                               Get Started
                             </Button>
@@ -512,7 +549,7 @@ export default function CourseSidebar({
                           <img
                             src={alldata?.img || "/placeholder-course.jpg"}
                             alt="Course Cover"
-                            className="w-full h-auto object-cover"
+                            className="w-full h-auto object-cover transform hover:scale-105 transition-transform duration-300"
                           />
                         </div>
                       </div>
@@ -525,13 +562,18 @@ export default function CourseSidebar({
                           weeksdata.map((week, index) => (
                             <Card
                               key={index}
-                              className="overflow-hidden transition-all hover:shadow-lg"
+                              className="overflow-hidden transition-all hover:shadow-lg border-none"
                             >
-                              <img
-                                src="/course/folderimg.jpg"
-                                alt={week.name}
-                                className="w-full h-40 object-cover"
-                              />
+                              <div className="relative">
+                                <img
+                                  src="/course/folderimg.jpg"
+                                  alt={week.name}
+                                  className="w-full h-40 object-cover"
+                                />
+                                <div className="absolute top-3 left-3 bg-blue-600 text-white px-2 py-1 rounded-md text-sm">
+                                  Module {index + 1}
+                                </div>
+                              </div>
                               <CardHeader className="pb-2">
                                 <CardTitle className="text-lg">
                                   {week.name}: {week.type}
@@ -541,7 +583,7 @@ export default function CourseSidebar({
                                 <CardDescription>{week.description}</CardDescription>
                                 <Button
                                   variant="outline"
-                                  className="w-full mt-4"
+                                  className="w-full mt-4 border-blue-200 text-blue-600 hover:bg-blue-50"
                                   onClick={() => {
                                     setMenuWeek(week.name);
                                     setIsSidebarOpen(true);
@@ -596,14 +638,14 @@ export default function CourseSidebar({
 
                 {activeFolder === "meeting" && (
                   <div className="max-w-md mx-auto">
-                    <Card className="shadow-md">
-                      <CardHeader>
+                    <Card className="shadow-md border-none">
+                      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
                         <CardTitle>{content.name}</CardTitle>
-                        <CardDescription>{content.description}</CardDescription>
+                        <CardDescription className="text-blue-100">{content.description}</CardDescription>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-5 w-5 text-gray-500" />
+                      <CardContent className="space-y-4 pt-6">
+                        <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                          <Calendar className="h-5 w-5 text-blue-600" />
                           <span>
                             {content.date ? new Date(content.date).toLocaleDateString("en-US", {
                               weekday: "long",
@@ -613,11 +655,11 @@ export default function CourseSidebar({
                             }) : "Date not specified"}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-5 w-5 text-gray-500" />
+                        <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
+                          <Clock className="h-5 w-5 text-blue-600" />
                           <span>{formatTime(content.time)} (IST)</span>
                         </div>
-                        <Button className="w-full">
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                           <a
                             href={content.link}
                             target="_blank"
@@ -647,7 +689,7 @@ export default function CourseSidebar({
       {/* Chat Button */}
       <Button
         onClick={() => setAiopen(!aiopen)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg flex items-center justify-center p-0 z-40"
+        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg flex items-center justify-center p-0 z-40 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
       >
         <MessageCircle className="h-6 w-6" />
       </Button>

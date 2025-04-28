@@ -24,7 +24,7 @@ export const POST = async (req, res) => {
         return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
     }
     let course = new Courses({
-        title:reqdata.title,desc:reqdata.desc,skills:reqdata.skills,price:reqdata.price,img:reqdata.img,grouplink:reqdata.grouplink,seats:reqdata.seats,duration:reqdata.duration,isopen:reqdata.isopen,discount:reqdata.discount,feature:reqdata.feature,ytvideo:reqdata.ytvideo,startdate:reqdata.startdate,content:reqdata.content,batch:reqdata.batch
+        title:reqdata.title,desc:reqdata.desc,skills:reqdata.skills,price:reqdata.price,img:reqdata.img,grouplink:reqdata.grouplink,seats:reqdata.seats,duration:reqdata.duration,isopen:reqdata.isopen,discount:reqdata.discount,feature:reqdata.feature,ytvideo:reqdata.ytvideo,startdate:reqdata.startdate,content:reqdata.content,batch:reqdata.batch,coursetype:reqdata.courseType,domain:reqdata.domain
     });
     await course.save();
     await redis.del(`allcourses`);
