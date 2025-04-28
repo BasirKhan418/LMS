@@ -25,7 +25,7 @@ if(verify!=null){
     if(verifym2.token === reqdata){
         //FETCHING FROM REDIS
         let Buser = await client.get(`user:${verify.email}:homeauth`);
-        let Bcr = await client.get(`cr:${verify.email}:homeauth`);
+        let Bcr = await client.get(`cr:${verify.email}:homeafuth`);
         let Bbatch = await client.get(`batch:${verify.email}:homeauth`);
         if(Buser && Bcr&& Bbatch){
             let user = JSON.parse(Buser);

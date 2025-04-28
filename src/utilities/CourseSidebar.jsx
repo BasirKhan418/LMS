@@ -60,7 +60,7 @@ export default function CourseSidebar({
   const [activeFolder, setActiveFolder] = useState("overview");
   const [aiopen, setAiopen] = useState(false);
   const [activemenu, setActivemenu] = useState("");
-  const [content, setContent] = useState([]);
+  const [content, setContent] = useState({});  // Initialize as empty object instead of array
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [menuWeek, setMenuWeek] = useState("");
@@ -73,6 +73,7 @@ export default function CourseSidebar({
   const [loading, setLoading] = useState(true);
   const [batch, setBatch] = useState(null);
   const [currentCourse, setCurrentCourse] = useState(null);
+  
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -165,7 +166,11 @@ export default function CourseSidebar({
   };
 
   const updateProgress = async () => {
-    if (!content.name) return;
+    // Check if content and content.name exist before proceeding
+    if (!content || !content.name) {
+      console.log("No content selected to update progress");
+      return;
+    }
     
     try {
       const res = await fetch("/api/progress", {
@@ -175,7 +180,7 @@ export default function CourseSidebar({
           token: localStorage.getItem("dilmstoken"),
         },
         body: JSON.stringify({
-          id: userdata._id,
+          id: userdata?._id, // Add null check for userdata
           crid: crid,
           data: { name: content.name },
         }),
@@ -196,6 +201,9 @@ export default function CourseSidebar({
   };
 
   const getProgressData = async () => {
+    // Add null check for userdata
+    if (!userdata || !userdata._id) return;
+    
     try {
       const res = await fetch(`/api/progress?id=${userdata._id}&&crid=${crid}`, {
         method: "GET",
@@ -217,41 +225,66 @@ export default function CourseSidebar({
   };
 
   const handleNavigationNext = () => {
+    // First update progress for current content
     updateProgress();
     
-    if (currentContentindex < weeksdata[currentWeekindex].content.length - 1) {
+    // Check if there are any weeks
+    if (!weeksdata || weeksdata.length === 0) {
+      return;
+    }
+    
+    // Next content in current week
+    if (currentContentindex < weeksdata[currentWeekindex]?.content?.length - 1) {
       const nextContentIndex = currentContentindex + 1;
       setCurrentContentindex(nextContentIndex);
       setMenuWeek(weeksdata[currentWeekindex].name);
-      setContent(weeksdata[currentWeekindex].content[nextContentIndex]);
-      setActivemenu(weeksdata[currentWeekindex].content[nextContentIndex].name);
-      setActiveFolder(weeksdata[currentWeekindex].content[nextContentIndex].type);
-    } else if (currentWeekindex < weeksdata.length - 1) {
+      const nextContent = weeksdata[currentWeekindex].content[nextContentIndex];
+      setContent(nextContent);
+      setActivemenu(nextContent.name);
+      setActiveFolder(nextContent.type);
+    } 
+    // First content in next week
+    else if (currentWeekindex < weeksdata.length - 1) {
       const nextWeekIndex = currentWeekindex + 1;
       setCurrentWeekindex(nextWeekIndex);
       setCurrentContentindex(0);
-      const firstContent = weeksdata[nextWeekIndex].content[0];
-      setContent(firstContent);
-      setMenuWeek(weeksdata[nextWeekIndex].name);
-      setActivemenu(firstContent.name);
-      setActiveFolder(firstContent.type);
+      
+      // Make sure the next week has content
+      if (weeksdata[nextWeekIndex]?.content?.length > 0) {
+        const firstContent = weeksdata[nextWeekIndex].content[0];
+        setContent(firstContent);
+        setMenuWeek(weeksdata[nextWeekIndex].name);
+        setActivemenu(firstContent.name);
+        setActiveFolder(firstContent.type);
+      }
     }
   };
 
   const handleNavigationPrevious = () => {
+    // Previous content in current week
     if (currentContentindex > 0) {
-      setCurrentContentindex(currentContentindex - 1);
-      setContent(weeksdata[currentWeekindex].content[currentContentindex - 1]);
-      setActivemenu(weeksdata[currentWeekindex].content[currentContentindex - 1].name);
-      setActiveFolder(weeksdata[currentWeekindex].content[currentContentindex - 1].type);
-    } else if (currentWeekindex > 0) {
-      setCurrentWeekindex(currentWeekindex - 1);
-      const lastContentIndex = weeksdata[currentWeekindex - 1].content.length - 1;
-      setCurrentContentindex(lastContentIndex);
-      setContent(weeksdata[currentWeekindex - 1].content[lastContentIndex]);
-      setMenuWeek(weeksdata[currentWeekindex - 1].name);
-      setActivemenu(weeksdata[currentWeekindex - 1].content[lastContentIndex].name);
-      setActiveFolder(weeksdata[currentWeekindex - 1].content[lastContentIndex].type);
+      const prevContentIndex = currentContentindex - 1;
+      setCurrentContentindex(prevContentIndex);
+      const prevContent = weeksdata[currentWeekindex].content[prevContentIndex];
+      setContent(prevContent);
+      setActivemenu(prevContent.name);
+      setActiveFolder(prevContent.type);
+    } 
+    // Last content in previous week
+    else if (currentWeekindex > 0) {
+      const prevWeekIndex = currentWeekindex - 1;
+      setCurrentWeekindex(prevWeekIndex);
+      
+      // Make sure previous week has content
+      if (weeksdata[prevWeekIndex]?.content?.length > 0) {
+        const lastContentIndex = weeksdata[prevWeekIndex].content.length - 1;
+        setCurrentContentindex(lastContentIndex);
+        const lastContent = weeksdata[prevWeekIndex].content[lastContentIndex];
+        setContent(lastContent);
+        setMenuWeek(weeksdata[prevWeekIndex].name);
+        setActivemenu(lastContent.name);
+        setActiveFolder(lastContent.type);
+      }
     }
   };
 
@@ -335,7 +368,7 @@ export default function CourseSidebar({
             {/* Sidebar Header */}
             <div className="flex items-center justify-between p-4 border-b bg-gray-300">
               <div className="flex items-center space-x-2">
-                <div className="flex items-center justify-center  h-10 w-48">
+                <div className="flex items-center justify-center h-10 w-48">
                   <img src="/9.png" alt="Logo" className="h-36 w-36 absolute" />
                 </div>
               </div>
@@ -348,22 +381,24 @@ export default function CourseSidebar({
             </div>
 
             {/* Progress Bar */}
-            {currentCourse&&currentCourse.coursetype!="live"&& <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-2 w-full">
-              <div className="flex-grow">
-                 <div className="flex justify-between mb-1">
-                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Course Progress</span>
-                    <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                      {progress || 0}%
-                    </span>
+            {currentCourse && currentCourse.coursetype !== "live" && (
+              <div className="flex items-center justify-between p-4 border-b">
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex-grow">
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Course Progress</span>
+                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                        {progress || 0}%
+                      </span>
+                    </div>
+                    <Progress 
+                      value={progress || 0} 
+                      className="h-2.5 bg-blue-100 dark:bg-gray-700" 
+                    />
                   </div>
-                  <Progress 
-                    value={progress || 0} 
-                    className="h-2.5 bg-blue-100 dark:bg-gray-700" 
-                  />
                 </div>
               </div>
-            </div>}
+            )}
 
             {/* Sidebar Menu */}
             <div className="flex-1 overflow-y-auto py-2 px-2">
@@ -374,8 +409,8 @@ export default function CourseSidebar({
                 onValueChange={setMenuWeek}
                 className="space-y-2"
               >
-                {currentCourse&&weeksdata &&
-                  currentCourse.coursetype=="recording"&&weeksdata.map((week, weekIndex) => (
+                {currentCourse && weeksdata &&
+                  currentCourse.coursetype === "recording" && weeksdata.map((week, weekIndex) => (
                     <AccordionItem
                       value={week.name}
                       key={weekIndex}
@@ -392,7 +427,7 @@ export default function CourseSidebar({
                       </AccordionTrigger>
                       <AccordionContent className="pt-1 pb-2 bg-gray-50 dark:bg-gray-850">
                         <div className="ml-2 space-y-1">
-                          {week.content.map((item, index) => (
+                          {week.content && week.content.map((item, index) => (
                             <button
                               key={index}
                               className={`flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-colors ${
@@ -418,10 +453,9 @@ export default function CourseSidebar({
                     </AccordionItem>
                   ))}
 
-
-
-{userdata&&currentCourse&&weeksdata &&
-                  currentCourse.coursetype=="live"&&weeksdata.slice(0,userdata.month[0]*4).map((week, weekIndex) => (
+                {userdata && currentCourse && weeksdata &&
+                  currentCourse.coursetype === "live" && 
+                  weeksdata.slice(0, userdata.month[0] * 4).map((week, weekIndex) => (
                     <AccordionItem
                       value={week.name}
                       key={weekIndex}
@@ -438,7 +472,7 @@ export default function CourseSidebar({
                       </AccordionTrigger>
                       <AccordionContent className="pt-1 pb-2 bg-gray-50 dark:bg-gray-850">
                         <div className="ml-2 space-y-1">
-                          {week.content.map((item, index) => (
+                          {week.content && week.content.map((item, index) => (
                             <button
                               key={index}
                               className={`flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-colors ${
@@ -466,25 +500,29 @@ export default function CourseSidebar({
               </Accordion>
             </div>
             
-            {/* Help Button */}
-            {currentCourse&&currentCourse.coursetype=="recording"&&<div className="p-4 border-t">
-              <Button
-                variant="outline"
-                className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
-              >
-                <LiaCertificateSolid className="h-4 w-4 mr-2" />
-                Certificate
-              </Button>
-            </div>}
-            {currentCourse&&currentCourse.coursetype=="live"&&<div className="p-4 border-t">
-              <Button
-                variant="outline"
-                className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
-              >
-                <MessageCircle className="h-4 w-4 mr-2" />
-                Help
-              </Button>
-            </div>}
+            {/* Certificate/Help Button */}
+            {currentCourse && currentCourse.coursetype === "recording" && (
+              <div className="p-4 border-t">
+                <Button
+                  variant="outline"
+                  className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
+                >
+                  <LiaCertificateSolid className="h-4 w-4 mr-2" />
+                  Certificate
+                </Button>
+              </div>
+            )}
+            {currentCourse && currentCourse.coursetype === "live" && (
+              <div className="p-4 border-t">
+                <Button
+                  variant="outline"
+                  className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
+                >
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  Help
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -554,7 +592,7 @@ export default function CourseSidebar({
                   onClick={handleNavigationNext}
                   className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  <span className="hidden md:inline">Complete & Next</span>
+                  <span className="hidden md:inline">Mark as Complete</span>
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -591,8 +629,10 @@ export default function CourseSidebar({
                           <div className="flex flex-wrap gap-4">
                             <Button
                               onClick={() => {
-                                setMenuWeek(weeksdata[0].name);
-                                setIsSidebarOpen(true);
+                                if (weeksdata && weeksdata.length > 0) {
+                                  setMenuWeek(weeksdata[0].name);
+                                  setIsSidebarOpen(true);
+                                }
                               }}
                               className="bg-blue-600 hover:bg-blue-700 text-white"
                             >
@@ -698,14 +738,14 @@ export default function CourseSidebar({
                   <div className="max-w-md mx-auto">
                     <Card className="shadow-md border-none">
                       <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-                        <CardTitle>{content.name}</CardTitle>
-                        <CardDescription className="text-blue-100">{content.description}</CardDescription>
+                        <CardTitle>{content?.name}</CardTitle>
+                        <CardDescription className="text-blue-100">{content?.description}</CardDescription>
                       </CardHeader>
                       <CardContent className="space-y-4 pt-6">
                         <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                           <Calendar className="h-5 w-5 text-blue-600" />
                           <span>
-                            {content.date ? new Date(content.date).toLocaleDateString("en-US", {
+                            {content?.date ? new Date(content.date).toLocaleDateString("en-US", {
                               weekday: "long",
                               month: "long",
                               day: "numeric",
@@ -715,11 +755,11 @@ export default function CourseSidebar({
                         </div>
                         <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
                           <Clock className="h-5 w-5 text-blue-600" />
-                          <span>{formatTime(content.time)} (IST)</span>
+                          <span>{formatTime(content?.time)} (IST)</span>
                         </div>
                         <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                           <a
-                            href={content.link}
+                            href={content?.link}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center justify-center gap-2 w-full"
