@@ -73,7 +73,9 @@ const Page = () => {
     <>
    { loading?<HomePageSkl/>:<div className='flex justify-start items-center flex-wrap '>
     {data&&data.map((item)=>(
-        <Link href={`/course/detail/${item.courseid._id}`} key={item._id}><Card title={item.courseid.title} description={item.courseid.desc} duration={item.courseid.duration} validity={"1"} img={item.courseid.img} skills={item.courseid.skills} isadmin={false} progress={item.progress&&item.progress==null?0:item.progress}/></Link>
+        <Link href={`/course/detail/${item.courseid._id}`} key={item._id} className='mx-2 my-2'><Card title={item.courseid.title} description={item.courseid.desc} duration={item.courseid.duration} validity={"1"} img={item.courseid.img} skills={item.courseid.skills} isadmin={false} progress={item.progress&&item.progress==null?0:item.progress} course={{coursetype:item.courseid.coursetype}} isBestseller={item.courseid.coursetype=="live"?false:true}
+        
+        /></Link>
       ))}
      
       
