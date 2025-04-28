@@ -117,15 +117,15 @@ const Page = () => {
       <Toaster position="top-center" />
     
       {/* Hero Section with Better Gradient and Logo */}
-      <header className="bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white  relative overflow-hidden py-6 mb-10">
+      <header className="bg-gradient-to-r from-blue-700 via-indigo-600 to-purple-700 text-white  relative overflow-hidden py-6 mb-10 rounded-lg">
         <div className="absolute inset-0 bg-pattern opacity-10"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col items-center justify-center mb-8">
             <div className="flex items-center mb-6">
-              <div className="bg-white p-3 rounded-full mr-4 shadow-lg">
-                <GraduationCap className="w-12 h-12 text-indigo-600" />
+              <div className="rounded-full mr-4 shadow-lg bg-gray-200">
+                <img src="/11.png" alt="infotact learning logo" className='h-20 w-20'/>
               </div>
-              <h1 className="text-5xl font-bold tracking-tight">LearnHub</h1>
+              <h1 className="text-5xl font-bold tracking-tight">Infotact Learning</h1>
             </div>
             <p className="text-center text-xl max-w-2xl mx-auto mb-8">
               Discover, learn, and master new skills with our expertly crafted courses. 
@@ -192,7 +192,7 @@ const Page = () => {
       </div>
       
       {/* Call to Action */}
-      <div className="bg-indigo-700 text-white py-12">
+      <div className="bg-indigo-700 text-white py-12 rounded-lg">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to start learning?</h2>
           <p className="mb-8 max-w-2xl mx-auto">Join thousands of students who are already advancing their careers with our courses.</p>
