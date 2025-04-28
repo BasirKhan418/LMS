@@ -34,6 +34,9 @@ const UserSchema = new mongoose.Schema({
     country:{type:String,required:false},
     skilllevel:{type:String,required:false},
     source:{type:String,required:false},
+    github:{type:String,required:false},
+    linkedin:{type:String,required:false},
+    bio:{type:String,required:false},
 }, { timestamps: true });
 
 // mongoose.models is read-only and cannot be reassigned
