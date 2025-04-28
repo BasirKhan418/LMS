@@ -444,7 +444,7 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div>
                           <h3 className="text-sm font-medium text-gray-500">Price</h3>
-                          <p className="font-semibold">{courseData.price ? `$${courseData.price}` : 'Not set'}</p>
+                          <p className="font-semibold">{courseData.price ? `₹${courseData.price}` : 'Not set'}</p>
                         </div>
                         <div>
                           <h3 className="text-sm font-medium text-gray-500">Duration</h3>
