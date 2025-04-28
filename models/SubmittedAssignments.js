@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const SubmittedSchema = new Schema({
   asid: { type: Schema.Types.ObjectId, ref: 'Assignments' },
-  crid: { type: Schema.Types.ObjectId, ref: 'Courses' },
+  crid: { type: Schema.Types.ObjectId, ref:"Courses" },
   userid: { type: Schema.Types.ObjectId, ref: 'User' },
   response: {
     type: String,

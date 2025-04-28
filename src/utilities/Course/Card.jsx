@@ -15,7 +15,8 @@ export default function Component({
   assignment,
   course = { coursetype: "recording" }, // Default to recording if not specified
   rating = 4.8,
-  isBestseller = false
+  isBestseller = false,
+  project
 }) {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -157,7 +158,7 @@ export default function Component({
           )}
           {assignment && (
             <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <ClipboardIcon className="w-4 h-4 mr-2" /> View Assignment
+              <ClipboardIcon className="w-4 h-4 mr-2" /> View {project?"Project":"Assignment"}
             </Button>
           )}
         </div>

@@ -82,7 +82,7 @@ const [project, setProject] = useState({
               <Input
                 id="title"
                 name="title"
-                value={project.title}
+                value={initialProject.title}
                 onChange={handleChange}
                 className="border-violet-200 focus:border-violet-500 focus:ring-violet-500 transition-all"
                 placeholder="Enter project title"
@@ -97,7 +97,7 @@ const [project, setProject] = useState({
               <Textarea
                 id="description"
                 name="description"
-                value={project.description}
+                value={initialProject.description}
                 onChange={handleChange}
                 className="border-violet-200 focus:border-violet-500 focus:ring-violet-500 min-h-[100px] transition-all"
                 placeholder="Describe your project in detail"
@@ -113,7 +113,7 @@ const [project, setProject] = useState({
                 <Input
                   id="link"
                   name="link"
-                  value={project.link}
+                  value={initialProject.link}
                   onChange={handleChange}
                   className="border-violet-200 focus:border-violet-500 focus:ring-violet-500 transition-all"
                   placeholder="https://example.com"
@@ -128,7 +128,7 @@ const [project, setProject] = useState({
                 <Input
                   id="extraLink"
                   name="extraLink"
-                  value={project.extraLink}
+                  value={initialProject.extraLink}
                   onChange={handleChange}
                   className="border-violet-200 focus:border-violet-500 focus:ring-violet-500 transition-all"
                   placeholder="https://github.com/example"
