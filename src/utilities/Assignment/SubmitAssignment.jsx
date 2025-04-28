@@ -300,7 +300,7 @@ export default function SubmitAssignment({ aid, crid, id }) {
   }
   
   const handleShare = () => {
-    const url = encodeURIComponent('https://devsomeware.com')
+    const url = encodeURIComponent('https://learn.infotact.in')
     const linkedInUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${url}`
     window.open(linkedInUrl, '_blank')
   }
@@ -696,12 +696,14 @@ export default function SubmitAssignment({ aid, crid, id }) {
                   </p>
                   
                   <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Link href={`/dashboard/${crid}`} passHref>
-                      <Button variant="default" className="w-full">
+                    
+                      <Button variant="default" className="w-full" onClick={()=>{
+                        router.back()
+                      }}>
                         <BookOpen className="mr-2 h-4 w-4" />
                         Back to Course
                       </Button>
-                    </Link>
+                    
                     
                     <Button variant="outline" onClick={handleShare} className="w-full">
                       <Share className="mr-2 h-4 w-4" />

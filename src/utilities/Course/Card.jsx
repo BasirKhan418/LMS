@@ -147,7 +147,7 @@ export default function Component({
         <div className="flex items-center justify-between mt-4">
           {isadmin && (
             <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <PlusIcon className="w-4 h-4 mr-2" /> Add Course
+              <PlusIcon className="w-4 h-4 mr-2" /> Manage Course
             </Button>
           )}
           {!isadmin && !assignment && (
