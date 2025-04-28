@@ -39,6 +39,7 @@
     "firebase": "^11.0.2",
     "firebase-admin": "^13.0.1",
     "formidable": "^3.5.4",
+    "framer-motion": "^12.9.2",
     "input-otp": "^1.2.4",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.396.0",
