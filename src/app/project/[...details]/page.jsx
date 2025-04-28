@@ -2,7 +2,7 @@
 import React, { use, useEffect, useState } from 'react'
 import { Toaster, toast } from 'sonner'
 import { motion } from 'framer-motion'
-import { Calendar, Clock, Laptop, Link, FileText, Send, X, CheckCircle, Loader2 } from 'lucide-react'
+import { Calendar, Clock, Laptop, Link, FileText, Send, X, CheckCircle, Loader2, FolderX, PlusCircle } from 'lucide-react'
 
 const ProjectPage = (props) => {
   const params = use(props.params)
@@ -148,8 +148,58 @@ const ProjectPage = (props) => {
     )
   }
 
+  // No Project Found State
+  if (!projectData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="max-w-lg w-full bg-white shadow-xl rounded-2xl overflow-hidden"
+        >
+          <div className="bg-blue-600 h-3 w-full"></div>
+          <div className="p-8 text-center">
+            <div className="bg-blue-50 rounded-full h-24 w-24 flex items-center justify-center mx-auto mb-6">
+              <FolderX className="h-12 w-12 text-blue-600" />
+            </div>
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Project Found</h2>
+            <p className="text-gray-600 mb-8">
+            We couldn't locate the project you are looking for. It may have been removed, you might not have access to it, or you may not have been assigned to it yet.
+            </p>
+            
+            <div className="space-y-4">
+              <a 
+                href="/" 
+                className="block w-full py-3 px-4 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition duration-200 shadow-md hover:shadow-lg"
+              >
+                Return to Dashboard
+              </a>
+              
+              <a 
+                href="/project" 
+                className="block w-full py-3 px-4 rounded-lg border border-gray-300 hover:border-blue-400 hover:bg-blue-50 text-gray-700 font-medium transition duration-200"
+              >
+                View All Projects
+              </a>
+            </div>
+            
+            <div className="mt-8 pt-6 border-t border-gray-200">
+              <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
+                <PlusCircle className="h-4 w-4" />
+                <span>Need help? Contact <a href="mailto:support@infotact.in" className="text-blue-600 hover:underline">support@infotact.in</a></span>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    
+      <div className="min-h-screen bg-gray-50">
       
       
       {/* Hero Section */}
@@ -510,6 +560,7 @@ const ProjectPage = (props) => {
         </div>
       )}
     </div>
+    
   )
 }
 
