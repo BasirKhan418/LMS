@@ -115,7 +115,7 @@ export function Sidebar({children}) {
         <BiTask className="h-4 w-4" />
         <span>Assignments</span>
         {/* Optional: Add a badge for new assignments */}
-        <Badge variant="outline" className="ml-auto bg-primary text-primary-foreground">3</Badge>
+        {/* <Badge variant="outline" className="ml-auto bg-primary text-primary-foreground">3</Badge> */}
       </Link>
       <Link
         href="/project"

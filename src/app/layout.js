@@ -33,12 +33,13 @@ console.log(pathname);
   
   <Sidebar>
     {children}
-    <Button className="flex items-center gap-2 fixed lg:bottom-6 lg:right-6 md:bottom-4 md:right-4 bottom-2 right-2 rounded-full lg:py-8 md:py-8 py-8" size="lg" onClick={()=>{
-      setaiopen(!aiopen)
-    }}>
-      <MessageCircleIcon className="h-5 w-5" />
-      Chat with AI
-    </Button>
+    <button 
+      className="flex items-center justify-center fixed bottom-6 right-6 rounded-full w-16 h-16 shadow-lg bg-gradient-to-br from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+      onClick={() => setaiopen(true)}
+    >
+      <div className="absolute inset-0 rounded-full bg-white opacity-20 animate-pulse"></div>
+      <MessageCircleIcon className="h-6 w-6 text-white" />
+    </button>
     <Chat aiopen={aiopen} setaiopen={setaiopen}/>
   </Sidebar>
 )}

@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { IoCloseSharp } from "react-icons/io5";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 const Chat = ({ aiopen, setaiopen }) => {
@@ -14,10 +14,10 @@ const Chat = ({ aiopen, setaiopen }) => {
       role: "user",
       parts: [
         {
-          text: `You are DSW-AI, an AI assistant created by Devsomeware. 
+          text: `You are IL Ai, an AI assistant created by Infotact. 
                  Your role is to answer technology and coding-related questions only. 
-                 If a query is beyond your expertise or violates Devsomeware's privacy policy, 
-                 respond with: "I'm sorry, that question is beyond Devsomeware's privacy policy."`,
+                 If a query is beyond your expertise or violates Infotact's privacy policy, 
+                 respond with: "I'm sorry, that question is beyond Infotact's privacy policy."`,
         },
       ],
     },
@@ -25,10 +25,10 @@ const Chat = ({ aiopen, setaiopen }) => {
   const [loading, setLoading] = useState(false);
   const [chat, setChat] = useState([
     {
-      name: "DSW-AI",
+      name: "IL-AI",
       type: "bot",
       message:
-        "Hello! I'm an AI assistant created by Devsomeware. How can I help you today with your technology or coding questions?",
+        "Hello! I'm an AI assistant created by Infotact. How can I help you today with your technology or coding questions?",
     },
   ]);
 
@@ -72,7 +72,7 @@ const Chat = ({ aiopen, setaiopen }) => {
         const updatedChat = [
           ...chat,
           { name: "You", type: "user", message: usermessage },
-          { name: "DSW-AI", type: "bot", message: sanitizedBotMessage },
+          { name: "IL-AI", type: "bot", message: sanitizedBotMessage },
         ];
 
         setChat(updatedChat);
@@ -116,6 +116,9 @@ const Chat = ({ aiopen, setaiopen }) => {
     <>
       <Toaster position="top-center" expand={false} />
       <Sheet open={aiopen} variants="bottom">
+        <SheetTitle className="hidden">
+menu
+        </SheetTitle>
         <SheetContent className="w-full h-full">
           <div
             className="absolute right-[13px] top-[10px] cursor-pointer"
@@ -128,10 +131,10 @@ const Chat = ({ aiopen, setaiopen }) => {
           <div className="flex flex-col h-full w-full bg-background">
             <header className="flex items-center gap-4 px-6 py-4 border-b bg-card">
               <Avatar className="w-10 h-10 border">
-                <AvatarFallback>DSW</AvatarFallback>
+                <AvatarFallback>IL</AvatarFallback>
               </Avatar>
               <div>
-                <div className="font-medium">DSW AI</div>
+                <div className="font-medium">IL AI</div>
                 <div className="text-sm text-muted-foreground">
                   AI Assistant
                 </div>
