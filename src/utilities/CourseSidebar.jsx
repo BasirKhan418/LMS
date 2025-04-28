@@ -71,7 +71,8 @@ export default function CourseSidebar({
   const [progress, setProgress] = useState(0);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [batch, setBatch] = useState(null);
+  const [currentCourse, setCurrentCourse] = useState(null);
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -104,7 +105,9 @@ export default function CourseSidebar({
       if (res.success) {
         setUserdata(res.user);
         let resdata = res.data.filter((item) => item.courseid._id === crid)[0];
+        setCurrentCourse(resdata.courseid);
         let crcmp = resdata && resdata.crcmp;
+        setBatch(res.batch);
         setData(res.data);
         setProgress(resdata?.progress || 0);
         
@@ -345,10 +348,10 @@ export default function CourseSidebar({
             </div>
 
             {/* Progress Bar */}
-            <div className="flex items-center justify-between p-4 border-b">
+            {currentCourse&&currentCourse.coursetype!="live"&& <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-2 w-full">
-                <div className="flex-grow">
-                  <div className="flex justify-between mb-1">
+              <div className="flex-grow">
+                 <div className="flex justify-between mb-1">
                     <span className="text-xs font-medium text-gray-600 dark:text-gray-400">Course Progress</span>
                     <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
                       {progress || 0}%
@@ -360,7 +363,7 @@ export default function CourseSidebar({
                   />
                 </div>
               </div>
-            </div>
+            </div>}
 
             {/* Sidebar Menu */}
             <div className="flex-1 overflow-y-auto py-2 px-2">
@@ -371,8 +374,54 @@ export default function CourseSidebar({
                 onValueChange={setMenuWeek}
                 className="space-y-2"
               >
-                {weeksdata &&
-                  weeksdata.map((week, weekIndex) => (
+                {currentCourse&&weeksdata &&
+                  currentCourse.coursetype=="recording"&&weeksdata.map((week, weekIndex) => (
+                    <AccordionItem
+                      value={week.name}
+                      key={weekIndex}
+                      className="border rounded-lg overflow-hidden shadow-sm"
+                    >
+                      <AccordionTrigger className="flex items-center justify-between py-3 px-4 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 text-left bg-white dark:bg-gray-800">
+                        <div className="flex items-center gap-2">
+                          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-medium text-sm">
+                            {weekIndex + 1}
+                          </div>
+                          <span className="font-medium text-sm truncate">{week.name}</span>
+                        </div>
+                        <ChevronDown className="h-4 w-4 shrink-0 text-gray-500 transition-transform duration-200" />
+                      </AccordionTrigger>
+                      <AccordionContent className="pt-1 pb-2 bg-gray-50 dark:bg-gray-850">
+                        <div className="ml-2 space-y-1">
+                          {week.content.map((item, index) => (
+                            <button
+                              key={index}
+                              className={`flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-colors ${
+                                activemenu === item.name
+                                  ? "bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
+                                  : "hover:bg-gray-100 dark:hover:bg-gray-700"
+                              }`}
+                              onClick={() => handleContentSelection(item, weekIndex, index)}
+                            >
+                              <div className={`rounded-full p-1.5 ${
+                                isContentCompleted(item.name) ? "bg-green-100 dark:bg-green-900/30" : "bg-gray-100 dark:bg-gray-800"
+                              }`}>
+                                {contentTypeIcons[item.type] || <Folder className="h-4 w-4" />}
+                              </div>
+                              <span className="truncate text-left flex-1">{item.name}</span>
+                              {isContentCompleted(item.name) && (
+                                <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+
+
+
+{userdata&&currentCourse&&weeksdata &&
+                  currentCourse.coursetype=="live"&&weeksdata.slice(0,userdata.month[0]*4).map((week, weekIndex) => (
                     <AccordionItem
                       value={week.name}
                       key={weekIndex}
@@ -418,7 +467,7 @@ export default function CourseSidebar({
             </div>
             
             {/* Help Button */}
-            <div className="p-4 border-t">
+            {currentCourse&&currentCourse.coursetype=="recording"&&<div className="p-4 border-t">
               <Button
                 variant="outline"
                 className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
@@ -426,7 +475,16 @@ export default function CourseSidebar({
                 <LiaCertificateSolid className="h-4 w-4 mr-2" />
                 Certificate
               </Button>
-            </div>
+            </div>}
+            {currentCourse&&currentCourse.coursetype=="live"&&<div className="p-4 border-t">
+              <Button
+                variant="outline"
+                className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Help
+              </Button>
+            </div>}
           </div>
         </div>
 
