@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge"
 import { Switch } from "@/components/ui/switch"
 import { Bell, Calendar, AlertTriangle, Briefcase, Clock, Send, Users, Zap, CheckCircle } from "lucide-react"
 import { format } from "date-fns"
-
+import { Toaster,toast } from "sonner"
 export default function NotificationPage() {
   // Form state
   const [title, setTitle] = useState("")
@@ -53,7 +53,7 @@ export default function NotificationPage() {
   // Mock send function
   const handleSend = () => {
     if (!title || !description || (!sendNow && !sendTime) || !category || !batch) {
-      alert("Please fill all required fields")
+        toast.error("Please fill in all fields before sending.")
       return
     }
 
@@ -78,7 +78,7 @@ export default function NotificationPage() {
     setBatch("")
     setSendNow(false)
 
-    alert("Notification sent successfully!")
+    toast.success("Notification sent successfully!")
   }
 
   // Helper function to get category icon
@@ -115,6 +115,7 @@ export default function NotificationPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <Toaster richColors position="top-right" closeButton={false} />
       <div className="container mx-auto py-6 px-4 md:px-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center">
