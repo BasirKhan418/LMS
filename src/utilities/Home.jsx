@@ -126,6 +126,10 @@ export default function Home() {
     
     if(res.success) {
       setData(res.data);
+      console.log(res.data)
+    const result = res.data.find((item)=>item.courseid.coursetype=="live")
+    fetchAllAssignment(result && result.courseid._id, res.user._id);
+      console.log(result)
       setUser(res.user)
       // fetchAllAssignment(res.data && res.data[0].courseid._id, res.user._id);
     }
