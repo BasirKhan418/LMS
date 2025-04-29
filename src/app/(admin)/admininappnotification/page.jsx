@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState ,useEffect} from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -14,6 +14,40 @@ import { Bell, Calendar, AlertTriangle, Briefcase, Clock, Send, Users, Zap, Chec
 import { format } from "date-fns"
 import { Toaster,toast } from "sonner"
 export default function NotificationPage() {
+    //fetch all batches from api
+    const [batches, setBatches] = useState([
+      ])
+      const [users, setUsers] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+    //fetch all batches from api
+    const fetchBatches = async () => {
+      setBatches([])
+      try{
+        setIsLoading(true)
+     const data = await fetch("/api/batchcrud", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const res = await data.json()
+    setIsLoading(false)
+      if (res.success) {
+        setBatches(res.batch)
+      } else {
+        toast.warning(res.message)
+      }
+      }
+      catch(err){
+        console.log(err)
+        toast.error("Something went wrong while fetching batches")
+      }
+    }
+    //update on all render
+    useEffect(() => {
+      fetchBatches()
+    },[])
   // Form state
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -213,16 +247,13 @@ export default function NotificationPage() {
                           <SelectValue placeholder="Select batch" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="All Users">
+                         { batches&&batches.map((item)=>(<SelectItem value={item._id} key={item._id}>
                             <div className="flex items-center">
                               <Users className="mr-2 h-4 w-4" />
-                              All Users
+                                {item.name}
                             </div>
-                          </SelectItem>
-                          <SelectItem value="Batch A">Batch A - Marketing</SelectItem>
-                          <SelectItem value="Batch B">Batch B - Development</SelectItem>
-                          <SelectItem value="Batch C">Batch C - Management</SelectItem>
-                          <SelectItem value="Batch D">Batch D - Support</SelectItem>
+                          </SelectItem>))}
+                         
                         </SelectContent>
                       </Select>
                     </div>
