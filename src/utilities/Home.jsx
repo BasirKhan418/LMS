@@ -14,7 +14,7 @@ import useFcmToken from "../../hooks/useFcmToken"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-
+import {CirclePlay,FolderOpenDot} from 'lucide-react'
 export default function Home() {
   const router = useRouter();
   const { token, notificationPermissionStatus } = useFcmToken();
@@ -23,23 +23,23 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [isansession, setisansession] = useState(false)
   const [assignment, setAssignment] = useState(3);
-  const [project, setProject] = useState(3);
+  const [project, setProject] = useState(1);
   const [allAssignment, setAllAssignment] = useState([]);
   const [attendance, setAttendance] = useState(87); // Added attendance state
   
   // Dummy team members data
-  const teamMembers = [
+  const [teamMembers,setTeamMembers] = useState([
     { id: 1, name: "Alex Johnson", avatar: "/api/placeholder/40/40", role: "leader" },
     { id: 2, name: "Maria Garcia", avatar: "/api/placeholder/40/40", role: "member" },
     { id: 3, name: "Sam Patel", avatar: "/api/placeholder/40/40", role: "member" },
     { id: 4, name: "Jordan Lee", avatar: "/api/placeholder/40/40", role: "member" },
     { id: 5, name: "Taylor Reyes", avatar: "/api/placeholder/40/40", role: "member" },
-  ];
+  ])
 
   // Project data with progress
   const projectData = [
     { id: 1, title: "Capstone Project", progress: 65, team: teamMembers },
-    { id: 2, title: "Group Project", progress: 42, team: teamMembers },
+    { id: 2, title: "Group Project", progress: 42, team: [] },
     { id: 3, title: "Individual Project", progress: 28, team: null },
   ];
 
@@ -178,15 +178,19 @@ export default function Home() {
                   <p className="text-muted-foreground">Continue your learning journey</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button variant="outline" size="sm">
-                    <BellIcon className="w-4 h-4 mr-2" />
-                    Notifications
-                  </Button>
-                  <Button>
-                    <ClipboardIcon className="w-4 h-4 mr-2" />
-                    Upcoming Tasks
-                  </Button>
-                </div>
+                  <Link href="/poject" className=" hover:underline" prefetch={false}>
+  <Button variant="outline" size="sm" >
+    <FolderOpenDot className="w-4 h-4 mr-2" />
+    Manage Projects
+  </Button>
+  </Link>
+  <Link href="/course" className=" hover:underline" prefetch={false}>
+  <Button>
+    <CirclePlay className="w-4 h-4 mr-2" />
+    Continue Learning
+  </Button>
+  </Link>
+</div>
               </div>
             </div>
           </div>
@@ -407,9 +411,9 @@ export default function Home() {
               </Card>
             </div>
             
-            {/* Projects and Leaderboard section */}
+            {/* Projects and Activity Summary section */}
             <div className="grid gap-6 md:grid-cols-2">
-              {/* Projects section with tabs */}
+              {/* Projects section */}
               <Card className="shadow-md hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <div>
@@ -421,28 +425,19 @@ export default function Home() {
                   </Link>
                 </CardHeader>
                 <CardContent>
-                  <Tabs defaultValue="capstone" className="w-full">
-                    <TabsList className="grid grid-cols-3 mb-4">
-                      <TabsTrigger value="capstone">Capstone</TabsTrigger>
-                      <TabsTrigger value="group">Group</TabsTrigger>
-                      <TabsTrigger value="individual">Individual</TabsTrigger>
-                    </TabsList>
+                  <Tabs defaultValue="project-1" className="w-full">
+                   
                     
                     {projectData.map((project, index) => (
-                      <TabsContent value={index === 0 ? "capstone" : index === 1 ? "group" : "individual"} key={index}>
+                      <TabsContent value={`project-${project.id}`} key={index}>
                         <div className="space-y-4">
-                          <div className="flex items-center justify-between">
-                            <div className="font-semibold">{project.title}</div>
-                            <Badge variant={index === 0 ? "default" : index === 1 ? "secondary" : "outline"}>
-                              {project.progress}% Complete
-                            </Badge>
-                          </div>
                           
-                          <Progress value={project.progress} className="h-2" />
                           
-                          {project.team && (
+                          
+                          
+                          {project.team && project.team.length > 0 ? (
                             <div className="pt-4">
-                              <div className="text-sm font-medium mb-2">Team Members</div>
+                              <div className="text-sm font-medium mb-2">Team</div>
                               <div className="space-y-3">
                                 {project.team.map((member) => (
                                   <div className="flex items-center justify-between" key={member.id}>
@@ -453,12 +448,22 @@ export default function Home() {
                                       </Avatar>
                                       <div className="text-sm">{member.name}</div>
                                     </div>
-                                    {member.role === "leader" && (
+                                    {member.role === "leader" ? (
                                       <Badge className="bg-amber-500 hover:bg-amber-600">Leader</Badge>
+                                    ) : (
+                                      <Badge variant="outline">Member</Badge>
                                     )}
                                   </div>
                                 ))}
                               </div>
+                            </div>
+                          ) : (
+                            <div className="flex flex-col items-center justify-center p-6 mt-4 bg-muted/20 rounded-lg">
+                              <UserPlusIcon className="w-12 h-12 mb-2 text-muted-foreground" />
+                              <p className="text-center font-medium">Group not created by admin</p>
+                              <p className="text-xs text-muted-foreground text-center mt-1">
+                                Wait for instructor to assign team members.
+                              </p>
                             </div>
                           )}
                           
@@ -472,102 +477,101 @@ export default function Home() {
                 </CardContent>
               </Card>
               
-              {/* Leaderboard section with attendance */}
+              {/* Activity Summary section (replacing leaderboard) */}
               <Card className="shadow-md hover:shadow-lg transition-shadow">
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <div>
-                    <CardTitle className="text-lg font-semibold">Leaderboard</CardTitle>
-                    <p className="text-xs text-muted-foreground">Your performance and ranking</p>
+                    <CardTitle className="text-lg font-semibold">Your Activity</CardTitle>
+                    <p className="text-xs text-muted-foreground">Recent learning progress</p>
                   </div>
                   <Link href="#" className="text-sm text-primary hover:underline" prefetch={false}>
-                    View All
+                    Full Report
                   </Link>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center justify-between mb-6 bg-gradient-to-r from-primary/20 to-primary/5 p-3 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="rounded-full bg-primary/20 p-2">
-                        <TrophyIcon className="w-6 h-6 text-primary" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-lg">{user && user.name}</div>
-                        <div className="text-xs text-muted-foreground">Overall Score: 92%</div>
-                      </div>
+                  {/* Weekly activity graph */}
+                  <div className="mb-6">
+                    <h4 className="text-sm font-medium mb-2">Weekly Activity</h4>
+                    <div className="grid grid-cols-7 gap-2 mb-2">
+                      {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
+                        <div key={i} className="text-xs text-center text-muted-foreground">{day}</div>
+                      ))}
+                      {[40, 65, 85, 32, 45, 20, 60].map((height, i) => (
+                        <div key={i} className="flex flex-col items-center">
+                          <div 
+                            className="w-full bg-primary/20 rounded-sm" 
+                            style={{ height: `${height}px` }}
+                          ></div>
+                        </div>
+                      ))}
                     </div>
-                    <div>
-                      <Badge variant="outline" className="bg-primary/10 text-primary">Rank: 99+</Badge>
+                    <div className="text-xs text-muted-foreground text-center mt-1">Activity minutes by day</div>
+                  </div>
+                  
+                  {/* Upcoming deadlines */}
+                  <div className="space-y-4 mb-6">
+                    <h4 className="text-sm font-medium">Upcoming Deadlines</h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center p-2 rounded-lg bg-muted/20">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-full bg-red-100">
+                            <FileClockIcon className="w-4 h-4 text-red-600" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium">Database Project</div>
+                            <div className="text-xs text-muted-foreground">Tomorrow, 11:59 PM</div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">Urgent</Badge>
+                      </div>
+                      
+                      <div className="flex justify-between items-center p-2 rounded-lg bg-muted/20">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-full bg-amber-100">
+                            <FileClockIcon className="w-4 h-4 text-amber-600" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium">UI/UX Design Quiz</div>
+                            <div className="text-xs text-muted-foreground">May 2, 2025</div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">Coming soon</Badge>
+                      </div>
+                      
+                      <div className="flex justify-between items-center p-2 rounded-lg bg-muted/20">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-full bg-green-100">
+                            <FileClockIcon className="w-4 h-4 text-green-600" />
+                          </div>
+                          <div>
+                            <div className="text-sm font-medium">Data Structures Assignment</div>
+                            <div className="text-xs text-muted-foreground">May 5, 2025</div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Planned</Badge>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="space-y-4">
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="text-sm font-medium">Attendance</div>
-                        <div className="text-sm">{attendance}%</div>
-                      </div>
-                      <Progress value={attendance} className="h-2" />
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="text-sm font-medium">Assignment Completion</div>
-                        <div className="text-sm">85%</div>
-                      </div>
-                      <Progress value={85} className="h-2" />
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="text-sm font-medium">Quiz Performance</div>
-                        <div className="text-sm">92%</div>
-                      </div>
-                      <Progress value={92} className="h-2" />
-                    </div>
-                    
-                    <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <div className="text-sm font-medium">Project Grades</div>
-                        <div className="text-sm">78%</div>
-                      </div>
-                      <Progress value={78} className="h-2" />
-                    </div>
-                  </div>
-                  
-                  <div className="mt-6 pt-4 border-t">
-                    <h4 className="text-sm font-medium mb-3">Top Performers</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-amber-500 hover:bg-amber-600 w-6 h-6 flex items-center justify-center rounded-full p-0">1</Badge>
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage src="/api/placeholder/40/40" alt="Top performer" />
-                            <AvatarFallback>JP</AvatarFallback>
-                          </Avatar>
-                          <div className="text-sm">John Parker</div>
+                  {/* Learning streak */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-3">Current Streak</h4>
+                    <div className="flex items-center justify-between bg-gradient-to-r from-amber-100 to-amber-50 p-3 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-amber-500/20">
+                          <FlameIcon className="w-6 h-6 text-amber-600" />
                         </div>
-                        <div className="text-sm">97%</div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-slate-400 hover:bg-slate-500 w-6 h-6 flex items-center justify-center rounded-full p-0">2</Badge>
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage src="/api/placeholder/40/40" alt="Top performer" />
-                            <AvatarFallback>SS</AvatarFallback>
-                          </Avatar>
-                          <div className="text-sm">Sarah Smith</div>
+                        <div>
+                          <div className="font-medium text-lg">7 Days</div>
+                          <div className="text-xs text-muted-foreground">Keep learning to maintain your streak!</div>
                         </div>
-                        <div className="text-sm">95%</div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Badge className="bg-amber-700 hover:bg-amber-800 w-6 h-6 flex items-center justify-center rounded-full p-0">3</Badge>
-                          <Avatar className="w-8 h-8">
-                            <AvatarImage src="/api/placeholder/40/40" alt="Top performer" />
-                            <AvatarFallback>RK</AvatarFallback>
-                          </Avatar>
-                          <div className="text-sm">Ryan Kim</div>
-                        </div>
-                        <div className="text-sm">94%</div>
+                      <div className="flex">
+                        {[1, 2, 3, 4, 5, 6, 7].map((day) => (
+                          <div key={day} className="w-6 h-6 flex items-center justify-center">
+                            <div className="w-4 h-4 rounded-full bg-amber-500"></div>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -788,6 +792,67 @@ function AlertCircleIcon(props) {
       <circle cx="12" cy="12" r="10" />
       <line x1="12" x2="12" y1="8" y2="12" />
       <line x1="12" x2="12.01" y1="16" y2="16" />
+    </svg>
+  )
+}
+
+function UserPlusIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <line x1="19" x2="19" y1="8" y2="14" />
+      <line x1="22" x2="16" y1="11" y2="11" />
+    </svg>
+  )
+}
+function FileClockIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M16 22h2c.5 0 1-.2 1.4-.6.4-.4.6-.9.6-1.4V7.5L14.5 2H6c-.5 0-1 .2-1.4.6C4.2 3 4 3.5 4 4v3" />
+      <path d="M14 2v6h6" />
+      <circle cx="8" cy="16" r="6" />
+      <path d="M9.5 17.5 8 16.25V14" />
+    </svg>
+  )
+}
+function FlameIcon(props) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
     </svg>
   )
 }

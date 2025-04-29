@@ -50,6 +50,167 @@ import Logout from "./dialog/Logout"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
+// Sample notification data - in a real app, this would come from an API
+const sampleNotifications = [
+  {
+    id: 1,
+    title: "Assignment Deadline",
+    message: "Your React assignment is due tomorrow",
+    time: "1 hour ago",
+    read: false,
+    type: "assignment"
+  },
+  {
+    id: 2,
+    title: "New Course Available",
+    message: "Advanced JavaScript patterns course is now live",
+    time: "3 hours ago",
+    read: false,
+    type: "course"
+  },
+  {
+    id: 3,
+    title: "Discussion Reply",
+    message: "Sarah replied to your question about React hooks",
+    time: "Yesterday",
+    read: true,
+    type: "discussion"
+  },
+  {
+    id: 4,
+    title: "Project Feedback",
+    message: "Your instructor left feedback on your final project",
+    time: "2 days ago",
+    read: true,
+    type: "project"
+  }
+];
+
+// Notification component that will render each notification
+const NotificationItem = ({ notification, onMarkAsRead }) => {
+  const getIcon = () => {
+    switch(notification.type) {
+      case "assignment":
+        return <BiTask className="h-4 w-4 text-blue-500" />;
+      case "course":
+        return <BookOpenText className="h-4 w-4 text-green-500" />;
+      case "discussion":
+        return <GoDiscussionClosed className="h-4 w-4 text-purple-500" />;
+      case "project":
+        return <FolderGit2 className="h-4 w-4 text-orange-500" />;
+      default:
+        return <Bell className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
+  return (
+    <div 
+      className={`flex items-start gap-3 p-3 border-b last:border-b-0 hover:bg-muted/50 cursor-pointer transition-colors ${notification.read ? 'opacity-70' : 'bg-muted/20'}`}
+      onClick={() => onMarkAsRead(notification.id)}
+    >
+      <div className="mt-1 flex-shrink-0">
+        {getIcon()}
+      </div>
+      <div className="flex-1 space-y-1">
+        <div className="flex justify-between">
+          <p className={`text-sm font-medium ${!notification.read ? 'text-primary' : ''}`}>
+            {notification.title}
+          </p>
+          <span className="text-xs text-muted-foreground">{notification.time}</span>
+        </div>
+        <p className="text-xs text-muted-foreground line-clamp-2">
+          {notification.message}
+        </p>
+      </div>
+      {!notification.read && (
+        <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0 mt-1"></div>
+      )}
+    </div>
+  );
+};
+
+// NotificationsPopover component to handle notifications state and UI
+const NotificationsPopover = () => {
+  const [notifications, setNotifications] = useState(sampleNotifications);
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const unreadCount = notifications.filter(n => !n.read).length;
+  
+  const handleMarkAsRead = (id) => {
+    setNotifications(notifications.map(notif => 
+      notif.id === id ? { ...notif, read: true } : notif
+    ));
+  };
+  
+  const handleMarkAllAsRead = () => {
+    setNotifications(notifications.map(notif => ({ ...notif, read: true })));
+  };
+  
+  return (
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          <span className="sr-only">Notifications</span>
+          {unreadCount > 0 && (
+            <Badge 
+              variant="destructive" 
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+            >
+              {unreadCount}
+            </Badge>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-80">
+        <div className="flex items-center justify-between p-4 border-b">
+          <DropdownMenuLabel className="text-base font-medium">Notifications</DropdownMenuLabel>
+          {unreadCount > 0 && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-xs h-8 px-2 hover:bg-muted"
+              onClick={handleMarkAllAsRead}
+            >
+              Mark all as read
+            </Button>
+          )}
+        </div>
+        <div className="max-h-96 overflow-y-auto">
+          {notifications.length > 0 ? (
+            notifications.map(notification => (
+              <NotificationItem 
+                key={notification.id} 
+                notification={notification} 
+                onMarkAsRead={handleMarkAsRead} 
+              />
+            ))
+          ) : (
+            <div className="p-4 text-center text-muted-foreground">
+              No notifications
+            </div>
+          )}
+        </div>
+        <DropdownMenuSeparator />
+        <div className="p-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="w-full"
+            onClick={() => {
+              setIsOpen(false);
+              // In a real app, you would navigate to the notifications page
+              // router.push("/notifications");
+            }}
+          >
+            View all notifications
+          </Button>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
 export function Sidebar({children}) {
   const pathname = usePathname()
   const router = useRouter()
@@ -266,11 +427,8 @@ export function Sidebar({children}) {
 
           {/* Right side of header */}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
-              <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-primary"></span>
-            </Button>
+            {/* Replaced the simple Bell button with the NotificationsPopover component */}
+            <NotificationsPopover />
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
