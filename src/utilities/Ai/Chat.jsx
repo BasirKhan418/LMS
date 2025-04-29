@@ -116,42 +116,44 @@ const Chat = ({ aiopen, setaiopen }) => {
     <>
       <Toaster position="top-center" expand={false} />
       <Sheet open={aiopen} variants="bottom">
-        <SheetTitle className="hidden">
-menu
-        </SheetTitle>
-        <SheetContent className="w-full h-full">
-          <div
-            className="absolute right-[13px] top-[10px] cursor-pointer"
-            onClick={() => {
-              setaiopen(!aiopen);
-            }}
-          >
-            <IoCloseSharp className="text-2xl" />
-          </div>
-          <div className="flex flex-col h-full w-full bg-background">
-            <header className="flex items-center gap-4 px-6 py-4 border-b bg-card">
-              <Avatar className="w-10 h-10 border">
-                <AvatarFallback>IL</AvatarFallback>
-              </Avatar>
-              <div>
-                <div className="font-medium">IL AI</div>
-                <div className="text-sm text-muted-foreground">
-                  AI Assistant
+        <SheetTitle className="hidden">menu</SheetTitle>
+        <SheetContent className="w-full h-full p-0">
+          <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900">
+            {/* Header */}
+            <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 shadow-sm">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10 border-2 border-emerald-100 bg-emerald-500 text-white">
+                  <AvatarImage src="/ai-logo.png" alt="IL AI" />
+                  <AvatarFallback className="bg-emerald-500 text-white font-medium">IL</AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-semibold text-slate-900 dark:text-white">IL AI</div>
+                  <div className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                    Online • AI Assistant
+                  </div>
                 </div>
               </div>
+              <button 
+                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                onClick={() => setaiopen(false)}
+              >
+                <IoCloseSharp className="text-2xl text-slate-600 dark:text-slate-300" />
+              </button>
             </header>
-            <div className="flex-1 overflow-auto p-6 space-y-4">
+
+            {/* Chat Messages */}
+            <div className="flex-1 overflow-auto p-4 md:p-6 space-y-6 bg-slate-50 dark:bg-slate-900">
               {chat.map((item, index) => (
-                <div key={index}>
+                <div key={index} className="animate-fadeIn">
                   {item.type === "bot" && (
-                    <div className="flex items-start gap-4">
-                      <div className="rounded-lg w-11 h-11 bg-[#55efc4] text-3xl flex items-center justify-center px-4">
-                        <BotIcon className="w-6 h-6" />
+                    <div className="flex items-start gap-3 max-w-[85%]">
+                      <div className="flex-shrink-0 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center">
+                        <BotIcon className="w-5 h-5" />
                       </div>
-                      <div className="grid gap-1 items-start text-sm">
-                        <div className="font-medium">{item.name}</div>
-                        <div className="bg-card p-3 rounded-lg max-w-[100%] text-card-foreground">
-                          <p className="overflow-hidden">
+                      <div className="flex flex-col">
+                        <span className="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">{item.name}</span>
+                        <div className="bg-white dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none text-slate-700 dark:text-slate-200 shadow-sm border border-slate-200 dark:border-slate-700">
+                          <p className="whitespace-pre-wrap text-sm">
                             {item.message.replace(/\*/g, "")}
                           </p>
                         </div>
@@ -159,54 +161,71 @@ menu
                     </div>
                   )}
                   {item.type === "user" && (
-                    <div className="flex items-start gap-4 justify-end">
-                      <div className="grid gap-1 items-end text-sm">
-                        <div className="font-medium">{item.name}</div>
-                        <div className="bg-primary p-3 rounded-lg text-primary-foreground break-words">
-                          <p className="w-52 h-auto overflow-hidden">
-                            {item.message}
-                          </p>
-                        </div>
+                    <div className="flex items-start gap-3 ml-auto max-w-[85%] flex-row-reverse">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center">
+                        <UserIcon className="w-5 h-5" />
                       </div>
-                      <div className="rounded-lg w-11 h-11 bg-[#fdcb6e] text-3xl flex items-center justify-center px-4">
-                        <UserIcon className="w-6 h-6" />
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">{item.name}</span>
+                        <div className="bg-blue-500 dark:bg-blue-600 p-3 rounded-2xl rounded-tr-none text-white shadow-sm">
+                          <p className="whitespace-pre-wrap text-sm">{item.message}</p>
+                        </div>
                       </div>
                     </div>
                   )}
                 </div>
               ))}
+              
+              {/* Loading indicator */}
               {loading && (
-                <div className="w-full max-w-md mx-auto animate-pulse p-9">
-                  <h1 className="h-2 bg-gray-300 rounded-lg w-52 dark:bg-gray-600"></h1>
-                  <p className="w-48 h-2 mt-6 bg-gray-200 rounded-lg dark:bg-gray-700"></p>
-                  <p className="w-full h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></p>
-                  <p className="w-64 h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></p>
-                  <p className="w-4/5 h-2 mt-4 bg-gray-200 rounded-lg dark:bg-gray-700"></p>
+                <div className="flex items-start gap-3 max-w-[85%] animate-pulse">
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center">
+                    <BotIcon className="w-5 h-5" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">IL-AI</span>
+                    <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none shadow-sm border border-slate-200 dark:border-slate-700">
+                      <div className="flex gap-1">
+                        <div className="h-2 w-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                        <div className="h-2 w-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                        <div className="h-2 w-2 bg-slate-300 dark:bg-slate-600 rounded-full animate-bounce" style={{ animationDelay: "600ms" }}></div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
               <div ref={chatEndRef} />
             </div>
-            <div className="bg-card p-4 border-t">
-              <div className="relative">
+
+            {/* Input Area */}
+            <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+              <form onSubmit={handleSubmit} className="relative">
                 <Textarea
-                  placeholder="Type your message..."
+                  placeholder="Ask me anything about technology or coding..."
                   name="message"
                   id="message"
                   onChange={handleChange}
                   value={usermessage}
                   rows={1}
-                  onKeyPress={(e) => e.key === "Enter" && handleSubmit(e)}
-                  className="min-h-[48px] rounded-2xl resize-none p-4 border border-neutral-400 shadow-sm pr-16"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSubmit(e);
+                    }
+                  }}
+                  className="min-h-[50px] max-h-[150px] rounded-full resize-none py-3 px-4 pr-12 shadow-sm border border-slate-300 dark:border-slate-600 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
                 />
                 <Button
                   type="submit"
-                  size="icon"
-                  className="absolute w-8 h-8 top-3 right-3"
-                  onClick={handleSubmit}
+                  disabled={!usermessage.trim()}
+                  className="absolute right-2 bottom-1 top-1 my-auto w-10 h-10 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center transition-colors"
                 >
-                  <ArrowUpIcon className="w-4 h-4" />
+                  <ArrowUpIcon className="w-5 h-5" />
                   <span className="sr-only">Send</span>
                 </Button>
+              </form>
+              <div className="text-xs text-center mt-2 text-slate-500 dark:text-slate-400">
+                Press Enter to send, Shift+Enter for new line
               </div>
             </div>
           </div>
@@ -215,7 +234,6 @@ menu
     </>
   );
 };
-
 
 function ArrowUpIcon(props) {
   return (
