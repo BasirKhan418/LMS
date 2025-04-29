@@ -13,7 +13,9 @@ import { Switch } from "@/components/ui/switch"
 import { Bell, Calendar, AlertTriangle, Briefcase, Clock, Send, Users, Zap, CheckCircle } from "lucide-react"
 import { format } from "date-fns"
 import { Toaster,toast } from "sonner"
+import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
 export default function NotificationPage() {
+  const [loading, setLoading] = useState(false);
     //fetch all batches from api
     const [batches, setBatches] = useState([
       ])
@@ -58,61 +60,84 @@ export default function NotificationPage() {
 
   // Previous sent notifications state
   const [sentNotifications, setSentNotifications] = useState([
-    {
-      id: 1,
-      title: "System Maintenance",
-      description: "The system will be down for maintenance on Saturday night.",
-      sentTime: "2025-04-28T20:00:00",
-      category: "Schedule",
-      batch: "All Users",
-    },
-    {
-      id: 2,
-      title: "New Feature Release",
-      description: "We've added new features to the dashboard. Check them out!",
-      sentTime: "2025-04-27T14:30:00",
-      category: "Announcements",
-      batch: "Batch A",
-    },
-    {
-      id: 3,
-      title: "Server Outage Alert",
-      description: "We're experiencing some issues with our servers. Our team is working on it.",
-      sentTime: "2025-04-26T10:15:00",
-      category: "Warning",
-      batch: "Batch B",
-    },
+    
   ])
-
-  // Mock send function
-  const handleSend = () => {
+//fetch previous notifications from api
+const fetchNotifications = async () => {
+  try{
+    setIsLoading(true)
+    const data = await fetch("/api/notificationcrud", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+      },
+    })
+    const res = await data.json()
+    setIsLoading(false)
+    console.log("fetched res is ",res)
+    if (res.success) {
+      setSentNotifications(res.data)
+    } else {
+      toast.warning(res.message)
+    }
+  }
+  catch(err){
+    console.log(err)
+    toast.error("Something went wrong while fetching notifications")
+  }
+}
+useEffect(()=>{
+  fetchNotifications()
+},[])
+  //  send function
+  const handleSend = async() => {
     if (!title || !description || (!sendNow && !sendTime) || !category || !batch) {
         toast.error("Please fill in all fields before sending.")
       return
     }
-
+   setLoading(true);
     const currentTime = new Date().toISOString()
 
     const newNotification = {
-      id: sentNotifications.length + 1,
       title,
       description,
       sentTime: sendNow ? currentTime : sendTime,
       category,
       batch,
     }
+    try{
+   const res = await fetch("/api/notificationcrud", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+      },
+      body: JSON.stringify(newNotification),
+   })
+    const data = await res.json()
+    setLoading(false)
 
-    setSentNotifications([newNotification, ...sentNotifications])
+    if(data.success){
+      toast.success("Notification queued successfully")
+      setTitle("")
+      setDescription("")
+      setSendTime("")
+      setCategory("")
+      setBatch("")
+      fetchNotifications()
+      setSendNow(false)
+    }
+    else{
+      toast.error(data.message)
+    }
+    }
+    catch(err){
+      console.log(err)
+      toast.error("Something went wrong while sending notification. Please contact to the developer")
+    }
 
-    // Reset form
-    setTitle("")
-    setDescription("")
-    setSendTime("")
-    setCategory("")
-    setBatch("")
-    setSendNow(false)
-
-    toast.success("Notification sent successfully!")
+    
   }
 
   // Helper function to get category icon
@@ -146,7 +171,9 @@ export default function NotificationPage() {
         return "bg-gray-500"
     }
   }
-
+  if(isLoading){
+    return <ProfilePageSkeleton/>
+  }
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
         <Toaster richColors position="top-right" closeButton={false} />
@@ -287,7 +314,8 @@ export default function NotificationPage() {
                 </CardContent>
                 <CardFooter className="bg-slate-50 dark:bg-slate-800/50 border-t">
                   <Button onClick={handleSend} className="w-full md:w-auto">
-                    <Send className="mr-2 h-4 w-4" /> {sendNow ? "Send Now" : "Schedule Notification"}
+                  { !loading&&<> <Send className="mr-2 h-4 w-4" /> {sendNow ? "Send Now" : "Schedule Notification"}</>}
+                  { loading&&<> <Send className="mr-2 h-4 w-4" /> Processing .....</>}
                   </Button>
                 </CardFooter>
               </Card>
@@ -365,7 +393,7 @@ export default function NotificationPage() {
                   {sentNotifications.length > 0 ? (
                     sentNotifications.map((notification) => (
                       <div
-                        key={notification.id}
+                        key={notification._id}
                         className="border rounded-lg p-4 shadow-sm bg-white dark:bg-slate-800 hover:shadow-md transition-shadow"
                       >
                         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-2">
@@ -378,7 +406,7 @@ export default function NotificationPage() {
                             </Badge>
                             <Badge variant="secondary" className="text-xs">
                               <Users className="h-3 w-3 mr-1" />
-                              {notification.batch}
+                              {notification.batch.name}
                             </Badge>
                           </div>
                           <span className="text-xs text-muted-foreground flex items-center">
@@ -391,11 +419,7 @@ export default function NotificationPage() {
                           <span className="ml-2">{notification.title}</span>
                         </h3>
                         <p className="text-muted-foreground mt-2">{notification.description}</p>
-                        <div className="mt-4 flex justify-end">
-                          <Button variant="ghost" size="sm" className="text-xs">
-                            <Send className="h-3 w-3 mr-1" /> Resend
-                          </Button>
-                        </div>
+                        
                       </div>
                     ))
                   ) : (
