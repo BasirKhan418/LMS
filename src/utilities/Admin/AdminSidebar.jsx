@@ -9,7 +9,7 @@ import { MdOutlineOndemandVideo } from "react-icons/md";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { MdNavigateNext } from "react-icons/md";
 import { AiOutlineNotification } from "react-icons/ai";
-import {FolderGit2,School,Users,UsersRound,ShieldPlus} from "lucide-react"
+import {FolderGit2,School,Users,UsersRound,ShieldPlus,Send} from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import Image from "next/image"
 import { useState ,useEffect} from "react"
@@ -149,7 +149,14 @@ export default function AdminSidebar({children}) {
             <AiOutlineNotification className="h-5 w-5" />
             <span>Send Notification</span>
           </Link>
-          
+          <Link
+            href="/admininappnotification"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <Send className="h-5 w-5" />
+            <span>Mange Notifications</span>
+          </Link>
           <Link
             href="/adminvideogallery"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
