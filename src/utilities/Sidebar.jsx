@@ -267,10 +267,7 @@ export function Sidebar({children}) {
           {/* Right side of header */}
           <div className="flex items-center gap-2">
             {/* Simple Bell button - no notification functionality */}
-            <Button variant="ghost" size="icon">
-              <Bell className="h-5 w-5" />
-              <span className="sr-only">Notifications</span>
-            </Button>
+            
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
