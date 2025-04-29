@@ -26,7 +26,9 @@ export default function Home() {
   const [project, setProject] = useState(1);
   const [allAssignment, setAllAssignment] = useState([]);
   const [attendance, setAttendance] = useState(87); // Added attendance state
-  
+  const [team, setTeam] = useState({
+    team:[]
+  }); // Added team state
   // Dummy team members data
   const [teamMembers,setTeamMembers] = useState([
     { id: 1, name: "Alex Johnson", avatar: "/api/placeholder/40/40", role: "leader" },
@@ -110,7 +112,33 @@ export default function Home() {
       console.log(err)
     }
   }
-
+//find users team details
+  const findYourTeam = async(batchid, userid) => {
+    try{
+      const res = await fetch("/api/findyourteam", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": localStorage.getItem("dilmstoken")
+        },
+        body: JSON.stringify({
+          batchid: batchid,
+          userid: userid
+        })
+      })
+      const data = await res.json()
+      if(data.success) {
+        setTeam(data.data)
+      }
+      else{
+        toast.error(data.message)
+      }
+    }
+    catch(err) {
+      toast.error("Error in finding your team")
+      console.log(err)
+    }
+  }
   // Validate user with home auth
   const validatesFunc = async(token) => {
     setLoading(true);
@@ -126,7 +154,8 @@ export default function Home() {
     
     if(res.success) {
       setData(res.data);
-      console.log(res.data)
+      console.log(res)
+      findYourTeam(res.batch._id, res.user._id)
     const result = res.data.find((item)=>item.courseid.coursetype=="live")
     fetchAllAssignment(result && result.courseid._id, res.user._id);
       console.log(result)
@@ -181,7 +210,7 @@ export default function Home() {
                   <h1 className="text-2xl font-bold">Welcome back, {user && user.name}</h1>
                   <p className="text-muted-foreground">Continue your learning journey</p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <Link href="/poject" className=" hover:underline" prefetch={false}>
   <Button variant="outline" size="sm" >
     <FolderOpenDot className="w-4 h-4 mr-2" />
@@ -432,19 +461,20 @@ export default function Home() {
                   <Tabs defaultValue="project-1" className="w-full">
                    
                     
-                    {projectData.map((project, index) => (
-                      <TabsContent value={`project-${project.id}`} key={index}>
-                        <div className="space-y-4">
+                    
                           
                           
                           
                           
-                          {project.team && project.team.length > 0 ? (
+                          {team && team.team.length>1 ? (
                             <div className="pt-4">
+                              <div className="flex items-center justify-between mb-4 flex-wrap">
                               <div className="text-sm font-medium mb-2">Team</div>
+                              <div className="text-sm font-medium mb-2 bg-green-100 p-1 rounded">{team.teamname}</div>
+                              </div>
                               <div className="space-y-3">
-                                {project.team.map((member) => (
-                                  <div className="flex items-center justify-between" key={member.id}>
+                                {team!=null&&team.team.map((member) => (
+                                  <div className="flex items-center justify-between" key={member._id}>
                                     <div className="flex items-center gap-2">
                                       <Avatar className="w-8 h-8">
                                         <AvatarImage src={member.avatar} alt={member.name} />
@@ -452,7 +482,7 @@ export default function Home() {
                                       </Avatar>
                                       <div className="text-sm">{member.name}</div>
                                     </div>
-                                    {member.role === "leader" ? (
+                                    {team.teamleaderid._id==member._id ? (
                                       <Badge className="bg-amber-500 hover:bg-amber-600">Leader</Badge>
                                     ) : (
                                       <Badge variant="outline">Member</Badge>
@@ -471,12 +501,8 @@ export default function Home() {
                             </div>
                           )}
                           
-                          <div className="flex justify-end pt-2">
-                            <Button size="sm">View Details</Button>
-                          </div>
-                        </div>
-                      </TabsContent>
-                    ))}
+                         
+                    
                   </Tabs>
                 </CardContent>
               </Card>
