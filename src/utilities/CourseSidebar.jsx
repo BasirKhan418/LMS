@@ -368,7 +368,9 @@ export default function CourseSidebar({
             {/* Sidebar Header */}
             <div className="flex items-center justify-between p-4 border-b bg-gray-300">
               <div className="flex items-center space-x-2">
-                <div className="flex items-center justify-center h-10 w-48">
+                <div className="flex items-center justify-center h-10 w-48" onClick={()=>{
+                  setActiveFolder("overview")
+                }}>
                   <img src="/9.png" alt="Logo" className="h-36 w-36 absolute" />
                 </div>
               </div>
