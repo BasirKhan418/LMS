@@ -7,6 +7,7 @@ import { GrProjects } from "react-icons/gr"
 import { GoDiscussionClosed } from "react-icons/go"
 import { usePathname } from "next/navigation"
 import { FolderGit2 } from "lucide-react"
+import { GoShareAndroid } from "react-icons/go";
 import {
   Bell,
   CircleUser,
@@ -136,6 +137,16 @@ export function Sidebar({children}) {
       >
         <GoDiscussionClosed className="h-4 w-4" />
         <span>Discussion Forum</span>
+      </Link>
+      <Link
+        href="/socialmedia"
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted ${
+          pathname === "/socialmedia" ? "bg-primary-foreground text-primary font-medium" : "text-muted-foreground"
+        }`}
+        onClick={onClick}
+      >
+        <GoShareAndroid  className="h-4 w-4" />
+        <span>Social Media</span>
       </Link>
     </>
   )
