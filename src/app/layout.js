@@ -8,7 +8,6 @@ import AdminSidebar from "@/utilities/Admin/AdminSidebar";
 const inter = Inter({ subsets: ["latin"] });
 import Chat from "@/utilities/Ai/Chat";
 import { useState } from "react";
-import { TainerLogin } from "@/utilities/Auth/TainerLogin";
 import TrainerSidebar from "@/utilities/Trainer/TrainerSidebar";
 
 export default function RootLayout({ children }) {

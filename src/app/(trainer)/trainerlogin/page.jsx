@@ -1,5 +1,5 @@
 import React from 'react'
-import { TainerLogin } from '@/utilities/Auth/TainerLogin';
+import { TrainerLogin } from '@/utilities/Auth/TrainerLogin';
 export const metadata = {
   title: "Trainer Login - Infotact | Infotact Admin Panel",
   description:
@@ -46,7 +46,7 @@ export const metadata = {
 const page = () => {
   return (
     <div>
-      <TainerLogin/>
+      <TrainerLogin/>
     </div>
   )
 }

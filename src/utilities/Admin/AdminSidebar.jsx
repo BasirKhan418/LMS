@@ -18,8 +18,11 @@ import { usePathname } from "next/navigation"
 import { ValidatesFunc } from "../../../functions/authfunc";
 import { RiTeamLine } from "react-icons/ri";
 import { TbUsersGroup } from "react-icons/tb";
+import { Toaster,toast } from "sonner";
+import { useRouter } from "next/navigation";
 export default function AdminSidebar({children}) {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false)
   const [data,setData] = useState(null);
   const validates = async(token)=>{
@@ -34,11 +37,11 @@ export default function AdminSidebar({children}) {
       if(data.ansession){
         setTimeout(()=>{
           router.push("/adminlogin");
-        },4000)
+        },2000)
       }
       setTimeout(()=>{
         router.push("/adminlogin");
-      },3000)
+      },2000)
     }
   }
     useEffect(()=>{
@@ -46,6 +49,7 @@ export default function AdminSidebar({children}) {
     },[])
   return (
     <div className="flex min-h-screen w-full">
+      <Toaster richColors position="top-center" closeButton />
       <aside className="sticky top-0 hidden h-screen w-[280px] lg:w-[280px] shrink-0 border-r bg-background md:block">
         <div className="flex h-16 items-center justify-between border-b px-4">
         <Link href="/admin" className="flex items-center gap-2 font-semibold">
