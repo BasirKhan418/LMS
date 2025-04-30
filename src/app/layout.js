@@ -7,9 +7,9 @@ import NextTopLoader from 'nextjs-toploader';
 import AdminSidebar from "@/utilities/Admin/AdminSidebar";
 const inter = Inter({ subsets: ["latin"] });
 import Chat from "@/utilities/Ai/Chat";
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import Head from "next/head";
+import { TainerLogin } from "@/utilities/Auth/TainerLogin";
+import TrainerSidebar from "@/utilities/Trainer/TrainerSidebar";
 
 export default function RootLayout({ children }) {
   const [aiopen, setaiopen] = useState(false);
@@ -22,10 +22,12 @@ export default function RootLayout({ children }) {
       color="#FF0000"
       showSpinner={false}
       />
-      {pathname === "/adminlogin" ? (
+      {pathname === "/adminlogin" || pathname === "/trainerlogin" ? (
         children
       ) : pathname.startsWith("/admin") ? (
         <AdminSidebar>{children}</AdminSidebar>
+      ) : pathname.startsWith("/trainer") ? (
+        <TrainerSidebar>{children}</TrainerSidebar>
       ) : pathname === "/login" || pathname.startsWith("/course/detail") ? (
         children
       ) : (
