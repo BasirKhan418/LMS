@@ -91,7 +91,7 @@ export default function TrainerSidebar({children}) {
             <span>View Courses</span>
           </Link>
           <Link
-            href="/adminassignment"
+            href="/trainerassignment"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
