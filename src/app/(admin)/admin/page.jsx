@@ -12,6 +12,7 @@ const Page = () => {
     const [data,setData]=useState(null);
     const [analytics,setAnalytics]=useState(null);
     const [loading,setLoading] = useState(false)
+    const [sentNotifications,setSentNotifications] = useState([])
     const validates = async(token)=>{
       setLoading(true);
       let data =  await ValidatesFunc(token);
@@ -61,16 +62,42 @@ const Page = () => {
         },3000)
       }
     }
+    //fetching recent notification
+    const fetchNotifications = async () => {
+      try{
+        setLoading(true)
+        const data = await fetch("/api/notificationcrud", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+          },
+        })
+        const res = await data.json()
+        setLoading(false)
+        console.log("fetched res is ",res)
+        if (res.success) {
+          setSentNotifications(res.data)
+        } else {
+          toast.warning(res.message)
+        }
+      }
+      catch(err){
+        console.log(err)
+        toast.error("Something went wrong while fetching notifications")
+      }
+    }
       useEffect(()=>{
     validates(localStorage.getItem("dilmsadmintoken"))
     getAnalytics();
+    fetchNotifications();
       },[])
   return (
     <div>
         <Toaster position='top-center' expand={false}/>
        { loading?<HomePageSkl/>:<>
         {isansession&&<SessionDetected/>}
-     { !isansession&&<Home name={data&&data[0].name} analytics={analytics}/>}
+     { !isansession&&<Home name={data&&data[0].name} analytics={analytics} sentNotifications={sentNotifications}/>}
    
     </>}
     </div>

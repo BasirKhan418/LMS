@@ -1,6 +1,6 @@
 import React from 'react'
 export const metadata = {
-  title: "Admin Profile - Infotact | Learn Infotact ",
+  title: "Trainer Profile - Infotact | Learn Infotact ",
   description:
     "View and manage your admin profile on Infotact . Update your personal information, change settings, and oversee your platform activity to ensure smooth administration of the learning platform.",
   keywords: [

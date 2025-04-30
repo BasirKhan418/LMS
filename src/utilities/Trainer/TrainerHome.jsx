@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
-import { formatDate } from 'date-fns'
 
-const Home = ({name,analytics,sentNotifications}) => {
+const TrainerHome = ({name,analytics,sentNotifications}) => {
   const formatDateToIST = (isoString) => new Date(isoString).toLocaleString('en-GB', {day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'Asia/Kolkata'}).replace(',', '').replace(' at', '');
   return (
     <div className="min-h-screen bg-gray-100">
@@ -57,7 +56,7 @@ const Home = ({name,analytics,sentNotifications}) => {
               <CardTitle>Manage Courses</CardTitle>
               <CardDescription>Add, edit, and delete courses</CardDescription>
             </CardHeader>
-            <Link href={"/admincourse"}><CardContent>
+            <Link href={"/trainercourse"}><CardContent>
               <div className="grid gap-4">
               <Button>Add New Course</Button>
                 <Button variant="outline">View All Courses</Button>
@@ -69,7 +68,7 @@ const Home = ({name,analytics,sentNotifications}) => {
               <CardTitle>Manage Assignments</CardTitle>
               <CardDescription>View and evaluate student</CardDescription>
             </CardHeader>
-           <Link href={"/adminassignment"}><CardContent>
+           <Link href={"/trainerassignment"}><CardContent>
               <div className="grid gap-4">
                 <Button>View Assignments List</Button>
                 <Button variant="outline">Manage Assignments</Button>
@@ -81,7 +80,7 @@ const Home = ({name,analytics,sentNotifications}) => {
               <CardTitle>Manage Projects</CardTitle>
               <CardDescription>View and manage projects and evaluate</CardDescription>
             </CardHeader>
-            <Link href={"/adminprojects"}><CardContent>
+            <Link href={"/trainerprojects"}><CardContent>
               <div className="grid gap-4">
                 <Button>View Projects List</Button>
                 <Button variant="outline">Manage Project</Button>
@@ -133,4 +132,4 @@ const Home = ({name,analytics,sentNotifications}) => {
   )
 }
 
-export default Home
+export default TrainerHome

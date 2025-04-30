@@ -53,7 +53,7 @@ export default function TrainerSidebar({children}) {
     
       <aside className="sticky top-0 hidden h-screen w-[280px] lg:w-[280px] shrink-0 border-r bg-background md:block">
         <div className="flex h-16 items-center justify-between border-b px-4">
-        <Link href="/admin" className="flex items-center gap-2 font-semibold">
+        <Link href="/trainer" className="flex items-center gap-2 font-semibold">
               <div>
                 <Image 
                   src="/9.png" 
@@ -67,7 +67,7 @@ export default function TrainerSidebar({children}) {
         </div>
         <nav className="flex flex-col space-y-1 px-4 py-6">
           <Link
-            href="/admin"
+            href="/trainer"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
@@ -149,7 +149,7 @@ export default function TrainerSidebar({children}) {
               
             </Link>
             <Link
-            href="/admin"
+            href="/trainer"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
@@ -270,7 +270,7 @@ export default function TrainerSidebar({children}) {
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Logged in as {data&&data[0].name}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <Link href={"/adminprofile"}><DropdownMenuItem>Profile</DropdownMenuItem></Link>
+                <Link href={"/trainerprofile"}><DropdownMenuItem>Profile</DropdownMenuItem></Link>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={()=>setIsOpen(true)}>Logout</DropdownMenuItem>
