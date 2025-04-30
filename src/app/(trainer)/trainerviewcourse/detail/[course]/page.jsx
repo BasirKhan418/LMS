@@ -3,7 +3,7 @@ import React, { useEffect, useState, use } from 'react';
 import { Toaster, toast } from 'sonner';
 import HomePageSkl from '@/utilities/skeleton/HomePageSkl';
 import TrainerCourseSidebar from '@/utilities/Trainer/TrainerCourseSidebar';
-
+import { CourseData } from '../../../../../../functions/Coursedata';
 // You need to either import the CourseData function
 // import { CourseData } from '@/services/api'; // Add proper path to your API service
 
@@ -35,9 +35,17 @@ const Page = props => {
     }
   };
 
+const setAllcourseData = async()=>{
+    let res = await CourseData();
+    if(res.data!=null){
+      let all  = res.data&&res.data.filter((item)=>item._id != params.course)
+      setallCoursetdata(all)
+    }
 
+  }
   useEffect(() => {
     fetchallcoursedata();
+    setAllcourseData();
     
   }, []);
 

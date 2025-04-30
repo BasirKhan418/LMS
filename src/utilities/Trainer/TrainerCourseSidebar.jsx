@@ -62,7 +62,7 @@ export default function AdminCourseSidebar({
   const [currentWeekindex, setCurrentWeekindex] = useState(0);
   const [currentContentindex, setCurrentContentindex] = useState(-1);
   const [loading, setLoading] = useState(false);
-  
+  const [allComment, setAllComment] = useState([]);
   // Handle window resize
   useEffect(() => {
     const handleResize = () => {
@@ -152,14 +152,40 @@ export default function AdminCourseSidebar({
     
     return `${hours}:${minutes} ${period}`;
   };
-
+const fetchComments = async (id) => {
+    try {
+      setAllComment([]);
+      const res = await fetch(`/api/comment?id=${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("dilmstoken"),
+        },
+      });
+      const result = await res.json();
+      
+      if (result.success) {
+        if (result.data && result.data.comment != null) {
+          setAllComment(result.data.comment);
+        }
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error("Error fetching comments:", error);
+      toast.error("Failed to load comments");
+    }
+  };
   const handleContentSelection = (item, weekIndex, contentIndex) => {
     setActiveFolder(item.type);
     setActivemenu(item.name);
     setContent(item);
     setCurrentWeekindex(weekIndex);
     setCurrentContentindex(contentIndex);
-    
+
+    if (item.type === "video" || item.type === "ytvideo") {
+      fetchComments(item.name);
+    }
     // Close sidebar on mobile when selecting content
     if (window.innerWidth < 768) {
       setIsMenuOpen(false);
@@ -489,8 +515,8 @@ export default function AdminCourseSidebar({
                     <VideoContent
                       content={content}
                       allcoursedata={allcoursedata}
-                      allComment={[]}
-                      setAllComment={() => {}}
+                      allComment={allComment}
+                      setAllComment={setAllComment}
                       isAdminView={true}
                     />
                   </div>
@@ -501,8 +527,8 @@ export default function AdminCourseSidebar({
                     <YtVideo
                       content={content}
                       allcoursedata={allcoursedata}
-                      allComment={[]}
-                      setAllComment={() => {}}
+                      allComment={allComment}
+                      setAllComment={setAllComment}
                       isAdminView={true}
                     />
                   </div>

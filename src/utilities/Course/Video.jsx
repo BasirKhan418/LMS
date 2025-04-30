@@ -8,7 +8,7 @@ import MuxPlayer from '@mux/mux-player-react';
 import { useEffect, useState } from "react"
 import useAuth from "../../../hooks/useAuth"
 import { Toaster,toast } from "sonner"
-export default function VideoContent({content,allcoursedata,allComment,setAllComment}) {
+export default function VideoContent({content,allcoursedata,allComment,setAllComment, isAdminView}) {
   const [like,setLike] = useState(false)
   const [dislike,setDislike] = useState(false)
   const [data] = useAuth();
@@ -122,7 +122,7 @@ const handleCommentSubmit = async()=>{
     value={description}
   />
   <div className="flex justify-end mt-2">
-    <Button size="" onClick={handleCommentSubmit}>Post</Button>
+    <Button size="" onClick={handleCommentSubmit}  >Post</Button>
   </div>
 </div>
 
