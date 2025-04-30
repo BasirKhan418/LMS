@@ -110,7 +110,7 @@ export default function TrainerSidebar({children}) {
           
          
           <Link
-            href="/adminnotification"
+            href="/trainernotification"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
@@ -118,7 +118,7 @@ export default function TrainerSidebar({children}) {
             <span>Send Notification</span>
           </Link>
           <Link
-            href="/admininappnotification"
+            href="/trainerinappnotification"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
