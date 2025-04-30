@@ -16,8 +16,7 @@ import { useState ,useEffect} from "react"
 import Logout from "../dialog/Logout"
 import { usePathname } from "next/navigation"
 import { TrainerValidatesFunc } from "../../../functions/trainerauthfunc";
-import { RiTeamLine } from "react-icons/ri";
-import { TbUsersGroup } from "react-icons/tb";
+import { MdMenuBook } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { Toaster,toast } from "sonner";
 export default function TrainerSidebar({children}) {
@@ -82,6 +81,14 @@ export default function TrainerSidebar({children}) {
           >
             <BookIcon className="h-5 w-5" />
             <span>Courses</span>
+          </Link>
+          <Link
+            href="/trainerviewcourse"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <MdMenuBook className="h-5 w-5" />
+            <span>View Courses</span>
           </Link>
           <Link
             href="/adminassignment"
@@ -160,7 +167,7 @@ export default function TrainerSidebar({children}) {
           
           
           <Link
-            href="/admincourse"
+            href="/trainercourse"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
@@ -168,7 +175,15 @@ export default function TrainerSidebar({children}) {
             <span>Courses</span>
           </Link>
           <Link
-            href="/adminassignment"
+            href="/trainerviewcourse"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <MdMenuBook className="h-5 w-5" />
+            <span>View Courses</span>
+          </Link>
+          <Link
+            href="/trainerassignment"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >
@@ -176,7 +191,7 @@ export default function TrainerSidebar({children}) {
             <span>Assignments</span>
           </Link>
           <Link
-            href="/adminprojects"
+            href="/trainerprojects"
             className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
             prefetch={false}
           >

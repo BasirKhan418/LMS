@@ -16,7 +16,8 @@ export default function Component({
   course = { coursetype: "recording" }, // Default to recording if not specified
   rating = 4.8,
   isBestseller = false,
-  project
+  project,
+  view
 }) {
   const [isHovered, setIsHovered] = useState(false);
   
@@ -148,7 +149,7 @@ export default function Component({
         <div className="flex items-center justify-between mt-4">
           {isadmin && (
             <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <PlusIcon className="w-4 h-4 mr-2" /> Manage Course
+              <PlusIcon className="w-4 h-4 mr-2" /> {view?"View":"Manage"} Course
             </Button>
           )}
           {!isadmin && !assignment && (

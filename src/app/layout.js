@@ -21,13 +21,13 @@ export default function RootLayout({ children }) {
       color="#FF0000"
       showSpinner={false}
       />
-      {pathname === "/adminlogin" || pathname === "/trainerlogin" ? (
+      {pathname === "/adminlogin" || pathname === "/trainerlogin" || pathname.startsWith("/trainerviewcourse/detail") || pathname.startsWith("/adminviewcourse/detail") ?(
         children
       ) : pathname.startsWith("/admin") ? (
         <AdminSidebar>{children}</AdminSidebar>
       ) : pathname.startsWith("/trainer") ? (
         <TrainerSidebar>{children}</TrainerSidebar>
-      ) : pathname === "/login" || pathname.startsWith("/course/detail") ? (
+      ) : pathname === "/login" || pathname.startsWith("/course/detail")  ? (
         children
       ) : (
         // Optionally handle other paths if needed

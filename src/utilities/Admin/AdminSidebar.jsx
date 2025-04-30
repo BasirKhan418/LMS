@@ -11,7 +11,8 @@ import { MdNavigateNext } from "react-icons/md";
 import { AiOutlineNotification } from "react-icons/ai";
 import {FolderGit2,School,Users,UsersRound,ShieldPlus,Send} from "lucide-react"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import Image from "next/image"
+import Image from "next/image";
+import { MdMenuBook } from "react-icons/md";
 import { useState ,useEffect} from "react"
 import Logout from "../dialog/Logout"
 import { usePathname } from "next/navigation"
@@ -104,6 +105,14 @@ export default function AdminSidebar({children}) {
           >
             <BookIcon className="h-5 w-5" />
             <span>Courses</span>
+          </Link>
+          <Link
+            href="/adminviewcourse"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <MdMenuBook className="h-5 w-5" />
+            <span>View Courses</span>
           </Link>
           <Link
             href="/adminassignment"
@@ -237,6 +246,14 @@ export default function AdminSidebar({children}) {
           >
             <BookIcon className="h-5 w-5" />
             <span>Courses</span>
+          </Link>
+          <Link
+            href="/adminviewcourse"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <MdMenuBook className="h-5 w-5" />
+            <span>View Courses</span>
           </Link>
           <Link
             href="/adminassignment"
