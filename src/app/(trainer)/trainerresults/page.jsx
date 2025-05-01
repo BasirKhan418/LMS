@@ -2,47 +2,69 @@
 
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { 
+  AlertDialog, 
+  AlertDialogAction, 
+  AlertDialogCancel, 
+  AlertDialogContent, 
+  AlertDialogDescription, 
+  AlertDialogFooter, 
+  AlertDialogHeader, 
+  AlertDialogTitle 
+} from "@/components/ui/alert-dialog"
 import CreateTab from "@/utilities/AdminResults/create-tab"
 import PendingTab from "@/utilities/AdminResults/pending-tab"
 import EvaluatedTab from "@/utilities/AdminResults/evaluated-tab"
 import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
-import { Toaster,toast } from "sonner"
+import { Toaster, toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { TrainerValidatesFunc } from "../../../../functions/trainerauthfunc"
+
 export default function ResultsPage() {
   const [activeTab, setActiveTab] = useState("pending")
   const [isLoading, setIsLoading] = useState(false)
   const [batches, setBatches] = useState([])
   const router = useRouter()
-  const [data,setData]=useState(null);
+  const [data, setData] = useState(null)
   const [results, setResults] = useState([])
   const [pendingResults, setPendingResults] = useState([])
-    const [evaluatedResults, setEvaluatedResults] = useState([])
-    //validate trainer
-    const validates = async(token)=>{
-        setIsLoading(true);
-        let data =  await TrainerValidatesFunc(token);
-        setIsLoading(false);
-        console.log(data)
-        if(data.success){
-          fetchResults(data.data[0].batches);
-          setData(data.data[0])
-        }
-        else{
-          toast.error(data.message);
-          if(data.ansession){
-            setisansession(true);
-            setTimeout(()=>{
-              router.push("/trainerlogin");
-            },2000)
-          }
-          setTimeout(()=>{
-            router.push("/trainerlogin");
-          },2000)
-        }
-      }
-  //fetching batch from the db
+  const [evaluatedResults, setEvaluatedResults] = useState([])
+  const [isansession, setisansession] = useState(false)
+  
+  // Alert dialog state
+  const [alertOpen, setAlertOpen] = useState(false)
+  const [alertConfig, setAlertConfig] = useState({
+    title: "",
+    description: "",
+    actionText: "Confirm",
+    onConfirm: () => {},
+  })
 
+  //validate trainer
+  const validates = async(token) => {
+    setIsLoading(true)
+    let data = await TrainerValidatesFunc(token)
+    setIsLoading(false)
+    console.log(data)
+    if(data.success){
+      fetchResults(data.data[0].batches)
+      setData(data.data[0])
+    }
+    else{
+      toast.error(data.message)
+      if(data.ansession){
+        setisansession(true)
+        setTimeout(() => {
+          router.push("/trainerlogin")
+        }, 2000)
+      }
+      setTimeout(() => {
+        router.push("/trainerlogin")
+      }, 2000)
+    }
+  }
+  
+  //fetching batch from the db
   const fetchBatches = async () => {
     setBatches([])
     try{
@@ -67,163 +89,181 @@ export default function ResultsPage() {
       toast.error("Something went wrong while fetching batches")
     }
   }
-  //end of fetching batch from the db
+  
   const fetchResults = async (batch) => {
     console.log(batch)  
     try{
-        setIsLoading(true)
-        const data = await fetch("/api/resultcrud", {
-            method: "GET",
-            headers: {
-            "Content-Type": "application/json",
-            "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
-            },
-        })
-        const res = await data.json()
-        setIsLoading(false)
-        if (res.success) {
-            setResults(res.results)
-            setPendingResults(res.results.filter((r) => r.status === "pending" && batch.includes(r.batchid._id)))
-            setEvaluatedResults(res.results.filter((r) => batch.includes(r.batchid._id) && r.status === "evaluated" || r.status === "published"))
-        } else {
-            toast.warning(res.message)
-        }
+      setIsLoading(true)
+      const data = await fetch("/api/resultcrud", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const res = await data.json()
+      setIsLoading(false)
+      if (res.success) {
+        setResults(res.results)
+        setPendingResults(res.results.filter((r) => r.status === "pending" && batch.includes(r.batchid._id)))
+        setEvaluatedResults(res.results.filter((r) => batch.includes(r.batchid._id) && (r.status === "evaluated" || r.status === "published")))
+      } else {
+        toast.warning(res.message)
+      }
     }
     catch(err){
-        console.log(err)
-        toast.error("Something went wrong while fetching results")
+      console.log(err)
+      toast.error("Something went wrong while fetching results")
     }
   }
-  //find 
+  
   useEffect(() => {
     // Load results from localStorage if available
     const savedResults = localStorage.getItem("lmsResults")
     if (savedResults) {
       setResults(JSON.parse(savedResults))
     }
-    fetchBatches();
+    fetchBatches()
     validates(localStorage.getItem("dilmsadmintoken"))
-    
   }, [])
 
   useEffect(() => {
     // Save results to localStorage whenever they change
     localStorage.setItem("lmsResults", JSON.stringify(results))
   }, [results])
+  
   const handleCreateResult = async(batchId) => {
     try{
-        setIsLoading(true)
-        const data = await fetch("/api/resultcrud", {
-            method: "POST",
-            headers: {
-            "Content-Type": "application/json",
-            "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
-            },
-            body: JSON.stringify({ batchid: batchId }),
-        })
-        const res = await data.json()
-        setIsLoading(false)
-        if (res.success) {
-            toast.success(res.message)
-            fetchResults(data[0].batches)
-        } else {
-            toast.warning(res.message)
-        }   
+      setIsLoading(true)
+      const data = await fetch("/api/resultcrud", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({ batchid: batchId }),
+      })
+      const res = await data.json()
+      setIsLoading(false)
+      if (res.success) {
+        toast.success(res.message)
+        fetchResults(data[0].batches)
+      } else {
+        toast.warning(res.message)
+      }   
     }
     catch(err){
-        
-        console.log(err)
-        setIsLoading(false)
-        toast.error("Something went wrong while creating results")
+      console.log(err)
+      setIsLoading(false)
+      toast.error("Something went wrong while creating results")
     }
   }
 
   const handleUpdateResults = async(resultId, updatedUserResults) => {
-   try{
-    setIsLoading(true)
-     const res = await fetch(`/api/resultcrud`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
-      },
-      body: JSON.stringify({ resultid:resultId, updatedresults:updatedUserResults }),
-     })
-     setIsLoading(false)
-     const data1 = await res.json()
-     if(data1.success){
-      toast.success(data1.message)
-      fetchResults(data.batches)
-     }
-     else{
-      toast.error(data1.message)
-     }
-   }
-   catch(err){
-    console.log(err)
-    toast.error("Something went wrong while updating results")
-   }
-  }
-
-  const handleChangeStatus = async(resultId, newStatus) => {
-   const res = window.confirm("Are you sure you want to change the status of this result?")
-    if(!res) return
-
-   try{
-    setIsLoading(true)
-    const res = await fetch(`/api/resultcrud/updatestatus`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
-      },
-      body: JSON.stringify({ resultid: resultId, status: newStatus }),
-    })
-    setIsLoading(false)
-    const data1 = await res.json()
-    console.log(data1)
-    if(data1.success){
-      toast.success(data1.message)
-      fetchResults(data.batches)
-    }
-    else{
-      toast.error(data1.message)
-    }
-   }
-   catch(err){
-    console.log(err)
-    toast.error("Something went wrong while changing status")
-   }
-  }
-
-  const handlePublishResult = async(resultId) => {
-    const res = window.confirm("Are you sure you want to publish this result?")
-    if(!res) return
-    // Handle the publish result logic here
     try{
-     const data = await fetch(`/api/resultcrud/updatestatus`, {
-       method: "PUT",
-       headers: {
-         "Content-Type": "application/json",
+      setIsLoading(true)
+      const res = await fetch(`/api/resultcrud`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
           "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
         },
-        body: JSON.stringify({ resultid: resultId, status: "published" }),
+        body: JSON.stringify({ resultid:resultId, updatedresults:updatedUserResults }),
       })
-      const res = await data.json()
       setIsLoading(false)
-      if(res.success){
-        toast.success(res.message)
+      const data1 = await res.json()
+      if(data1.success){
+        toast.success(data1.message)
         fetchResults(data.batches)
       }
       else{
-        toast.error(res.message)
+        toast.error(data1.message)
       }
-    
     }
     catch(err){
       console.log(err)
-      toast.error("Something went wrong while publishing results")
+      toast.error("Something went wrong while updating results")
     }
+  }
+
+  // Alert dialog helper function
+  const showConfirmationDialog = (title, description, actionText, onConfirm) => {
+    setAlertConfig({
+      title,
+      description,
+      actionText,
+      onConfirm,
+    })
+    setAlertOpen(true)
+  }
+
+  const handleChangeStatus = async(resultId, newStatus) => {
+    showConfirmationDialog(
+      "Change Status",
+      "Are you sure you want to change the status of this result?",
+      "Change Status",
+      async () => {
+        try{
+          setIsLoading(true)
+          const res = await fetch(`/api/resultcrud/updatestatus`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+            },
+            body: JSON.stringify({ resultid: resultId, status: newStatus }),
+          })
+          setIsLoading(false)
+          const data1 = await res.json()
+          console.log(data1)
+          if(data1.success){
+            toast.success(data1.message)
+            fetchResults(data.batches)
+          }
+          else{
+            toast.error(data1.message)
+          }
+        }
+        catch(err){
+          console.log(err)
+          toast.error("Something went wrong while changing status")
+        }
+      }
+    )
+  }
+
+  const handlePublishResult = async(resultId) => {
+    showConfirmationDialog(
+      "Publish Result",
+      "Are you sure you want to publish this result?",
+      "Publish",
+      async () => {
+        try{
+          setIsLoading(true)
+          const data = await fetch(`/api/resultcrud/updatestatus`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+            },
+            body: JSON.stringify({ resultid: resultId, status: "published" }),
+          })
+          const res = await data.json()
+          setIsLoading(false)
+          if(res.success){
+            toast.success(res.message)
+            fetchResults(data.batches)
+          }
+          else{
+            toast.error(res.message)
+          }
+        }
+        catch(err){
+          console.log(err)
+          toast.error("Something went wrong while publishing results")
+        }
+      }
+    )
   }
 
   return (
@@ -261,10 +301,7 @@ export default function ResultsPage() {
 
         <main className="container mx-auto px-4 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
-              {/* <TabsTrigger value="create" className="text-base">
-                Create
-              </TabsTrigger> */}
+            <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="pending" className="text-base">
                 Pending
               </TabsTrigger>
@@ -293,6 +330,34 @@ export default function ResultsPage() {
               />
             </TabsContent>
           </Tabs>
+          
+          {/* Alert Dialog Component */}
+          <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+            <AlertDialogContent className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-lg">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-xl text-slate-900 dark:text-white">
+                  {alertConfig.title}
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-slate-500 dark:text-slate-400">
+                  {alertConfig.description}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border-0">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction 
+                  className="bg-purple-600 hover:bg-purple-700 text-white" 
+                  onClick={() => {
+                    alertConfig.onConfirm();
+                    setAlertOpen(false);
+                  }}
+                >
+                  {alertConfig.actionText}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </main>
       </div>
     )
