@@ -267,7 +267,7 @@ export default function ResultsPage() {
                     {/* <Button variant="outline" size="sm" className="bg-white/70">
                       <Download className="h-4 w-4 mr-1" /> Export
                     </Button> */}
-                    <img src="/11.png" alt="Result" className="h-16 w-16 " />
+                    <img src="/11.png" alt="Result" className="h-20 w-20" />
                   </div>
                 </div>
               </CardHeader>
