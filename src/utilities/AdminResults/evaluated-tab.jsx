@@ -4,21 +4,64 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, ChevronUp, Send } from "lucide-react"
+import { ChevronDown, ChevronUp, Send, ExternalLink } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
-export default function EvaluatedTab({ results, onPublishResult,isadmin }) {
+export default function EvaluatedTab({ results, onPublishResult, isadmin }) {
   const [openBatches, setOpenBatches] = useState({})
+  const [publishModalOpen, setPublishModalOpen] = useState(false)
+  const [currentResultId, setCurrentResultId] = useState(null)
+  const [stipendUrl, setStipendUrl] = useState("")
+  const [urlError, setUrlError] = useState("")
 
   const toggleBatch = (batchId) => {
     setOpenBatches((prev) => ({
       ...prev,
       [batchId]: !prev[batchId],
     }))
+  }
+
+  const handlePublishClick = (resultId) => {
+    setCurrentResultId(resultId)
+    setStipendUrl("")
+    setUrlError("")
+    setPublishModalOpen(true)
+  }
+
+  const handleConfirmPublish = () => {
+    // Simple URL validation
+    if (!stipendUrl.trim()) {
+      setUrlError("Stipend URL is required")
+      return
+    }
+
+    // Basic URL format validation
+    try {
+      new URL(stipendUrl)
+      setUrlError("")
+    } catch (e) {
+      setUrlError("Please enter a valid URL")
+      return
+    }
+
+    // If validation passes, publish result and close modal
+    console.log("Publishing result with stipend URL:", stipendUrl)
+    onPublishResult(currentResultId, stipendUrl)
+    setPublishModalOpen(false)
   }
 
   if (results.length === 0) {
@@ -43,16 +86,16 @@ export default function EvaluatedTab({ results, onPublishResult,isadmin }) {
           className="bg-white dark:bg-slate-950 rounded-lg shadow-md border border-slate-200 dark:border-slate-800 overflow-hidden"
         >
           <CollapsibleTrigger className="w-full flex items-center justify-between p-4 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors">
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 text-left">
               <Badge
                 variant="outline"
                 className={
-                  result.status=="published"
+                  result.status == "published"
                     ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800"
                     : "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
                 }
               >
-                {result.status=="published" ? "Published" : "Evaluated"}
+                {result.status == "published" ? "Published" : "Evaluated"}
               </Badge>
               <h3 className="text-lg font-medium">{result.batchid.name}</h3>
               <span className="text-sm text-slate-500 dark:text-slate-400">
@@ -65,7 +108,7 @@ export default function EvaluatedTab({ results, onPublishResult,isadmin }) {
                 {result.duration} onwards
               </span>
             </div>
-            {openBatches[result._id] ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
+            {openBatches[result._id] ? <ChevronUp className="h-5 w-5 flex-shrink-0" /> : <ChevronDown className="h-5 w-5 flex-shrink-0" />}
           </CollapsibleTrigger>
 
           <CollapsibleContent>
@@ -190,9 +233,9 @@ export default function EvaluatedTab({ results, onPublishResult,isadmin }) {
               </Tabs>
 
               <div className="mt-6 flex items-center justify-end">
-                {result.status!="published" && isadmin &&(
+                {result.status != "published" && isadmin && (
                   <Button
-                    onClick={() => onPublishResult(result._id)}
+                    onClick={() => handlePublishClick(result._id)}
                     className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
                   >
                     <Send className="h-4 w-4" />
@@ -204,6 +247,52 @@ export default function EvaluatedTab({ results, onPublishResult,isadmin }) {
           </CollapsibleContent>
         </Collapsible>
       ))}
+
+      {/* Publish Confirmation Modal */}
+      <Dialog open={publishModalOpen} onOpenChange={setPublishModalOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Publish Results</DialogTitle>
+            <DialogDescription>
+              Please enter the URL where students can find information about their stipends before publishing the results.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="stipendUrl" className="text-sm font-medium">
+                Stipend URL
+              </Label>
+              <div className="flex items-center space-x-2">
+                <ExternalLink className="h-4 w-4 text-slate-400" />
+                <Input
+                  id="stipendUrl"
+                  placeholder="https://example.com/stipends"
+                  className="flex-1"
+                  value={stipendUrl}
+                  onChange={(e) => setStipendUrl(e.target.value)}
+                />
+              </div>
+              {urlError && <p className="text-sm text-red-500">{urlError}</p>}
+            </div>
+            <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800">
+              <AlertDescription className="text-blue-800 dark:text-blue-300 text-sm">
+                Publishing results will notify all students about their performance and provide access to stipend information.
+              </AlertDescription>
+            </Alert>
+          </div>
+          <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+            <Button variant="outline" onClick={() => setPublishModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleConfirmPublish}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
+              Confirm & Publish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

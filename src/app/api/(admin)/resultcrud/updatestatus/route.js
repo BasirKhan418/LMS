@@ -13,13 +13,15 @@ try{
         return NextResponse.json({success:false,message:"Unauthorized"})
     }
     await ConnectDb()
-    const {resultid} = await req.json()
+    const {resultid,status,url} = await req.json()
+    console.log(resultid,status,url)
     const findresult = await Result.findById(resultid)
     if(!findresult){
         return NextResponse.json({success:false,message:"Result not found"})
     }
     const updatedresult = await Result.findByIdAndUpdate(resultid,{
-        status:"published"
+        status:"published",
+        url:url
     },{new:true})
     return NextResponse.json({success:true,message:"Result status updated successfully to published !",result:updatedresult})
 }
@@ -40,13 +42,14 @@ export const PUT = async (req) => {
             return NextResponse.json({success:false,message:"Unauthorized"})
         }
         await ConnectDb()
-        const {resultid,status} = await req.json()
+        const {resultid,status,url} = await req.json()
         const findresult = await Result.findById(resultid)
         if(!findresult){
             return NextResponse.json({success:false,message:"Result not found"})
         }
         const updatedresult = await Result.findByIdAndUpdate(resultid,{
-            status:status
+            status:status,
+            url:url
         },{new:true})
         return NextResponse.json({success:true,message:"Result status updated successfully",result:updatedresult})
     }

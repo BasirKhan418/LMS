@@ -6,5 +6,6 @@ const ResultSchema = new Schema({
  batchid:{type:Schema.Types.ObjectId,required:true,ref:'Batch'},
  users: [{ type: Schema.Types.ObjectId, ref: 'User' }],
  results:{type:Array,default:[]},
+ url:{type:String,default:""},
 }, { timestamps: true });
 export default mongoose.models.Result || mongoose.model('Result', ResultSchema);

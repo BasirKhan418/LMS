@@ -169,10 +169,12 @@ export default function ResultsPage() {
    }
   }
 
-  const handlePublishResult = async(resultId) => {
+  const handlePublishResult = async(resultId,url) => {
     const res = window.confirm("Are you sure you want to publish this result?")
     if(!res) return
     // Handle the publish result logic here
+    console.log("Publishing result with ID:", resultId)
+    console.log("Publishing result with URL:", url)
     try{
      const data = await fetch(`/api/resultcrud/updatestatus`, {
        method: "PUT",
@@ -180,7 +182,7 @@ export default function ResultsPage() {
          "Content-Type": "application/json",
           "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
         },
-        body: JSON.stringify({ resultid: resultId, status: "published" }),
+        body: JSON.stringify({ resultid: resultId, status: "published",url }),
       })
       const res = await data.json()
       setIsLoading(false)
