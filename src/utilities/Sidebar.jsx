@@ -8,6 +8,7 @@ import { GoDiscussionClosed } from "react-icons/go"
 import { usePathname } from "next/navigation"
 import { FolderGit2 } from "lucide-react"
 import { GoShareAndroid } from "react-icons/go";
+import { MdOutlineLeaderboard } from "react-icons/md";
 import {
   Bell,
   CircleUser,
@@ -127,6 +128,16 @@ export function Sidebar({children}) {
       >
         <FolderGit2 className="h-4 w-4" />
         <span>Projects</span>
+      </Link>
+      <Link
+        href="/results"
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted ${
+          pathname === "/results" ? "bg-primary-foreground text-primary font-medium" : "text-muted-foreground"
+        }`}
+        onClick={onClick}
+      >
+        <MdOutlineLeaderboard  className="h-4 w-4" />
+        <span>Results</span>
       </Link>
       <Link
         href="/discussion"
