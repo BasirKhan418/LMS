@@ -131,9 +131,15 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
               >
                 Pending
               </Badge>
-              <h3 className="text-lg font-medium">{result.batchName}</h3>
+              <h3 className="text-lg font-medium">{result.batchid.name}</h3>
               <span className="text-sm text-slate-500 dark:text-slate-400">
                 {new Date(result.createdAt).toLocaleDateString()}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {result.batchid.domain}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                Duration :- {result.duration} onwards
               </span>
             </div>
             {openBatches[result._id] ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
@@ -164,7 +170,8 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                               Fetch Automated Marks
                             </Button>
                           </CardTitle>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">{user.email}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Email:- {user.email}</p>
+                          <p className="text-sm text-slate-500 dark:text-slate-400">Duration:- {user.month}</p>
                         </CardHeader>
                         <CardContent>
                           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

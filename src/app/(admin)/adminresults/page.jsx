@@ -5,23 +5,77 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import CreateTab from "@/utilities/AdminResults/create-tab"
 import PendingTab from "@/utilities/AdminResults/pending-tab"
 import EvaluatedTab from "@/utilities/AdminResults/evaluated-tab"
-
+import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
+import { Toaster,toast } from "sonner"
 export default function ResultsPage() {
   const [activeTab, setActiveTab] = useState("create")
-  const [batches, setBatches] = useState([
-    { _id: "1", name: "Batch 2023 Spring" },
-    { _id: "2", name: "Batch 2023 Fall" },
-    { _id: "3", name: "Batch 2024 Winter" },
-  ])
+  const [isLoading, setIsLoading] = useState(false)
+  const [batches, setBatches] = useState([])
 
   const [results, setResults] = useState([])
+  const [pendingResults, setPendingResults] = useState([])
+    const [evaluatedResults, setEvaluatedResults] = useState([])
+  //fetching batch from the db
 
+  const fetchBatches = async () => {
+    setBatches([])
+    try{
+      setIsLoading(true)
+      const data = await fetch("/api/batchcrud", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+      })
+      const res = await data.json()
+      setIsLoading(false)
+      if (res.success) {
+        setBatches(res.batch)
+      } else {
+        toast.warning(res.message)
+      }
+    }
+    catch(err){
+      console.log(err)
+      toast.error("Something went wrong while fetching batches")
+    }
+  }
+  //end of fetching batch from the db
+  const fetchResults = async () => {
+    try{
+        setIsLoading(true)
+        const data = await fetch("/api/resultcrud", {
+            method: "GET",
+            headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+            },
+        })
+        const res = await data.json()
+        setIsLoading(false)
+        if (res.success) {
+            setResults(res.results)
+            setPendingResults(res.results.filter((r) => r.status === "pending"))
+            setEvaluatedResults(res.results.filter((r) => r.status === "evaluated"))
+        } else {
+            toast.warning(res.message)
+        }
+    }
+    catch(err){
+        console.log(err)
+        toast.error("Something went wrong while fetching results")
+    }
+  }
+  //find 
   useEffect(() => {
     // Load results from localStorage if available
     const savedResults = localStorage.getItem("lmsResults")
     if (savedResults) {
       setResults(JSON.parse(savedResults))
     }
+    fetchBatches();
+    fetchResults();
   }, [])
 
   useEffect(() => {
@@ -29,29 +83,32 @@ export default function ResultsPage() {
     localStorage.setItem("lmsResults", JSON.stringify(results))
   }, [results])
 
-  const handleCreateResult = (batchId) => {
-    const selectedBatch = batches.find((batch) => batch._id === batchId)
-
-    // Mock users for the selected batch
-    const users = [
-      { _id: "u1", name: "John Doe", email: "john@example.com" },
-      { _id: "u2", name: "Jane Smith", email: "jane@example.com" },
-      { _id: "u3", name: "Alex Johnson", email: "alex@example.com" },
-      { _id: "u4", name: "Sarah Williams", email: "sarah@example.com" },
-    ]
-
-    const newResult = {
-      _id: Date.now().toString(),
-      status: "pending",
-      batchid: batchId,
-      batchName: selectedBatch.name,
-      users: users,
-      results: [],
-      createdAt: new Date().toISOString(),
+  const handleCreateResult = async(batchId) => {
+    try{
+        setIsLoading(true)
+        const data = await fetch("/api/resultcrud", {
+            method: "POST",
+            headers: {
+            "Content-Type": "application/json",
+            "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+            },
+            body: JSON.stringify({ batchid: batchId }),
+        })
+        const res = await data.json()
+        setIsLoading(false)
+        if (res.success) {
+            toast.success(res.message)
+            fetchResults()
+        } else {
+            toast.warning(res.message)
+        }   
     }
-
-    setResults([...results, newResult])
-    setActiveTab("pending")
+    catch(err){
+        
+        console.log(err)
+        setIsLoading(false)
+        toast.error("Something went wrong while creating results")
+    }
   }
 
   const handleUpdateResults = (resultId, updatedUserResults) => {
@@ -73,8 +130,11 @@ export default function ResultsPage() {
   }
 
   return (
-    
+    isLoading ? (
+      <ProfilePageSkeleton />
+    ) : (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+        <Toaster richColors position="top-center" closeButton />
         <header className="bg-white dark:bg-slate-950 shadow-sm">
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
@@ -122,7 +182,7 @@ export default function ResultsPage() {
 
             <TabsContent value="pending">
               <PendingTab
-                results={results.filter((r) => r.status === "pending")}
+                results={pendingResults}
                 onUpdateResults={handleUpdateResults}
                 onChangeStatus={handleChangeStatus}
               />
@@ -130,13 +190,13 @@ export default function ResultsPage() {
 
             <TabsContent value="evaluated">
               <EvaluatedTab
-                results={results.filter((r) => r.status === "evaluated")}
+                results={evaluatedResults}
                 onPublishResult={handlePublishResult}
               />
             </TabsContent>
           </Tabs>
         </main>
       </div>
-   
+    )
   )
 }
