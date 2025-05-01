@@ -19,8 +19,10 @@ import { TrainerValidatesFunc } from "../../../functions/trainerauthfunc";
 import { MdMenuBook } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { Toaster,toast } from "sonner";
+import { MdOutlineLeaderboard } from "react-icons/md";
 export default function TrainerSidebar({children}) {
   const pathname = usePathname();
+
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false)
   const [data,setData] = useState(null);
@@ -106,7 +108,14 @@ export default function TrainerSidebar({children}) {
             <FolderGit2 className="h-5 w-5" />
             <span>Projects</span>
           </Link>
-          
+          <Link
+            href="/trainerresults"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <MdOutlineLeaderboard className="h-5 w-5" />
+            <span>Manage Results</span>
+          </Link>
           
          
           <Link
@@ -197,6 +206,14 @@ export default function TrainerSidebar({children}) {
           >
             <FolderGit2 className="h-5 w-5" />
             <span>Projects</span>
+          </Link>
+          <Link
+            href="/trainerresults"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted"
+            prefetch={false}
+          >
+            <MdOutlineLeaderboard className="h-5 w-5" />
+            <span>Manage Results</span>
           </Link>
           
           

@@ -7,14 +7,40 @@ import PendingTab from "@/utilities/AdminResults/pending-tab"
 import EvaluatedTab from "@/utilities/AdminResults/evaluated-tab"
 import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
 import { Toaster,toast } from "sonner"
+import { useRouter } from "next/navigation"
+import { TrainerValidatesFunc } from "../../../../functions/trainerauthfunc"
 export default function ResultsPage() {
-  const [activeTab, setActiveTab] = useState("create")
+  const [activeTab, setActiveTab] = useState("pending")
   const [isLoading, setIsLoading] = useState(false)
   const [batches, setBatches] = useState([])
-
+  const router = useRouter()
+  const [data,setData]=useState(null);
   const [results, setResults] = useState([])
   const [pendingResults, setPendingResults] = useState([])
     const [evaluatedResults, setEvaluatedResults] = useState([])
+    //validate trainer
+    const validates = async(token)=>{
+        setIsLoading(true);
+        let data =  await TrainerValidatesFunc(token);
+        setIsLoading(false);
+        console.log(data)
+        if(data.success){
+          fetchResults(data.data[0].batches);
+          setData(data.data[0])
+        }
+        else{
+          toast.error(data.message);
+          if(data.ansession){
+            setisansession(true);
+            setTimeout(()=>{
+              router.push("/trainerlogin");
+            },2000)
+          }
+          setTimeout(()=>{
+            router.push("/trainerlogin");
+          },2000)
+        }
+      }
   //fetching batch from the db
 
   const fetchBatches = async () => {
@@ -42,7 +68,8 @@ export default function ResultsPage() {
     }
   }
   //end of fetching batch from the db
-  const fetchResults = async () => {
+  const fetchResults = async (batch) => {
+    console.log(batch)  
     try{
         setIsLoading(true)
         const data = await fetch("/api/resultcrud", {
@@ -56,8 +83,8 @@ export default function ResultsPage() {
         setIsLoading(false)
         if (res.success) {
             setResults(res.results)
-            setPendingResults(res.results.filter((r) => r.status === "pending"))
-            setEvaluatedResults(res.results.filter((r) => r.status === "evaluated" || r.status === "published"))
+            setPendingResults(res.results.filter((r) => r.status === "pending" && batch.includes(r.batchid._id)))
+            setEvaluatedResults(res.results.filter((r) => batch.includes(r.batchid._id) && r.status === "evaluated" || r.status === "published"))
         } else {
             toast.warning(res.message)
         }
@@ -75,14 +102,14 @@ export default function ResultsPage() {
       setResults(JSON.parse(savedResults))
     }
     fetchBatches();
-    fetchResults();
+    validates(localStorage.getItem("dilmsadmintoken"))
+    
   }, [])
 
   useEffect(() => {
     // Save results to localStorage whenever they change
     localStorage.setItem("lmsResults", JSON.stringify(results))
   }, [results])
-
   const handleCreateResult = async(batchId) => {
     try{
         setIsLoading(true)
@@ -98,7 +125,7 @@ export default function ResultsPage() {
         setIsLoading(false)
         if (res.success) {
             toast.success(res.message)
-            fetchResults()
+            fetchResults(data[0].batches)
         } else {
             toast.warning(res.message)
         }   
@@ -123,13 +150,13 @@ export default function ResultsPage() {
       body: JSON.stringify({ resultid:resultId, updatedresults:updatedUserResults }),
      })
      setIsLoading(false)
-     const data = await res.json()
-     if(data.success){
-      toast.success(data.message)
-      fetchResults()
+     const data1 = await res.json()
+     if(data1.success){
+      toast.success(data1.message)
+      fetchResults(data.batches)
      }
      else{
-      toast.error(data.message)
+      toast.error(data1.message)
      }
    }
    catch(err){
@@ -153,14 +180,14 @@ export default function ResultsPage() {
       body: JSON.stringify({ resultid: resultId, status: newStatus }),
     })
     setIsLoading(false)
-    const data = await res.json()
-    console.log(data)
-    if(data.success){
-      toast.success(data.message)
-      fetchResults()
+    const data1 = await res.json()
+    console.log(data1)
+    if(data1.success){
+      toast.success(data1.message)
+      fetchResults(data.batches)
     }
     else{
-      toast.error(data.message)
+      toast.error(data1.message)
     }
    }
    catch(err){
@@ -186,7 +213,7 @@ export default function ResultsPage() {
       setIsLoading(false)
       if(res.success){
         toast.success(res.message)
-        fetchResults()
+        fetchResults(data.batches)
       }
       else{
         toast.error(res.message)
@@ -235,9 +262,9 @@ export default function ResultsPage() {
         <main className="container mx-auto px-4 py-8">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="create" className="text-base">
+              {/* <TabsTrigger value="create" className="text-base">
                 Create
-              </TabsTrigger>
+              </TabsTrigger> */}
               <TabsTrigger value="pending" className="text-base">
                 Pending
               </TabsTrigger>
@@ -262,7 +289,7 @@ export default function ResultsPage() {
               <EvaluatedTab
                 results={evaluatedResults}
                 onPublishResult={handlePublishResult}
-                isadmin={true}
+                isadmin={false}
               />
             </TabsContent>
           </Tabs>

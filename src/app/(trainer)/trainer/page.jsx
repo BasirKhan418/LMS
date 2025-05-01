@@ -26,12 +26,12 @@ const Page = () => {
         if(data.ansession){
           setisansession(true);
           setTimeout(()=>{
-            router.push("/adminlogin");
-          },4000)
+            router.push("/trainerlogin");
+          },2000)
         }
         setTimeout(()=>{
-          router.push("/adminlogin");
-        },3000)
+          router.push("/trainerlogin");
+        },2000)
       }
     }
     //get all analytics details

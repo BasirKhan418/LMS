@@ -133,10 +133,20 @@ export function TrainerLogin() {
                                 </InputOTP>
                             </div>}
                             
-                            {!isOtpSent && <Button type="submit" className="w-full" variant="" onClick={handleOtpSend}>
+                            {!isOtpSent && <Button 
+                                type="submit" 
+                                className="w-full" 
+                                variant="default" 
+                                onClick={handleOtpSend}
+                            >
                                 {loading ? "Sending..." : "Send OTP"}
                             </Button>}
-                            {isOtpSent && <Button type="submit" className="w-full" variant="" onClick={handleVerifyOtp}>
+                            {isOtpSent && <Button 
+                                type="submit" 
+                                className="w-full"
+                                variant="default"
+                                onClick={handleVerifyOtp}
+                            >
                                 {loading ? "Verifying..." : "Login"}
                             </Button>}
                         </div>

@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
 
-export default function EvaluatedTab({ results, onPublishResult }) {
+export default function EvaluatedTab({ results, onPublishResult,isadmin }) {
   const [openBatches, setOpenBatches] = useState({})
 
   const toggleBatch = (batchId) => {
@@ -57,6 +57,12 @@ export default function EvaluatedTab({ results, onPublishResult }) {
               <h3 className="text-lg font-medium">{result.batchid.name}</h3>
               <span className="text-sm text-slate-500 dark:text-slate-400">
                 {new Date(result.createdAt).toLocaleDateString()}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {result.batchid.domain}
+              </span>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {result.duration} onwards
               </span>
             </div>
             {openBatches[result._id] ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
@@ -184,7 +190,7 @@ export default function EvaluatedTab({ results, onPublishResult }) {
               </Tabs>
 
               <div className="mt-6 flex items-center justify-end">
-                {!result.published && (
+                {result.status!="published" && isadmin &&(
                   <Button
                     onClick={() => onPublishResult(result._id)}
                     className="bg-green-600 hover:bg-green-700 flex items-center gap-2"
