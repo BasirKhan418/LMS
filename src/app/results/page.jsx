@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState ,useEffect} from "react"
 import {
   AlertCircle,
   Award,
@@ -23,58 +23,90 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-
-// Mock data - replace with your actual data fetching logic
-const mockResults = {
-  "1 Month": {
-    _id: "67b464dcb0285001210b4b93",
-    projectreview: "10",
-    viva: "5",
-    finalprojectreview: "25",
-    finalviva: "5",
-    attendance: "12",
-    socialmediasharing: "8",
-    totalmarks: "80",
-    completionDate: "2023-04-15",
-    instructor: "Dr. Sarah Johnson",
-    courseName: "Web Development Fundamentals",
-  },
-  "2 Months": null,
-  "3 Months": {
-    _id: "67b464dcb0285001210b4b94",
-    projectreview: "8",
-    viva: "4",
-    finalprojectreview: "20",
-    finalviva: "4",
-    attendance: "5",
-    socialmediasharing: "3",
-    totalmarks: "44",
-    completionDate: "2023-06-22",
-    instructor: "Prof. Michael Chen",
-    courseName: "Advanced JavaScript",
-  },
-  "4 Months": null,
-}
+import { useRouter } from "next/navigation";
+import { Toaster,toast } from "sonner";
+import { formatDate } from "date-fns";
 
 export default function ResultsPage() {
   const [selectedBatch, setSelectedBatch] = useState("1 Month")
   const [resultData, setResultData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
+  const [user, setUser] = useState(null)
+  const [data, setData] = useState(null)
+  const [wholeresult, setWholeresult] = useState(null)
+  const [batchdetails, setBatchdetails] = useState(null)
+  const router = useRouter()
 
-  const handleViewResult = () => {
-    setLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      setResultData(mockResults[selectedBatch])
+  const validateUser = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch("/api/homeauth", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "token": localStorage.getItem("dilmstoken")
+        }
+      })
+      const res = await response.json()
+      console.log("basir reg is ",res)
       setLoading(false)
-      setError(false)
-    }, 800)
+      
+      if (res.success) {
+        setUser(res.user)
+        setData(res.data)
+        setBatchdetails(res.batch)
+        if (res.user == null) {
+          router.push("/login")
+        }
+      } else {
+        toast.error(res.message || "Authentication failed")
+      }
+    } catch (err) {
+      setLoading(false)
+      toast.error("Error connecting to server")
+    }
+  }
+
+  useEffect(() => {
+    validateUser()
+  }, [])
+
+  const handleViewResult = async() => {
+    setLoading(true)
+    setResultData(null)
+    try{
+     const response = await fetch("/api/findresult", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "Authorization": localStorage.getItem("dilmstoken")
+        },
+        body: JSON.stringify({
+          duration: selectedBatch,
+          userid: user._id,
+          batchid: batchdetails._id
+        })
+      })
+      const res = await response.json()
+      setLoading(false)
+      if(res.success){
+        setResultData(res.result)
+        setWholeresult(res.data)
+        setError(false)
+      }
+      else{
+        toast.error(res.message || "Failed to fetch results")
+      }
+    }
+    catch(err){
+      toast.error("Something went wrong. Please try again later.")
+    }
   }
 
   const calculatePercentage = (result) => {
     if (!result || !result.totalmarks) return 0
-    const maxMarks = 100 // Adjust based on your actual maximum
+    const maxMarks = 60 // Updated max marks to 60
     return (Number.parseInt(result.totalmarks) / maxMarks) * 100
   }
 
@@ -93,7 +125,7 @@ export default function ResultsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      
+      <Toaster richColors position="top-center" closeButton />
 
       <main className="container mx-auto py-8 px-4 max-w-5xl">
         {/* Student Profile Summary */}
@@ -105,23 +137,23 @@ export default function ResultsPage() {
             <div className="flex flex-col md:flex-row gap-6 items-start md:items-center relative z-10">
               <Avatar className="h-20 w-20 border-4 border-white shadow-md">
                 <AvatarImage src="/placeholder.svg?height=80&width=80" alt="Student" />
-                <AvatarFallback className="text-2xl">ST</AvatarFallback>
+                <AvatarFallback className="text-2xl">{user&&user.name[0]}</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold">Alex Johnson</h2>
+                <h2 className="text-2xl font-bold">{user&&user.name}</h2>
                 <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <User className="h-4 w-4" />
-                    <span>ID: STU-2023-0042</span>
+                    <span>ID: {user&&user._id.slice(9)}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <BookOpen className="h-4 w-4" />
-                    <span>Full Stack Development</span>
+                    <span>{user&&user.domain}</span>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   <Badge variant="outline" className="bg-white/50">
-                    2023 Batch
+                   {batchdetails&&batchdetails.name}
                   </Badge>
                   <Badge variant="outline" className="bg-white/50">
                     Remote Learning
@@ -153,6 +185,7 @@ export default function ResultsPage() {
           <CardContent className="p-6">
             <Tabs defaultValue="1 Month" className="w-full" onValueChange={(value) => setSelectedBatch(value)}>
               <TabsList className="grid grid-cols-4 mb-6 p-1 bg-muted/50">
+              {user&&user.month=="4 Months"&&<>
                 {["1 Month", "2 Months", "3 Months", "4 Months"].map((batch) => (
                   <TabsTrigger
                     key={batch}
@@ -162,6 +195,40 @@ export default function ResultsPage() {
                     {batch}
                   </TabsTrigger>
                 ))}
+                </>}
+                {user&&user.month=="3 Months"&&<>
+                {["1 Month", "2 Months", "3 Months"].map((batch) => (
+                  <TabsTrigger
+                    key={batch}
+                    value={batch}
+                    className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
+                  >
+                    {batch}
+                  </TabsTrigger>
+                ))}
+                </>}
+                {user&&user.month=="2 Months"&&<>
+                {["1 Month", "2 Months"].map((batch) => (
+                  <TabsTrigger
+                    key={batch}
+                    value={batch}
+                    className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
+                  >
+                    {batch}
+                  </TabsTrigger>
+                ))}
+                </>}
+                {user&&user.month=="1 Months"&&<>
+                {["1 Month"].map((batch) => (
+                  <TabsTrigger
+                    key={batch}
+                    value={batch}
+                    className="data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm"
+                  >
+                    {batch}
+                  </TabsTrigger>
+                ))}
+                </>}
               </TabsList>
 
               <div className="flex justify-center mt-4">
@@ -190,11 +257,11 @@ export default function ResultsPage() {
                         {selectedBatch}
                       </Badge>
                       <Badge variant="outline" className="bg-white/70">
-                        {resultData.courseName}
+                        {batchdetails&&batchdetails.name}
                       </Badge>
                     </div>
                     <CardTitle className="mt-2">Performance Results</CardTitle>
-                    <CardDescription>Completed on {resultData.completionDate}</CardDescription>
+                    <CardDescription>Published on {new Date(wholeresult.updatedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</CardDescription>
                   </div>
                   <div className="hidden md:flex items-center gap-2">
                     <Button variant="outline" size="sm" className="bg-white/70">
@@ -213,7 +280,7 @@ export default function ResultsPage() {
                         <h3 className="font-semibold text-lg">Overall Performance</h3>
                         <div className="flex items-center">
                           <span className="text-2xl font-bold">{resultData.totalmarks}</span>
-                          <span className="text-muted-foreground">/100</span>
+                          <span className="text-muted-foreground">/60</span>
                         </div>
                       </div>
 
@@ -221,23 +288,19 @@ export default function ResultsPage() {
                         <div className="h-2 bg-muted rounded-full">
                           <div
                             className="h-2 rounded-full bg-gradient-to-r from-primary to-primary/80"
-                            style={{ width: `${resultData.totalmarks}%` }}
+                            style={{ width: `${calculatePercentage(resultData)}%` }}
                           ></div>
                         </div>
                         <div className="flex justify-between mt-1 text-xs text-muted-foreground">
                           <span>0</span>
-                          <span>25</span>
-                          <span>50</span>
-                          <span>75</span>
-                          <span>100</span>
+                          <span>15</span>
+                          <span>30</span>
+                          <span>45</span>
+                          <span>60</span>
                         </div>
                       </div>
 
                       <div className="flex flex-wrap gap-4 mt-4">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Instructor:</span>
-                          <span className="text-sm font-medium">{resultData.instructor}</span>
-                        </div>
                         <div className="flex items-center gap-2">
                           <span className="text-sm text-muted-foreground">Result ID:</span>
                           <code className="text-xs bg-muted px-2 py-1 rounded">{resultData._id}</code>
@@ -248,11 +311,11 @@ export default function ResultsPage() {
                     <div className="bg-muted/20 rounded-xl p-4 flex flex-col items-center justify-center">
                       <div className="text-center">
                         <div className="text-sm text-muted-foreground mb-1">Overall Grade</div>
-                        <div className={`text-3xl font-bold ${getGradeLabel(Number(resultData.totalmarks)).color}`}>
-                          {getGradeLabel(Number(resultData.totalmarks)).label}
+                        <div className={`text-3xl font-bold ${getGradeLabel(calculatePercentage(resultData)).color}`}>
+                          {getGradeLabel(calculatePercentage(resultData)).label}
                         </div>
                         <div className="flex justify-center mt-3">
-                          {Number(resultData.totalmarks) >= 80 && (
+                          {calculatePercentage(resultData) >= 80 && (
                             <div className="flex items-center gap-1 text-amber-500">
                               <Trophy className="h-4 w-4" />
                               <span className="text-sm font-medium">Stipend Eligible</span>
@@ -272,42 +335,42 @@ export default function ResultsPage() {
                       <ScoreCard
                         title="Project Review"
                         score={resultData.projectreview}
-                        maxScore="15"
+                        maxScore="10"
                         icon={<BookOpen className="h-5 w-5 text-blue-500" />}
                         color="blue"
                       />
                       <ScoreCard
                         title="Viva"
                         score={resultData.viva}
-                        maxScore="10"
+                        maxScore="5"
                         icon={<User className="h-5 w-5 text-purple-500" />}
                         color="purple"
                       />
                       <ScoreCard
                         title="Final Project Review"
                         score={resultData.finalprojectreview}
-                        maxScore="40"
+                        maxScore="30"
                         icon={<Trophy className="h-5 w-5 text-amber-500" />}
                         color="amber"
                       />
                       <ScoreCard
                         title="Final Viva"
                         score={resultData.finalviva}
-                        maxScore="10"
+                        maxScore="5"
                         icon={<Medal className="h-5 w-5 text-emerald-500" />}
                         color="emerald"
                       />
                       <ScoreCard
                         title="Attendance"
                         score={resultData.attendance || "0"}
-                        maxScore="15"
+                        maxScore="5"
                         icon={<Calendar className="h-5 w-5 text-red-500" />}
                         color="red"
                       />
                       <ScoreCard
                         title="Social Media Sharing"
                         score={resultData.socialmediasharing || "0"}
-                        maxScore="10"
+                        maxScore="5"
                         icon={<Share2 className="h-5 w-5 text-indigo-500" />}
                         color="indigo"
                       />
@@ -339,7 +402,7 @@ export default function ResultsPage() {
               <div className="flex justify-center mb-4">
                 <div className="relative w-32 h-32">
                   <Image
-                    src="/placeholder.svg?height=128&width=128"
+                    src="/11.png"
                     width={128}
                     height={128}
                     alt="No results"
@@ -351,59 +414,13 @@ export default function ResultsPage() {
               <p className="text-muted-foreground mb-6">
                 Result is not declared yet or published yet. Please check back later.
               </p>
-              <Button variant="outline">Notify Me When Available</Button>
+              <Button variant="outline" onClick={()=>{
+                toast.success("You will be notified when results are available")
+              }}>Notify Me When Available</Button>
             </div>
           </Card>
         )}
-
-        {/* Additional Information Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-          <Card className="border-none shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-primary" />
-                Upcoming Assessments
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Your next assessment is scheduled for May 15, 2023.</p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-primary" />
-                Learning Resources
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                Access study materials and resources for your current batch.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base flex items-center gap-2">
-                <User className="h-4 w-4 text-primary" />
-                Support
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">Need help? Contact your instructor or support team.</p>
-            </CardContent>
-          </Card>
-        </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-muted/30 border-t mt-12 py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2023 EduPulse Learning Management System. All rights reserved.</p>
-        </div>
-      </footer>
     </div>
   )
 }
