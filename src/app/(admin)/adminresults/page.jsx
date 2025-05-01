@@ -57,7 +57,7 @@ export default function ResultsPage() {
         if (res.success) {
             setResults(res.results)
             setPendingResults(res.results.filter((r) => r.status === "pending"))
-            setEvaluatedResults(res.results.filter((r) => r.status === "evaluated"))
+            setEvaluatedResults(res.results.filter((r) => r.status === "evaluated" || r.status === "published"))
         } else {
             toast.warning(res.message)
         }
@@ -111,22 +111,92 @@ export default function ResultsPage() {
     }
   }
 
-  const handleUpdateResults = (resultId, updatedUserResults) => {
-    setResults((prevResults) =>
-      prevResults.map((result) => (result._id === resultId ? { ...result, results: updatedUserResults } : result)),
-    )
+  const handleUpdateResults = async(resultId, updatedUserResults) => {
+   try{
+    setIsLoading(true)
+     const res = await fetch(`/api/resultcrud`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+      },
+      body: JSON.stringify({ resultid:resultId, updatedresults:updatedUserResults }),
+     })
+     setIsLoading(false)
+     const data = await res.json()
+     if(data.success){
+      toast.success(data.message)
+      fetchResults()
+     }
+     else{
+      toast.error(data.message)
+     }
+   }
+   catch(err){
+    console.log(err)
+    toast.error("Something went wrong while updating results")
+   }
   }
 
-  const handleChangeStatus = (resultId, newStatus) => {
-    setResults((prevResults) =>
-      prevResults.map((result) => (result._id === resultId ? { ...result, status: newStatus } : result)),
-    )
+  const handleChangeStatus = async(resultId, newStatus) => {
+   const res = window.confirm("Are you sure you want to change the status of this result?")
+    if(!res) return
+
+   try{
+    setIsLoading(true)
+    const res = await fetch(`/api/resultcrud/updatestatus`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+      },
+      body: JSON.stringify({ resultid: resultId, status: newStatus }),
+    })
+    setIsLoading(false)
+    const data = await res.json()
+    console.log(data)
+    if(data.success){
+      toast.success(data.message)
+      fetchResults()
+    }
+    else{
+      toast.error(data.message)
+    }
+   }
+   catch(err){
+    console.log(err)
+    toast.error("Something went wrong while changing status")
+   }
   }
 
-  const handlePublishResult = (resultId) => {
-    setResults((prevResults) =>
-      prevResults.map((result) => (result._id === resultId ? { ...result, published: true } : result)),
-    )
+  const handlePublishResult = async(resultId) => {
+    const res = window.confirm("Are you sure you want to publish this result?")
+    if(!res) return
+    // Handle the publish result logic here
+    try{
+     const data = await fetch(`/api/resultcrud/updatestatus`, {
+       method: "PUT",
+       headers: {
+         "Content-Type": "application/json",
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({ resultid: resultId, status: "published" }),
+      })
+      const res = await data.json()
+      setIsLoading(false)
+      if(res.success){
+        toast.success(res.message)
+        fetchResults()
+      }
+      else{
+        toast.error(res.message)
+      }
+    
+    }
+    catch(err){
+      console.log(err)
+      toast.error("Something went wrong while publishing results")
+    }
   }
 
   return (

@@ -280,7 +280,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                     <h3 className="text-lg font-medium mb-3">Batch Summary</h3>
                     <div className="space-y-2">
                       <p>
-                        <strong>Batch:</strong> {result.batchName}
+                        <strong>Batch:</strong> {result.batchid.name}
                       </p>
                       <p>
                         <strong>Total Students:</strong> {result.users.length}

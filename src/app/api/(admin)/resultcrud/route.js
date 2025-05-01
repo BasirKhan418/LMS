@@ -146,3 +146,27 @@ function extractMonthNumber(monthStr) {
     }
 }
 
+//update for updating results
+export const PUT = async(req)=>{
+    try{
+     const headerlist = await headers()
+     const token = headerlist.get("authorization")
+        const auth = await AuthorizeMd(token)
+        if(!auth.status){
+            return NextResponse.json({success:false,message:"Unauthorized"})
+        }
+        await ConnectDb()
+        const {resultid,updatedresults} = await req.json()
+        const findresult = await Result.findById(resultid);
+        if(!findresult){
+            return NextResponse.json({success:false,message:"Result not found"})
+        }
+        const findAndUpdate = await Result.findByIdAndUpdate(resultid,{
+            results:updatedresults
+        },{new:true})
+        return NextResponse.json({success:true,message:"Result updated successfully"})
+    }
+    catch(err){
+        return NextResponse.json({success:false,message:"Something went wrong"})
+    }
+}

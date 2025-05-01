@@ -47,14 +47,14 @@ export default function EvaluatedTab({ results, onPublishResult }) {
               <Badge
                 variant="outline"
                 className={
-                  result.published
+                  result.status=="published"
                     ? "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800"
                     : "bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
                 }
               >
-                {result.published ? "Published" : "Evaluated"}
+                {result.status=="published" ? "Published" : "Evaluated"}
               </Badge>
-              <h3 className="text-lg font-medium">{result.batchName}</h3>
+              <h3 className="text-lg font-medium">{result.batchid.name}</h3>
               <span className="text-sm text-slate-500 dark:text-slate-400">
                 {new Date(result.createdAt).toLocaleDateString()}
               </span>
