@@ -14,7 +14,7 @@ export const GET = async()=>{
             return NextResponse.json({success:false,message:"Unauthorized"})
         }
         await ConnectDb()
-        const results = await Result.find({}).populate("batchid").populate("users")
+        const results = await Result.find({}).populate("batchid").populate("users").sort({createdAt:-1})
         console.log(results)
         if(results.length==0){
             console.log("No results found")
