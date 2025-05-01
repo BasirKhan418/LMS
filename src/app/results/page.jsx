@@ -264,9 +264,10 @@ export default function ResultsPage() {
                     <CardDescription>Published on {new Date(wholeresult.updatedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</CardDescription>
                   </div>
                   <div className="hidden md:flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="bg-white/70">
+                    {/* <Button variant="outline" size="sm" className="bg-white/70">
                       <Download className="h-4 w-4 mr-1" /> Export
-                    </Button>
+                    </Button> */}
+                    <img src="/11.png" alt="Result" className="h-16 w-16 " />
                   </div>
                 </div>
               </CardHeader>
@@ -381,7 +382,7 @@ export default function ResultsPage() {
             </Card>
 
             {/* Stipend Eligibility Card */}
-            {isEligibleForStipend(calculatePercentage(resultData)) && <StipendEligibilityCard />}
+            {isEligibleForStipend(calculatePercentage(resultData)) && <StipendEligibilityCard url={wholeresult.url}/>}
           </div>
         ) : error ? (
           <Alert variant="destructive" className="shadow-md">
@@ -467,7 +468,7 @@ function ScoreCard({ title, score, maxScore, icon, color }) {
   )
 }
 
-function StipendEligibilityCard() {
+function StipendEligibilityCard({url}) {
   return (
     <Card className="border-none shadow-lg overflow-hidden">
       <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-6 relative">
@@ -495,12 +496,13 @@ function StipendEligibilityCard() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button className="bg-green-600 hover:bg-green-700 shadow-sm">
+            <Button className="bg-green-600 hover:bg-green-700 shadow-sm" onClick={()=>{
+                window.open(`${url}`, "_blank");
+                toast.success("Stipend application form opened in new tab")
+            }}>
               Apply for Stipend <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
-            <Button variant="outline" className="bg-white/70">
-              Learn More
-            </Button>
+           
           </div>
         </div>
       </div>
