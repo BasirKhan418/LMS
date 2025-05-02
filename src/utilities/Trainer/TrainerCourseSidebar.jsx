@@ -579,7 +579,7 @@ const fetchComments = async (id) => {
 
                 {activeFolder === "meeting" && (
                   <div className="">
-                   <AdminView />
+                   <AdminView content={content}/>
                   </div>
                 )}
 

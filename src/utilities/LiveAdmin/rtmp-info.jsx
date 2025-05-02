@@ -6,16 +6,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-
-export function RTMPInfo({ disabled = false }) {
+import { toast } from "sonner"
+export function RTMPInfo({ disabled = false,rtmpUrl, streamKey,streamId,playbackId}) {
   const [copied, setCopied] = useState({
     key: false,
     url: false,
   })
-
-  // Mock RTMP data
-  const rtmpUrl = "rtmp://live.example.com/stream"
-  const rtmpKey = "live_123456789_abcdefghijklmnopqrstuvwxyz"
+  const rtmpKey = streamKey || "exampleStreamKey"
 
   const handleCopy = (type, value) => {
     navigator.clipboard.writeText(value)
@@ -30,6 +27,7 @@ export function RTMPInfo({ disabled = false }) {
         ...copied,
         [type]: false,
       })
+      toast.success(`${type === "url" ? "RTMP URL" : "Stream Key"} copied to clipboard!`)
     }, 2000)
   }
 

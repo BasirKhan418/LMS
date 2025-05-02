@@ -121,10 +121,7 @@ export function PollView({ isAdmin, onClose }) {
     setActivePoll({ ...poll, isActive: true })
     setIsCreating(false)
 
-    toast({
-      title: "Poll started",
-      description: "Your poll is now active",
-    })
+toast.success("Poll started")
   }
 
   const handleVote = () => {

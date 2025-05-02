@@ -9,16 +9,25 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Toaster, toast } from "sonner"
 
-export default function AdminView() {
+export default function AdminView({ content }) {
   const [isLive, setIsLive] = useState(false)
   const [isChatEnabled, setIsChatEnabled] = useState(true)
   const [activeView, setActiveView] = useState("dashboard")
   const [classInfo, setClassInfo] = useState({
-    title: "Advanced React Patterns & Performance Optimization",
-    startTime: new Date(Date.now() + 1000 * 60 * 2).toISOString(), // 2 minutes from now
-    instructor: "Dr. Sarah Johnson",
-    category: "Web Development",
+    title: content?.description || "Advanced React Patterns & Performance Optimization",
+    startTime: content?.date && content?.time 
+      ? new Date(`${content.date}T${content.time}`).toISOString() 
+      : new Date(Date.now() + 1000 * 60 * 2).toISOString(), // 2 minutes from now as fallback
+    instructor: content?.name || "Dr. Sarah Johnson",
+    category: content?.type || "Web Development",
     attendees: 42,
+    streamSettings: {
+      rtmpUrl: content?.rtmpurl || "",
+      streamId: content?.streamid || "",
+      playbackId: content?.playbackid || "",
+      rtmpKey: content?.rtmpkey || ""
+    },
+    link: content?.link || ""
   })
 
   // Simulate class going live after timer ends
@@ -82,11 +91,23 @@ export default function AdminView() {
                 <ClassTimer targetDate={classInfo.startTime} onComplete={() => setIsLive(true)} compact />
               </div>
 
-              <RTMPInfo disabled={true} />
+              <RTMPInfo 
+                disabled={true} 
+                rtmpUrl={classInfo.streamSettings.rtmpUrl}
+                streamKey={classInfo.streamSettings.rtmpKey}
+                streamId={classInfo.streamSettings.streamId}
+                playbackId={classInfo.streamSettings.playbackId}
+              />
             </div>
           ) : (
             <div className="mb-6">
-              <RTMPInfo disabled={false} />
+              <RTMPInfo 
+                disabled={false} 
+                rtmpUrl={classInfo.streamSettings.rtmpUrl}
+                streamKey={classInfo.streamSettings.rtmpKey}
+                streamId={classInfo.streamSettings.streamId}
+                playbackId={classInfo.streamSettings.playbackId}
+              />
             </div>
           )}
 

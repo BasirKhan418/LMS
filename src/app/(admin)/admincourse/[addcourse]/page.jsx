@@ -397,7 +397,7 @@ fetchallcoursedata()
   const createLiveStream = async()=>{
     const [streamKey,streamid,playback_ids] = await CreateLiveStream()
     console.log(streamKey,streamid,playback_ids)
-    setcreatecontentform({...createcontentform,streamid:streamid,playbackid:playback_ids,rtmpkey:streamKey})
+    setcreatecontentform({...createcontentform,streamid:streamid,playbackid:playback_ids,rtmpkey:streamKey,rtmpurl:"rtmps://global-live.mux.com:443/app"})
   }
   return (
     <>
@@ -677,7 +677,19 @@ fetchallcoursedata()
           placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
         />
       </div>}
-      {createcontentform.type=="video"||createcontentform.type=="meeting"&&<div className="grid grid-cols-4 items-center gap-4">
+      {createcontentform.type=="video" &&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="playbackid" className="text-right">
+          PlayBack Id
+        </Label>
+        <Input
+          id="playbackid"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.playbackid}
+          className="col-span-3"
+          placeholder=""
+        />
+      </div>}
+      {createcontentform.type=="meeting"&&<div className="grid grid-cols-4 items-center gap-4">
         <Label htmlFor="playbackid" className="text-right">
           PlayBack Id
         </Label>
