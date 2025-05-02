@@ -17,24 +17,6 @@ export function ChatSidebar({ isAdmin, isChatEnabled = true, setIsChatEnabled })
       text: "Welcome to the class! Feel free to ask questions.",
       timestamp: new Date(Date.now() - 1000 * 60 * 5),
     },
-    {
-      id: "2",
-      user: { name: "Sarah", role: "user" },
-      text: "Thanks for the session! Looking forward to learning more.",
-      timestamp: new Date(Date.now() - 1000 * 60 * 3),
-    },
-    {
-      id: "3",
-      user: { name: "Mike", role: "user" },
-      text: "Could you explain the concept of React hooks again?",
-      timestamp: new Date(Date.now() - 1000 * 60 * 2),
-    },
-    {
-      id: "4",
-      user: { name: "Instructor", role: "admin" },
-      text: "Sure Mike! React hooks let you use state and other React features without writing a class component.",
-      timestamp: new Date(Date.now() - 1000 * 60 * 1),
-    },
   ])
 
   const messagesEndRef = useRef(null)

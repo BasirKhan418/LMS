@@ -12,16 +12,7 @@ export function MembersSidebar({ totalMembers }) {
   // Mock data
   const members = [
     { id: "1", name: "Sarah Johnson", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 30) },
-    { id: "2", name: "Mike Peterson", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 25) },
-    { id: "3", name: "Emma Wilson", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 20) },
-    { id: "4", name: "David Lee", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 15) },
-    { id: "5", name: "Alex Chen", isActive: false, joinedAt: new Date(Date.now() - 1000 * 60 * 10) },
-    { id: "6", name: "Jessica Taylor", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 5) },
-    { id: "7", name: "Ryan Garcia", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 5) },
-    { id: "7", name: "Ryan Garcia", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 4) },
-    { id: "8", name: "Olivia Brown", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 3) },
-    { id: "9", name: "Daniel Smith", isActive: false, joinedAt: new Date(Date.now() - 1000 * 60 * 2) },
-    { id: "10", name: "Sophia Martinez", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 1) },
+   
   ]
 
   const filteredMembers = members.filter((member) => member.name.toLowerCase().includes(searchQuery.toLowerCase()))
