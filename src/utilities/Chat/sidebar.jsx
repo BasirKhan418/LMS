@@ -1,25 +1,19 @@
 import { Users, Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
-
-export default function Sidebar({ groupData }) {
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { ImageIcon } from "lucide-react"
+export default function Sidebar({ user, team }) {
+    console.log("team", team)
   return (
     <div className="flex flex-col h-full">
       {/* Group Info */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{groupData.name}</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">{groupData.description}</p>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-1">{team&&team.teamname}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{team&&team.teamname}</p>
       </div>
 
       {/* Search */}
-      <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder="Search participants..."
-            className="pl-9 bg-gray-100 dark:bg-gray-700 border-0 focus-visible:ring-1 focus-visible:ring-offset-0"
-          />
-        </div>
-      </div>
+    
 
       {/* Participants */}
       <div className="flex-1 overflow-y-auto">
@@ -28,11 +22,11 @@ export default function Sidebar({ groupData }) {
             <div className="flex items-center">
               <Users className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
               <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                Participants ({groupData.participants.length})
+                Participants ({team&&team.team.length})
               </h3>
             </div>
             <span className="text-xs font-medium px-2 py-1 rounded-full bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
-              {groupData.participants.filter((p) => p.isOnline).length} online
+              {/* {groupData.participants.filter((p) => p.isOnline).length} online */}
             </span>
           </div>
 
@@ -42,59 +36,35 @@ export default function Sidebar({ groupData }) {
               Online
             </h4>
             <div className="space-y-3">
-              {groupData.participants
-                .filter((participant) => participant.isOnline)
+              {team&&team.team
                 .map((participant) => (
                   <div
-                    key={participant.id}
+                    key={participant._id}
                     className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                   >
                     <div className="relative">
-                      <img
-                        src={participant.avatar || "/placeholder.svg"}
+                     <Avatar
+                        src={participant.profilepic || "/placeholder.svg"}
                         alt={participant.name}
-                        className="h-10 w-10 rounded-full object-cover border-2 border-white dark:border-gray-800 shadow-sm"
-                      />
+                        className="h-8 w-8 rounded-full"
+                        >
+                        <AvatarFallback className="h-8 w-8 rounded-full" delayMs={600}>
+                          {participant.name.charAt(0).toUpperCase()}
+                        </AvatarFallback>
+                        </Avatar>
                       <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white dark:border-gray-800"></span>
                     </div>
                     <div className="ml-3">
                       <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{participant.name}</p>
-                      <p className="text-xs text-green-600 dark:text-green-400">Active now</p>
+                      {/* <p className="text-xs text-green-600 dark:text-green-400">Active now</p> */}
                     </div>
                   </div>
                 ))}
             </div>
           </div>
 
-          {/* Offline participants */}
-          <div>
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
-              Offline
-            </h4>
-            <div className="space-y-3">
-              {groupData.participants
-                .filter((participant) => !participant.isOnline)
-                .map((participant) => (
-                  <div
-                    key={participant.id}
-                    className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-                  >
-                    <div className="relative">
-                      <img
-                        src={participant.avatar || "/placeholder.svg"}
-                        alt={participant.name}
-                        className="h-10 w-10 rounded-full object-cover border-2 border-white dark:border-gray-800 shadow-sm opacity-70"
-                      />
-                      <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600 border-2 border-white dark:border-gray-800"></span>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{participant.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Last seen recently</p>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
+         
+         
         </div>
       </div>
     </div>

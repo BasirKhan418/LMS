@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react"
 
-export default function ChatArea({ messages }) {
+export default function ChatArea({ messages,team }) {
   const messagesEndRef = useRef(null)
 
   const scrollToBottom = () => {

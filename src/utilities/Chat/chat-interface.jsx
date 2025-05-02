@@ -6,107 +6,12 @@ import ChatArea from "./chat-area"
 import MessageInput from "./message-input"
 import { Menu, X, Info, Phone, Video, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Toaster ,toast } from "sonner"
 
-// Dummy data
-const groupData = {
-  name: "Project Brainstorm Team",
-  description: "Group for discussing new project ideas",
-  participants: [
-    { id: 1, name: "Sarah Johnson", avatar: "/placeholder.svg?height=40&width=40", isOnline: true },
-    { id: 2, name: "Michael Chen", avatar: "/placeholder.svg?height=40&width=40", isOnline: true },
-    { id: 3, name: "Jessica Williams", avatar: "/placeholder.svg?height=40&width=40", isOnline: false },
-    { id: 4, name: "David Rodriguez", avatar: "/placeholder.svg?height=40&width=40", isOnline: true },
-    { id: 5, name: "Emily Thompson", avatar: "/placeholder.svg?height=40&width=40", isOnline: false },
-    { id: 6, name: "James Wilson", avatar: "/placeholder.svg?height=40&width=40", isOnline: false },
-    { id: 7, name: "Olivia Martinez", avatar: "/placeholder.svg?height=40&width=40", isOnline: true },
-  ],
-  messages: [
-    {
-      id: 1,
-      sender: "Sarah Johnson",
-      content: "Hey everyone! Welcome to our new group chat.",
-      timestamp: "10:30 AM",
-      isSelf: false,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 2,
-      sender: "Michael Chen",
-      content: "Thanks for setting this up, Sarah!",
-      timestamp: "10:32 AM",
-      isSelf: false,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 3,
-      sender: "You",
-      content: "I'm excited to start brainstorming ideas for the new project.",
-      timestamp: "10:35 AM",
-      isSelf: true,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 4,
-      sender: "David Rodriguez",
-      content: "Me too! I've been thinking about some potential features we could implement.",
-      timestamp: "10:37 AM",
-      isSelf: false,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 5,
-      sender: "Olivia Martinez",
-      content: "I've prepared some mockups that I'll share with everyone later today.",
-      timestamp: "10:40 AM",
-      isSelf: false,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 6,
-      sender: "You",
-      content: "That sounds great, Olivia! Looking forward to seeing them.",
-      timestamp: "10:42 AM",
-      isSelf: true,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 7,
-      sender: "Michael Chen",
-      content: "Should we schedule a video call to discuss everything in more detail?",
-      timestamp: "10:45 AM",
-      isSelf: false,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 8,
-      sender: "Sarah Johnson",
-      content: "Good idea. How about tomorrow at 2 PM?",
-      timestamp: "10:47 AM",
-      isSelf: false,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 9,
-      sender: "David Rodriguez",
-      content: "Works for me!",
-      timestamp: "10:49 AM",
-      isSelf: false,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-    {
-      id: 10,
-      sender: "You",
-      content: "I'll be there.",
-      timestamp: "10:50 AM",
-      isSelf: true,
-      avatar: "/placeholder.svg?height=40&width=40",
-    },
-  ],
-}
-
-export default function ChatInterface() {
+export default function ChatInterface({user,team}) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
+  const [messages, setMessages] = useState([]);
 
   // Set initial state and detect mobile screens
   useEffect(() => {
@@ -151,7 +56,6 @@ export default function ChatInterface() {
     setIsSidebarOpen(!isSidebarOpen)
   }
 
-  const [messages, setMessages] = useState(groupData.messages)
 
   return (
     <div className="flex flex-col h-screen overflow-hidden lg:p-4">
@@ -183,7 +87,7 @@ export default function ChatInterface() {
               </Button>
             </div>
           )}
-          <Sidebar groupData={groupData} />
+          <Sidebar team={team&&team} />
         </div>
 
         {/* Main Chat Area */}
@@ -203,12 +107,12 @@ export default function ChatInterface() {
 
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shadow-md">
-                  {groupData.name.charAt(0)}
+                  {team&&team.teamname.charAt(0).toUpperCase()}
                 </div>
                 <div className="ml-3">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{groupData.name}</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{team&&team.teamname}</h2>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {groupData.participants.filter((p) => p.isOnline).length} online
+                    4 online
                   </p>
                 </div>
               </div>
@@ -220,6 +124,9 @@ export default function ChatInterface() {
                 variant="ghost"
                 size="icon"
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-full"
+                onClick={()=>{
+                    toast.success(`You are connecting to ${team&&team.teamname} discussion group`)
+                }}
               >
                 <Info className="h-5 w-5" />
               </Button>
@@ -227,10 +134,10 @@ export default function ChatInterface() {
           </div>
 
           {/* Messages */}
-          <ChatArea messages={messages} />
+          <ChatArea messages={messages} team={team}/>
 
           {/* Message Input */}
-          <MessageInput onSendMessage={handleSendMessage} />
+          <MessageInput onSendMessage={handleSendMessage} team={team}/>
         </div>
       </div>
     </div>

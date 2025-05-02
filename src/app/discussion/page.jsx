@@ -1,56 +1,90 @@
-import React from 'react'
+"use client"
+import React, { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation';
 import ChatInterface from '@/utilities/Chat/chat-interface';
-export const metadata = {
-  title: "Discussion Forum - Infotact | Learn Infotact",
-  description:
-    "Join the Infotact Discussion Forum to interact with peers, instructors, and experts. Share your thoughts, ask questions, and collaborate on various tech topics to enhance your learning experience.",
-  keywords: [
-    "Infotact Forum",
-    "Discussion Forum",
-    "Tech Discussions",
-    "Programming Forum",
-    "Online Learning Forum",
-    "Developer Community",
-    "Collaborate with Developers",
-    "Tech Community",
-    "Learn Infotact Discussions",
-    "Ask Questions",
-  ],
-  icons: {
-    icon: "/favicon.ico",
-  },
-  openGraph: {
-    title: "Discussion Forum - Infotact | Learn Infotact",
-    description:
-      "Engage with the Infotact community in the discussion forum. Ask questions, share insights, and collaborate with fellow learners and experts in tech.",
-    url: "https://learn.Infotact.com/discussion",
-    type: "website",
-    images: [
-      {
-        url: "/alogo.png",
-        width: 1200,
-        height: 630,
-        alt: "Infotact Discussion Forum",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    site: "@Infotact",
-    title: "Discussion Forum - Infotact | Learn Infotact",
-    description:
-      "Join the Infotact Forum to discuss tech topics, ask questions, and engage with the learning community. Connect with fellow developers and mentors.",
-    images: "/alogo.png",
-  },
-  robots: "index, follow",
-  alternates: {
-    canonical: "https://learn.Infotact.com/discussion",
-  },
-};
+import ProfilePageSkeleton from '@/utilities/skeleton/ProfilePageSkeleton';
 const page = () => {
+  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState(null);
+  const [user, setUser] = useState(null);
+  const [team, setTeam] = useState(null);
+  const router = useRouter();
+  //find users team details
+    const findYourTeam = async (batchid, userid) => {
+      try {
+        const res = await fetch("/api/findyourteam", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: localStorage.getItem("dilmstoken"),
+          },
+          body: JSON.stringify({
+            batchid: batchid,
+            userid: userid,
+          }),
+        });
+        const data = await res.json();
+        if (data.success) {
+          setTeam(data.data);
+          console.log("team", data.data);
+        } else {
+          toast.error(data.message);
+        }
+      } catch (err) {
+        toast.error("Error in finding your team");
+        console.log(err);
+      }
+    };
+
+    // Validate user with home auth
+      const validatesFunc = async (token) => {
+        setLoading(true);
+        const response = await fetch("/api/homeauth", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            token: token,
+          },
+        });
+        const res = await response.json();
+        setLoading(false);
+    
+        if (res.success) {
+          setData(res.data);
+          console.log(res);
+          findYourTeam(res.batch._id, res.user._id);
+          setUser(res.user);
+          // fetchAllAssignment(res.data && res.data[0].courseid._id, res.user._id);
+        } else {
+          toast.error(res.message);
+          if (res.ansession) {
+           
+            setTimeout(() => {
+              router.push("/login");
+            }, 1000);
+          }
+          router.push("/login");
+        }
+      };
+      useEffect(() => {
+        const token = localStorage.getItem("dilmstoken");
+        if (token) {
+          validatesFunc(token);
+        } else {
+          router.push("/login");
+        }
+      },[])
   return (
     <div>
-      <ChatInterface/>
+      {loading ? (
+        <ProfilePageSkeleton />
+      ) : (
+        <div className="">
+         
+            <ChatInterface user={user} team={team} />
+          
+        </div>
+      )}
     </div>
   )
 }
