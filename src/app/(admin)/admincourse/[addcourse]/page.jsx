@@ -13,6 +13,7 @@ import UploadModal from "@/utilities/Course/UploadModal"
 import Chat from "@/utilities/Ai/Chat"
 import axios from "axios"
 import MuxGetUrlFunc from "@/app/server/Mux"
+import CreateLiveStream from "@/app/server/CreateLiveStream"
 import {
   Dialog,
   DialogContent,
@@ -100,14 +101,23 @@ fetchallcoursedata()
   const [videoId, setVideoId] = useState('')
   const [playbackid, setPlaybackid] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [createcontentform,setcreatecontentform] = useState({
-    name:"",
-    description:"",
-    link:"",
-    type:"",
-    comment:[],
-    index:indexing
-  })
+  const [createcontentform, setcreatecontentform] = useState({
+    name: "",
+    type: "",
+    description: "",
+    link: "",
+    index: indexing || "",
+    date: "",
+    time: "",
+    slide: "",
+    playbackid: "",
+    streamid: "",
+    rtmpkey: "",
+    rtmpurl: "rtmps://global-live.mux.com:443/app",
+    videoid: "",
+    poster: "",
+    videonotes: ""
+  });
   const [uploadModal,setUploadModal] = useState(false)
   const [createweekform,setcreateweekform] = useState({
     name:"",
@@ -381,6 +391,14 @@ fetchallcoursedata()
      toast.error("Something went wrong! try again later"+error)
     }
   };
+
+  //create live stream
+
+  const createLiveStream = async()=>{
+    const [streamKey,streamid,playback_ids] = await CreateLiveStream()
+    console.log(streamKey,streamid,playback_ids)
+    setcreatecontentform({...createcontentform,streamid:streamid,playbackid:playback_ids,rtmpkey:streamKey})
+  }
   return (
     <>
      <Toaster position="top-center" expand={false}/>
@@ -708,7 +726,7 @@ fetchallcoursedata()
         />
       </div>}
       {createcontentform.type=="meeting"&&<div className=" flex justify-end items-center gap-2">
-        <Button className="bg-black rounded " size="sm" > 
+        <Button className="bg-black rounded " size="sm" onClick={createLiveStream}> 
           Create a Live Session
         </Button>
       </div>}
