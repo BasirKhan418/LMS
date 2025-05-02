@@ -24,7 +24,7 @@ export function UserView() {
       const startTime = new Date(classInfo.startTime)
       if (now >= startTime) {
         setIsLive(true)
-        toast.success("Class is now live!")
+        // toast.success("Class is now live!")
       }
     }
 

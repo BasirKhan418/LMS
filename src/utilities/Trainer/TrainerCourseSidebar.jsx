@@ -11,6 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
+import AdminView  from "../LiveAdmin/admin-view";
 import {
   Card,
   CardHeader,
@@ -577,41 +578,8 @@ const fetchComments = async (id) => {
                 )}
 
                 {activeFolder === "meeting" && (
-                  <div className="max-w-md mx-auto">
-                    <Card className="shadow-md border-none">
-                      <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-                        <CardTitle>{content?.name}</CardTitle>
-                        <CardDescription className="text-blue-100">{content?.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent className="space-y-4 pt-6">
-                        <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                          <Calendar className="h-5 w-5 text-blue-600" />
-                          <span>
-                            {content?.date ? new Date(content.date).toLocaleDateString("en-US", {
-                              weekday: "long",
-                              month: "long",
-                              day: "numeric",
-                              year: "numeric",
-                            }) : "Date not specified"}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg">
-                          <Clock className="h-5 w-5 text-blue-600" />
-                          <span>{formatTime(content?.time)} (IST)</span>
-                        </div>
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                          <a
-                            href={content?.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 w-full"
-                          >
-                            <VideoIcon className="h-5 w-5" />
-                            View Meeting Link
-                          </a>
-                        </Button>
-                      </CardContent>
-                    </Card>
+                  <div className="">
+                   <AdminView />
                   </div>
                 )}
 
