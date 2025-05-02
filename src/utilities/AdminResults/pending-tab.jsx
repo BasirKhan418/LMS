@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-
+import {toast }from "sonner"
 export default function PendingTab({ results, onUpdateResults, onChangeStatus }) {
   const [openBatches, setOpenBatches] = useState({})
   const [userResults, setUserResults] = useState({})
@@ -81,13 +81,35 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
     })
   }
 
-  const fetchAutomatedMarks = (batchId, userId) => {
-    // Mock fetching automated marks
-    const attendance = Math.floor(Math.random() * 6) // 0-5
-    const socialMedia = Math.floor(Math.random() * 6) // 0-5
+  const fetchAutomatedMarks = async(batchId, userId) => {
+    try{
+    const res = await fetch("/api/resultcrud/automatedmark", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Token": localStorage.getItem("dilmsadmintoken"),
+      },
+      body: JSON.stringify({
+        batchid: batchId,
+        userid: userId,
+      }),
+    })
+    const data = await res.json()
+    if(data.success){
+      toast.success("Automated marks fetched successfully for "+userId)
+      handleInputChange(batchId, userId, "attendance", data.attendance.toString())
+      handleInputChange(batchId, userId, "socialmediasharing", data.socialmedia.toString())
+    }
+    else{
+      toast.error("Error fetching automated marks")
+    }
+    }
+    catch(err){
+      console.log(err)
+      toast.error("Error fetching automated marks")
+    }
 
-    handleInputChange(batchId, userId, "attendance", attendance.toString())
-    handleInputChange(batchId, userId, "socialmediasharing", socialMedia.toString())
+
   }
 
   const handleSubmit = (batchId, status) => {
