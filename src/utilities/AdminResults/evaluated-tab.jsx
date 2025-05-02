@@ -4,12 +4,14 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { ChevronDown, ChevronUp, Send, ExternalLink } from "lucide-react"
+import { ChevronDown, ChevronUp, Send, ExternalLink, Download } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Progress } from "@/components/ui/progress"
+import { saveAs } from 'file-saver';
+import excel from 'exceljs'
 import {
   Dialog,
   DialogContent,
@@ -63,6 +65,94 @@ export default function EvaluatedTab({ results, onPublishResult, isadmin }) {
     onPublishResult(currentResultId, stipendUrl)
     setPublishModalOpen(false)
   }
+
+  const exportToExcel = async (result) => {
+    const workbook = new excel.Workbook();
+    const worksheet = workbook.addWorksheet("Results");
+    
+    // Set up columns
+    worksheet.columns = [
+      { header: "Student Name", key: "name", width: 30 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "Project Review", key: "projectreview", width: 15 },
+      { header: "Viva", key: "viva", width: 15 },
+      { header: "Final Project Review", key: "finalprojectreview", width: 20 },
+      { header: "Final Viva", key: "finalviva", width: 15 },
+      { header: "Attendance", key: "attendance", width: 15 },
+      { header: "Social Media", key: "socialmediasharing", width: 15 },
+      { header: "Total Marks", key: "totalmarks", width: 15 },
+    ];
+    
+    // Add header with batch info
+    worksheet.addRow([`Batch: ${result.batchid.name}`]).eachCell((cell) => {
+      cell.font = { bold: true, size: 14 };
+    });
+    worksheet.addRow([`Domain: ${result.batchid.domain}`]).eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+    worksheet.addRow([`Duration: ${result.duration} onwards`]).eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+    worksheet.addRow([`Total Students: ${result.users.length}`]).eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+    worksheet.addRow([]); // Empty row for spacing
+    
+    // Add data for each user
+    result.users.forEach((user) => {
+      const userResult = result.results.find((r) => r._id === user._id) || {
+        projectreview: "0",
+        viva: "0",
+        finalprojectreview: "0",
+        finalviva: "0",
+        attendance: "0",
+        socialmediasharing: "0",
+        totalmarks: "0",
+      };
+      
+      worksheet.addRow({
+        name: user.name,
+        email: user.email,
+        projectreview: userResult.projectreview || "0",
+        viva: userResult.viva || "0",
+        finalprojectreview: userResult.finalprojectreview || "0",
+        finalviva: userResult.finalviva || "0",
+        attendance: userResult.attendance || "0",
+        socialmediasharing: userResult.socialmediasharing || "0",
+        totalmarks: userResult.totalmarks || "0",
+      });
+    });
+    
+    // Add summary row
+    worksheet.addRow([]); // Empty row for spacing
+    worksheet.addRow([
+      "Average Scores", 
+      "",
+      (result.results.reduce((sum, r) => sum + (Number.parseFloat(r.projectreview) || 0), 0) / result.results.length).toFixed(2),
+      (result.results.reduce((sum, r) => sum + (Number.parseFloat(r.viva) || 0), 0) / result.results.length).toFixed(2),
+      (result.results.reduce((sum, r) => sum + (Number.parseFloat(r.finalprojectreview) || 0), 0) / result.results.length).toFixed(2),
+      (result.results.reduce((sum, r) => sum + (Number.parseFloat(r.finalviva) || 0), 0) / result.results.length).toFixed(2),
+      (result.results.reduce((sum, r) => sum + (Number.parseFloat(r.attendance) || 0), 0) / result.results.length).toFixed(2),
+      (result.results.reduce((sum, r) => sum + (Number.parseFloat(r.socialmediasharing) || 0), 0) / result.results.length).toFixed(2),
+      (result.results.reduce((sum, r) => sum + (Number.parseFloat(r.totalmarks) || 0), 0) / result.results.length).toFixed(2),
+    ]).eachCell((cell) => {
+      cell.font = { bold: true };
+    });
+    
+    // Style header rows
+    worksheet.getRow(6).eachCell((cell) => {
+      cell.font = { bold: true };
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
+    });
+    
+    // Generate the file
+    const buf = await workbook.xlsx.writeBuffer();
+    saveAs(new Blob([buf]), `${result.batchid.name}-${result.duration}.xlsx`);
+  };
 
   if (results.length === 0) {
     return (
@@ -192,7 +282,13 @@ export default function EvaluatedTab({ results, onPublishResult, isadmin }) {
                     <h3 className="text-lg font-medium mb-3">Batch Summary</h3>
                     <div className="space-y-2">
                       <p>
-                        <strong>Batch:</strong> {result.batchName}
+                        <strong>Batch:</strong> {result.batchid.name}
+                      </p>
+                      <p>
+                        <strong>Domain:</strong> {result.batchid.domain}
+                      </p>
+                      <p>
+                        <strong>Duration:</strong> {result.duration} onwards
                       </p>
                       <p>
                         <strong>Total Students:</strong> {result.users.length}
@@ -201,7 +297,7 @@ export default function EvaluatedTab({ results, onPublishResult, isadmin }) {
                         <strong>Created On:</strong> {new Date(result.createdAt).toLocaleDateString()}
                       </p>
                       <p>
-                        <strong>Status:</strong> {result.published ? "Published" : "Evaluated"}
+                        <strong>Status:</strong> {result.status == "published" ? "Published" : "Evaluated"}
                       </p>
                     </div>
 
@@ -226,6 +322,18 @@ export default function EvaluatedTab({ results, onPublishResult, isadmin }) {
                             </p>
                           </div>
                         </div>
+                      </div>
+                    )}
+                    
+                    {result.status == "published" && (
+                      <div className="mt-6">
+                        <Button
+                          onClick={() => exportToExcel(result)}
+                          className="bg-blue-600 hover:bg-blue-700 flex items-center gap-2"
+                        >
+                          <Download className="h-4 w-4" />
+                          Export to Excel
+                        </Button>
                       </div>
                     )}
                   </div>
