@@ -1,20 +1,105 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import Sidebar from "./sidebar"
 import ChatArea from "./chat-area"
 import MessageInput from "./message-input"
-import { Menu, X, Info, Phone, Video, PanelLeftClose, PanelLeftOpen } from "lucide-react"
+import { Menu, X, Info, PanelLeftClose, PanelLeftOpen } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Toaster ,toast } from "sonner"
+import { toast } from "sonner"
+import { io } from "socket.io-client"
 
-export default function ChatInterface({user,team}) {
+export default function ChatInterface({user, team}) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [isMobile, setIsMobile] = useState(false)
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([])
+  const [onlineUsers, setOnlineUsers] = useState([])
+  const [typingUsers, setTypingUsers] = useState([])
+  const socketRef = useRef(null)
 
-  // Set initial state and detect mobile screens
+  // Initialize socket connection once
   useEffect(() => {
+    // Create socket connection
+    socketRef.current = io(process.env.NEXT_PUBLIC_WEBSOCKET_URL)
+    
+    // Handle connection event
+    socketRef.current.on("connect", () => {
+      console.log("Socket connected:", socketRef.current.id)
+      
+      // Join the team room with user information
+      if (team && team._id && user && user._id) {
+        socketRef.current.emit("join", { 
+          teamid: team._id,
+          userid: user._id,
+          userName: user.name
+        })
+      }
+    })
+
+    // Handle online users count update
+    socketRef.current.on("onlineUsers", (data) => {
+      console.log("Online users update:", data)
+      if (data.teamid === team?._id) {
+        setOnlineUsers(data.users || []) // Store the actual users array, not just count
+      }
+    })
+    
+    // Handle typing users update
+    socketRef.current.on("typingUsers", (data) => {
+      console.log("Typing users update:", data)
+      if (data.teamid === team?._id) {
+        setTypingUsers(data.users)
+      }
+    })
+    
+    // Handle incoming messages
+    socketRef.current.on("message", (data) => {
+      console.log("Message received:", data)
+      setMessages(prevMessages => [...prevMessages, data])
+    })
+
+    // Cleanup on unmount
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect()
+      }
+    }
+  }, [team?._id, user?._id, user?.name])
+
+  // Fetch existing messages on initial load
+  const fetchAllMessages = async () => {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/chat/get`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: localStorage.getItem("dilmstoken")
+        },
+        body: JSON.stringify({
+          groupid: team?._id
+        })
+      })
+      
+      const data = await res.json()
+      console.log("Fetched messages:", data)
+      
+      if (data.success) {
+        setMessages(data.data)
+      } else {
+        toast.error(data.message)
+      }
+    } catch (err) {
+      console.error("Error fetching messages:", err)
+      toast.error("Error in fetching messages")
+    }
+  }
+
+  // Set initial state, detect mobile screens, and fetch messages
+  useEffect(() => {
+    if (team?._id) {
+      fetchAllMessages()
+    }
+    
     const handleResize = () => {
       const mobile = window.innerWidth < 1024
       setIsMobile(mobile)
@@ -30,21 +115,21 @@ export default function ChatInterface({user,team}) {
 
     window.addEventListener("resize", handleResize)
     return () => window.removeEventListener("resize", handleResize)
-  }, [isMobile])
+  }, [team?._id, isMobile])
 
   const handleSendMessage = (message) => {
-    if (message.trim() === "") return
+    if (message.trim() === "" || !user || !team) return
 
     const newMessage = {
-      id: messages.length + 1,
-      sender: "You",
-      content: message,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      isSelf: true,
-      avatar: "/placeholder.svg?height=40&width=40",
+      name: user.name,
+      message: message,
+      groupid: team._id,
+      sender: user._id,
+      timestamp: new Date().toISOString()
     }
 
-    setMessages([...messages, newMessage])
+    // Emit the message to the server
+    socketRef.current.emit("message", newMessage)
     
     // Auto-close sidebar on mobile when sending a message
     if (isMobile) {
@@ -55,7 +140,19 @@ export default function ChatInterface({user,team}) {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen)
   }
-
+  
+  // Format typing users message
+  const getTypingText = () => {
+    if (!typingUsers || typingUsers.length === 0) return "";
+    
+    // Filter out current user
+    const filteredUsers = typingUsers.filter(name => name !== user?.name);
+    
+    if (filteredUsers.length === 0) return "";
+    if (filteredUsers.length === 1) return `${filteredUsers[0]} is typing...`;
+    if (filteredUsers.length === 2) return `${filteredUsers[0]} and ${filteredUsers[1]} are typing...`;
+    if (filteredUsers.length > 2) return `${filteredUsers[0]} and ${filteredUsers.length - 1} others are typing...`;
+  }
 
   return (
     <div className="flex flex-col h-screen overflow-hidden lg:p-4">
@@ -87,7 +184,7 @@ export default function ChatInterface({user,team}) {
               </Button>
             </div>
           )}
-          <Sidebar team={team&&team} />
+          <Sidebar team={team} onlineUsers={onlineUsers} user={user}/>
         </div>
 
         {/* Main Chat Area */}
@@ -107,25 +204,24 @@ export default function ChatInterface({user,team}) {
 
               <div className="flex items-center">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg shadow-md">
-                  {team&&team.teamname.charAt(0).toUpperCase()}
+                  {team?.teamname?.charAt(0).toUpperCase()}
                 </div>
                 <div className="ml-3">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{team&&team.teamname}</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{team?.teamname}</h2>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    4 online
+                    {onlineUsers.length} online
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="flex items-center space-x-1">
-             
               <Button
                 variant="ghost"
                 size="icon"
                 className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 rounded-full"
-                onClick={()=>{
-                    toast.success(`You are connecting to ${team&&team.teamname} discussion group`)
+                onClick={() => {
+                  toast.success(`You are connected to ${team?.teamname} discussion group`)
                 }}
               >
                 <Info className="h-5 w-5" />
@@ -134,10 +230,22 @@ export default function ChatInterface({user,team}) {
           </div>
 
           {/* Messages */}
-          <ChatArea messages={messages} team={team}/>
+          <ChatArea messages={messages} team={team} user={user} />
+          
+          {/* Typing Indicator */}
+          {getTypingText() && (
+            <div className="px-4 py-1 text-xs text-gray-500 italic animate-pulse">
+              {getTypingText()}
+            </div>
+          )}
 
           {/* Message Input */}
-          <MessageInput onSendMessage={handleSendMessage} team={team}/>
+          <MessageInput 
+            onSendMessage={handleSendMessage} 
+            team={team} 
+            socket={socketRef.current}
+            user={user}
+          />
         </div>
       </div>
     </div>

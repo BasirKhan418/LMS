@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation';
 import ChatInterface from '@/utilities/Chat/chat-interface';
 import ProfilePageSkeleton from '@/utilities/skeleton/ProfilePageSkeleton';
+import { toast } from 'sonner';
 const page = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState(null);
