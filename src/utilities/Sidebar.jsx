@@ -7,6 +7,7 @@ import { GrProjects } from "react-icons/gr"
 import { GoDiscussionClosed } from "react-icons/go"
 import { usePathname } from "next/navigation"
 import { FolderGit2 } from "lucide-react"
+import { IoAnalytics } from "react-icons/io5";
 import { GoShareAndroid } from "react-icons/go";
 import { MdOutlineLeaderboard } from "react-icons/md";
 import {
@@ -138,6 +139,16 @@ export function Sidebar({children}) {
       >
         <MdOutlineLeaderboard  className="h-4 w-4" />
         <span>Results</span>
+      </Link>
+      <Link
+        href="/attendance"
+        className={`flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:bg-muted ${
+          pathname === "/attendance" ? "bg-primary-foreground text-primary font-medium" : "text-muted-foreground"
+        }`}
+        onClick={onClick}
+      >
+        <IoAnalytics className="h-4 w-4" />
+        <span>Attendance</span>
       </Link>
       <Link
         href="/discussion"
