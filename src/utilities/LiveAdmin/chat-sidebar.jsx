@@ -140,15 +140,22 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
 
   // Toggle chat enabled state (admin only)
   const handleToggleChatEnabled = () => {
-    if (!isAdmin || !socket) return
+    if (!isAdmin || !socket) return;
     
+    // Create a local copy of the next state  
+    const nextChatState = !isChatEnabled;
+    
+    // Update local state first for immediate UI feedback
+    setIsChatEnabled(nextChatState);
+    
+    // Then notify the server
     socket.emit("toggleStreamChat", {
       streamId: streamId,
-      enabled: !isChatEnabled
-    })
-    setIsChatEnabled(!isChatEnabled);
-    toast.info(`Chat has been ${!isChatEnabled ? "enabled" : "disabled"} by the instructor`)
-  }
+      enabled: nextChatState
+    });
+    
+    toast.info(`Chat has been ${nextChatState ? "enabled" : "disabled"} by the instructor`);
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter") {

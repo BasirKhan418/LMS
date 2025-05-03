@@ -42,8 +42,12 @@ export function LiveStreamView({
       // Listen for chat state updates
       socket.on("streamChatState", (data) => {
         console.log("Stream chat state updated:", data);
-        if (data.messagesEnabled !== undefined) {
+        if (data.messagesEnabled !== undefined && typeof setIsChatEnabled === 'function') {
           setIsChatEnabled(data.messagesEnabled);
+        } else {
+          console.warn("setIsChatEnabled is not available or not a function", 
+            typeof setIsChatEnabled);
+          // Optionally, update a local state as fallback
         }
       });
       

@@ -172,7 +172,6 @@ export default function AdminView({ content, data }) {
     toast.success("Class has been completed!")
   }
 
-  // Using useCallback to prevent recreation of this function on each render
   const toggleChatEnabled = useCallback((enabled) => {
     // Prevent multiple rapid toggles
     if (chatTogglingRef.current) {
@@ -183,15 +182,18 @@ export default function AdminView({ content, data }) {
     // Set toggle lock
     chatTogglingRef.current = true;
     
+    // Make sure we're working with a boolean value
+    const newEnabledState = typeof enabled === 'boolean' ? enabled : !isChatEnabled;
+    
     // Update local state
-    setIsChatEnabled(enabled);
+    setIsChatEnabled(newEnabledState);
     
     // Emit chat toggle event if socket is connected
     if (socketRef.current && isConnected) {
-      console.log(`Emitting toggleStreamChat event: ${enabled}`);
+      console.log(`Emitting toggleStreamChat event: ${newEnabledState}`);
       socketRef.current.emit("toggleStreamChat", {
         streamId: classInfo.streamSettings.streamId,
-        enabled: enabled
+        enabled: newEnabledState
       });
     }
     
@@ -199,8 +201,7 @@ export default function AdminView({ content, data }) {
     setTimeout(() => {
       chatTogglingRef.current = false;
     }, 500);
-  }, [isConnected, classInfo.streamSettings.streamId]);
-
+  }, [isConnected, classInfo.streamSettings.streamId, isChatEnabled]);
   // Handle player load state
   const handlePlayerLoad = useCallback(() => {
     setPlayerLoaded(true);
@@ -278,18 +279,20 @@ export default function AdminView({ content, data }) {
             </div>
           )}
 
-          {isLive && socketRef.current && (
-            <LiveStreamView
-              isAdmin={true}
-              classInfo={classInfo}
-              isChatEnabled={isChatEnabled}
-              setIsChatEnabled={toggleChatEnabled}
-              socket={socketRef.current}
-              userData={data}
-              onPlayerLoad={handlePlayerLoad}
-              playerLoaded={playerLoaded}
-            />
-          )}
+{isLive && socketRef.current && (
+  <LiveStreamView
+    isAdmin={true}
+    classInfo={classInfo}
+    isChatEnabled={isChatEnabled}
+    setIsChatEnabled={typeof toggleChatEnabled === 'function' ? toggleChatEnabled : () => {
+      console.warn("toggleChatEnabled is not available");
+    }}
+    socket={socketRef.current}
+    userData={data}
+    onPlayerLoad={handlePlayerLoad}
+    playerLoaded={playerLoaded}
+  />
+)}
         </div>
       </div>
     </>
