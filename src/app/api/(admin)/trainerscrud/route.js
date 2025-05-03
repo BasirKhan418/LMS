@@ -18,7 +18,7 @@ await ConnectDb();
         return NextResponse.json({message:"Trainers fetched successfully",status:200,success:true,trainers,batch})
     }
     catch(error){
-        console.log(error);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -34,7 +34,7 @@ export const POST = async(req,res)=>{
             }
             const reqdata = await req.json();
             const searchunique = await Trainer.findOne({email:reqdata.email});
-            console.log(searchunique);
+            
             if(searchunique!=null){
                 return NextResponse.json({message:"Trainer already exists",status:400,success:false})
             }
@@ -50,7 +50,7 @@ export const POST = async(req,res)=>{
             return NextResponse.json({message:"Trainers created successfully",status:200,success:true})
     }
 catch(error){
-        console.log(error);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -65,7 +65,7 @@ const data = AuthorizeMd(headerlist.get("Authorization"));
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
-        console.log(reqdata);
+      
         let trainers = await Trainer.findByIdAndUpdate(reqdata._id,{
             name:reqdata.name,
             email:reqdata.email,
@@ -76,7 +76,7 @@ const data = AuthorizeMd(headerlist.get("Authorization"));
 
     }
     catch(error){
-        console.log(error);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -90,12 +90,12 @@ export const DELETE = async(req,res)=>{
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
-        console.log(reqdata._id);   
+          
         let trainers = await Trainer.findByIdAndDelete(reqdata._id);
         return NextResponse.json({message:"Trainers deleted successfully",status:200,success:true})
     }
     catch(err){
-        console.log(err);
+       
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }

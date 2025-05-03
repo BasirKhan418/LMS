@@ -11,7 +11,7 @@ export const POST = async(req,res)=>{
 
 try{
 let verify  = jwt.verify(reqdata,process.env.JWT_SECRET);
-console.log(verify);
+
 //if token is verified
 if(verify!=null){
     //checking if the user is login in single device or not
@@ -19,11 +19,11 @@ if(verify!=null){
     
     if(verifym2.token === reqdata){
         let data = await Trainer.find({email:verify.email});
-        console.log(data);
+        
         return NextResponse.json({message:"You are authorized to access this route",success:true,data:data});
     }
     else{
-        console.log("token not matched")
+        
         return NextResponse.json({message:"Another session is detected from another device .Please Login again",success:false,ansession:true});
     }    
 }

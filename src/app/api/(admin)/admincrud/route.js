@@ -164,7 +164,7 @@ const SendEmail = async (email, name) => {
         `,
       });
   
-      console.log("Admin email sent: %s", info.messageId);
+      
     } catch (err) {
       console.log(err);
     }

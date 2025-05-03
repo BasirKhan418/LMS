@@ -72,7 +72,7 @@ export const POST= async(req,res)=>{
     
    }
    catch(err){
-    console.log(err);
+  
     return NextResponse.json({message:"something went wrong"+err,success:false});
     
    }
@@ -80,12 +80,12 @@ export const POST= async(req,res)=>{
   //if type is verify then verify otp
   else{
    try{
-    console.log(reqdata)
+   
     let otpdata = await Otp.findOne({email:reqdata.email,otp:reqdata.otp})
-    console.log(otpdata);
+  
     //if otp correct
     if(otpdata!=null){
-      console.log("indide")
+    
       //geeting user data
       let data = await User.find({email:reqdata.email});
       //creating token
@@ -102,7 +102,7 @@ export const POST= async(req,res)=>{
     }
    }
    catch(err){
-    console.log(err)
+    
     return NextResponse.json({success:false,message:"Something went wrong please try again after sometime"})
    }
   }

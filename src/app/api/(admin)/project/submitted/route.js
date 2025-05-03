@@ -13,7 +13,7 @@ export const GET = async (req, res) => {
     
     try {
         let a = AuthorizeMd(headerlist.get("token"));
-        console.log(a);
+        
         if(!a) {
             return NextResponse.json({message:"Unauthorized route cant handle request", status: "401" });
         }
@@ -22,7 +22,7 @@ export const GET = async (req, res) => {
         let assignments = await SubmittedProject.find({crid:id});
         
         if(assignments.length === 0) {
-            console.log("No project submission found");
+           
             return NextResponse.json({message:"No project submission found", status: "401", success:false});
         }
         
@@ -41,7 +41,7 @@ export const GET = async (req, res) => {
             success: true
         });
     } catch(err) {
-        console.log(err);
+        
         return NextResponse.json({message:"Some thing went wrong please try again after some time", status: "401" });
     }
 }

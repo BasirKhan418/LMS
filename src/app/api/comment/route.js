@@ -57,7 +57,7 @@ return NextResponse.json({message:"Comment added successfully",success:true})
 }
 }
 catch(err){
-    console.log(err)
+   
 return NextResponse.json({message:"Something went wrong! try again later",success:false})
 }
 }

@@ -10,9 +10,9 @@ try{
     await ConnectDb();
 let headersList = await headers();
 let auth = headersList.get('authorization');
-console.log(auth);
+
 let data = await AuthorizeMd(auth);
-console.log(data);
+
 if(!data.status){
     return NextResponse.json({message:"You are not authorized",status:data.status,success:false});
 }
@@ -153,7 +153,7 @@ export const POST = async (req) => {
             success: true,
         });
     } catch (err) {
-        console.log(err);
+        
         return NextResponse.json({message: "Internal Server Error", status: 500, success: false});
     }
 }
@@ -288,7 +288,7 @@ export const PUT = async (req) => {
         });
         
     } catch (err) {
-        console.error(err);
+        
         return NextResponse.json({
             message: "Internal Server Error", 
             status: 500, 

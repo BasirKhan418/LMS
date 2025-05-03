@@ -8,7 +8,7 @@ export const GET = async()=>{
         await ConnectDb();
      const headerlist = await headers();
         let data = AuthorizeMd(headerlist.get("authorization"));
-        console.log(data)
+        
         if(!data.status){
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
@@ -40,7 +40,7 @@ export const POST = async(req,res)=>{
         return NextResponse.json({message:"Batch created successfully",status:200,success:true})
     }
     catch(error){
-        console.log(error);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -54,7 +54,7 @@ export const PUT = async(req,res)=>{
             return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
         }
         const reqdata = await req.json();
-        console.log(reqdata);
+        
         let batch = await Batch.findByIdAndUpdate(reqdata._id,{
             name:reqdata.name,
             domain:reqdata.domain,
@@ -64,7 +64,7 @@ export const PUT = async(req,res)=>{
         return NextResponse.json({message:"Batch updated successfully",status:200,success:true})
     }
     catch(error){
-        console.log(error);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -82,7 +82,7 @@ export const DELETE = async(req,res)=>{
         return NextResponse.json({message:"Batch deleted successfully",status:200,success:true})
     }
     catch(error){
-        console.log(error);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }

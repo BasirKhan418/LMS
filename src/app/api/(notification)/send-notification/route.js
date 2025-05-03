@@ -27,7 +27,7 @@ export async function POST(request) {
     // Ensure token is an array
     const tokens = Array.isArray(data.token) ? data.token : [data.token];
 
-    console.log("Tokens:", tokens);
+    
 
     // Define the payload for notifications
     const payload = {
@@ -42,7 +42,7 @@ export async function POST(request) {
       },
     };
 
-    console.log("Payload:", payload);
+   
 
     // Use Firebase's `send` method
     const messaging = admin.messaging();
@@ -55,7 +55,7 @@ export async function POST(request) {
       )
     );
 
-    console.log("Responses:", responses);
+   
 
     // Collect failed tokens
     const failedTokens = responses
@@ -69,7 +69,7 @@ export async function POST(request) {
       failures: failedTokens,
     });
   } catch (error) {
-    console.error("Error sending notifications:", error);
+   
     return NextResponse.json({ success: false, error: error.message });
   }
 }

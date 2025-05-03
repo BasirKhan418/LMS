@@ -34,7 +34,7 @@ export const POST = async (req) => {
 
     }
     catch(err){
-        console.log(err)
+      
         return NextResponse.json({message:"Error in Attendance taking",success:false})
     }
 }

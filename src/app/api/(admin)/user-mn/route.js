@@ -15,7 +15,7 @@ export const GET = async()=>{
         return NextResponse.json({message:"Users fetched successfully",status:200,success:true,users})
     }
     catch(err){
-        console.log(err);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -33,7 +33,7 @@ export const POST = async(req,res)=>{
         return NextResponse.json({message:"Users imported successfully",status:200,success:true})
     }
     catch(err){
-        console.log(err);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -52,7 +52,7 @@ export const PUT = async(req,res)=>{
         return NextResponse.json({message:"User updated successfully",status:200,success:true,user})
     }
     catch(err){
-        console.log(err);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
@@ -70,7 +70,7 @@ export const DELETE = async(req,res)=>{
         return NextResponse.json({message:"User deleted successfully",status:200,success:true})
     }
     catch(err){
-        console.log(err);
+        
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }

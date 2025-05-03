@@ -12,7 +12,7 @@ export const GET = async (req, res) => {
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
         const userid = searchParams.get('userid');
-        console.log("id in project user route", id);
+      
         
         let a = AuthorizeMd(headerlist.get("token"));
         if(!a.status) {
@@ -44,8 +44,7 @@ export const POST = async (req, res) => {
         await ConnectDb();
         const headerlist = await headers();
         const reqdata = await req.json();
-        console.log(reqdata)
-        console.log("reqdata in project user route",reqdata);
+        
         
         let a = AuthorizeMd(headerlist.get("token"));
         if(!a.status) {

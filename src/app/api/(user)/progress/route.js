@@ -29,7 +29,7 @@ export const GET = async (req, res) => {
         let crcmplength = coursedata.crcmp.length;
         let progress = Math.floor((crcmplength / contentlength) * 100);
         let dataup = await Enrollc.findOneAndUpdate({ userid: id, courseid: crid }, { progress: progress }, { new: true });
-        console.log(a.email);
+      
         await redis.del(`user:${a.email}:homeauth`);
         await redis.del(`cr:${a.email}:homeauth`);
         await redis.del(`batch:${a.email}:homeauth`);
@@ -45,7 +45,7 @@ export const POST = async (req, res) => {
     await ConnectDb();
     const headerList = await headers();
     const reqData = await req.json();
-    console.log(reqData)
+    
     try {
         let a = AuthorizeMd(headerList.get("token"));
         if (!a) {
@@ -69,7 +69,7 @@ export const POST = async (req, res) => {
         }
 
         if (userdata == null) {
-            console.log("userdata is ", userdata);
+            
             return NextResponse.json({ success: false, message: "Course Progress Data not found", status: 404 });
         }
         return

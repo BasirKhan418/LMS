@@ -30,7 +30,7 @@ export const POST = async (req, res) => {
     await ConnectDb();
     const headerList = await headers();
     const reqdata = await req.json();
-    console.log("reqdata in submit assignment route",reqdata);
+    
     try{
     let a = AuthorizeMd(headerList.get("token"));
     if(!a){

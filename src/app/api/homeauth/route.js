@@ -17,7 +17,7 @@ export const POST = async(req,res)=>{
 
 try{
 let verify  = jwt.verify(reqdata,process.env.JWT_SECRET);
-console.log(verify);
+
 //if token is verified
 if(verify!=null){
     //checking if the user is login in single device or not
@@ -58,7 +58,7 @@ let batch = await Batch.findOne({
   },
   domain: user.domain
 });
-console.log("Found batches:", batch);
+
         //CACHING ALL DATA IN REDIS
         await client.set(`user:${verify.email}:homeauth`,JSON.stringify(user),{EX:200});
         await client.set(`cr:${verify.email}:homeauth`,JSON.stringify(cr),{EX:200});
@@ -74,7 +74,7 @@ else{
 }
 }
 catch(err){
-    console.log(err);
+    
     return NextResponse.json({message:"You are not authorized to access this route",success:false});
     
 }

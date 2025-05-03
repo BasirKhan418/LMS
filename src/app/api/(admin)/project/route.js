@@ -12,13 +12,13 @@ export const GET = async (req, res) => {
     const id = searchParams.get('id');
 try{
 let a  = AuthorizeMd(headerlist.get("token"));
-console.log(a)
+
 if(!a){
     return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" });
 }
 let assignment = await Project.find({crid:id});
 if(assignment.length==0){
-    console.log("No project found")
+    
     return NextResponse.json({message:"No project found",status: "401",success:false});
 }
 
@@ -34,7 +34,7 @@ export const POST = async (req, res) => {
     const reqdata = await req.json();
     try{
         let a  = AuthorizeMd(headerlist.get("token"));
-        console.log(a)
+        
         if(!a){
             return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" ,success:false});
         }
@@ -68,7 +68,7 @@ export const POST = async (req, res) => {
         
         }
         catch(err){
-            console.log(err);
+           
         return NextResponse.json({message:"Some thing went wrong please try again after some time",status: "401" ,success:false});
         }
 }

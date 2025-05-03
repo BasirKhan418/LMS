@@ -43,7 +43,7 @@ export const POST = async (req, res) => {
   await ConnectDb();
   const headerlist = await headers();
   const reqdata = await req.json();
-  console.log(reqdata);
+  
   try {
     let data = AuthorizeMd(headerlist.get("token"));
     if (!data) {

@@ -11,7 +11,7 @@ export const POST = async(req,res)=>{
 
 try{
 let verify  = jwt.verify(reqdata,process.env.JWT_SECRET);
-console.log(verify);
+
 //if token is verified
 if(verify!=null){
     //checking if the user is login in single device or not
@@ -30,7 +30,7 @@ else{
 }
 }
 catch(err){
-    console.log(err);
+    
     return NextResponse.json({message:"You are not authorized to access this route",success:false});
     
 }

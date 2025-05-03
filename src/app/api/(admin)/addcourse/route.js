@@ -11,14 +11,14 @@ export const POST = async (req, res) => {
         let redis = await ConnectRedis();
 
    const reqdata = await req.json();
-   console.log(reqdata);
+   
    const headerlist = await headers();
    let data = AuthorizeMd(headerlist.get("token"));
-   console.log(data);
+   
     if(!data.status){
      return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
     }
-    console.log(data.email)
+    
     let admin = await Admin.findOne({email:data.email});
     if(admin==null){
         return NextResponse.json({message:"You are not authorized to access this route",status:401,success:false})
@@ -32,7 +32,7 @@ export const POST = async (req, res) => {
 
     }
     catch(err){
-        console.log(err);
+        
         return NextResponse(500).json({error:"Internal server error",success:false});
     }
 }

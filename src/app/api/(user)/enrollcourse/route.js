@@ -41,7 +41,7 @@ export const POST = async (req,res) => {
         return NextResponse.json({message:`Enrollment Successful! You have been successfully enrolled in the course: ${reqdata.title}`,success:true});
 
     }catch(err){
-        console.log(err);
+        
         return NextResponse.json({error:"Internal server error",success:false});
     }
 }

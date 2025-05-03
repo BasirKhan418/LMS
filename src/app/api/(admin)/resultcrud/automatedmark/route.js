@@ -22,7 +22,7 @@ export const POST = async (req) => {
     return NextResponse.json({success:true,socialmedia:4,attendance:4})
 }
     catch(err){
-        console.log(err)
+        
         return NextResponse.json({success:false,message:"Internal Server Error"})
     }   
 }

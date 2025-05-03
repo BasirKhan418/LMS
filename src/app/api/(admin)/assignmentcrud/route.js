@@ -59,7 +59,7 @@ export const POST = async (req, res) => {
       let upadate = await SubmittedAssignments.findByIdAndUpdate({_id:reqData.id},{marks:reqData.marks,status:"evaluated"},{new:true});
         return NextResponse.json({ success: true, message: "Data Updated SuccessFully", status: 200, data: upadate });
     } catch (err) {
-      console.log("error in submit assignment route", err);
+      
       return NextResponse.json({ success: false, message: "Something went wrong! Try again later. " + err.message, status: 500 });
     }
 };

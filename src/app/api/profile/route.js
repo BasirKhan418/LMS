@@ -7,7 +7,7 @@ export const POST = async (req) => {
   const header = await headers();
   await ConnectDb();
   const reqdata = await req.json();
-  console.log(reqdata); 
+  
   try {
     let res = AuthorizeMd(header.get("token"));
      if(!res.status){
@@ -40,7 +40,7 @@ export const PUT = async (req) => {
 await ConnectDb();
 const header = await headers();
 const reqdata = await req.json();
-console.log(reqdata);
+
 const res = AuthorizeMd(header.get("token"));
 if(!res.status){
   return NextResponse.json({success:false,message:"You are not authorized to access this route",status:401});
@@ -55,7 +55,7 @@ await Users.findOneAndUpdate({email:res.email},{$set:{month:`${month} Months`}})
 return NextResponse.json({message:"Internship duration updated successfully",status:200,success:true});
   }
   catch(err){
-    console.log(err); 
+    
     return NextResponse.json({
       success: false,
       message: "Something went wrong please try again later !",

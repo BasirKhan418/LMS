@@ -13,13 +13,13 @@ export const GET = async (req) => {
         }
         const { searchParams } = new URL(req.url);
         const userid = searchParams.get("id");
-        console.log("userid is ", userid);
+       
         await ConnectDb();
         const data = await SocialMediaPost.find({ userid: userid }).populate("userid").sort({ createdAt: -1 });
-        console.log("fetched data is ", data);
+        
         return NextResponse.json({ success: true, data: data });
     } catch (err) {
-        console.log(err);
+        
         return NextResponse.json({ success: false, message: "Error fetching data" });
     }
 }
@@ -43,7 +43,7 @@ export const POST = async (req) => {
         return NextResponse.json({ success: true, message: "Social Media Post created successfully" });
     }
     catch(err){
-        console.log(err)
+        
         return NextResponse.json({success:false,message:"Error creating post"})
     }
 }

@@ -7,7 +7,7 @@ export const POST = async(req, request) => {
     try {
         const headerlist = await headers();
         const data = await req.json();
-        console.log("data in payment route", data);
+        
         let rand = Math.floor(Math.random() * 10000000);
         
         const auth = AuthorizeMd(headerlist.get("token"));
@@ -34,10 +34,10 @@ export const POST = async(req, request) => {
         const order = await new Promise((resolve, reject) => {
             instance.orders.create(options, (err, order) => {
                 if (err) {
-                    console.log("Razorpay error:", err);
+                    
                     reject(err);
                 } else {
-                    console.log("order is", order);
+                    
                     resolve(order);
                 }
             });
@@ -50,7 +50,7 @@ export const POST = async(req, request) => {
             order: order
         });
     } catch (e) {
-        console.log("error in payment route", e);
+        
         return NextResponse.json({
             message: "Internal Server Error",
             status: 500,

@@ -11,7 +11,7 @@ export const GET = async(req)=>{
     let redis = await ConnectRedis();
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
-    console.log(id)
+    
 
 try{
     let res =  AuthorizeMd(header.get("token"));
@@ -38,7 +38,7 @@ export const POST = async (req, res) => {
     const header = await headers();
     const redis = await ConnectRedis();
     const reqdata = await req.json();
-    console.log(reqdata);
+    
     try {
         await ConnectDb();
         let res = AuthorizeMd(header.get("token"));

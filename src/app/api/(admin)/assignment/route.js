@@ -12,7 +12,6 @@ export const GET = async (req, res) => {
     const id = searchParams.get('id');
 try{
 let a  = AuthorizeMd(headerlist.get("token"));
-console.log(a)
 if(!a){
     return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" });
 }
@@ -29,7 +28,7 @@ export const POST = async (req, res) => {
     const reqdata = await req.json();
     try{
         let a  = AuthorizeMd(headerlist.get("token"));
-        console.log(a)
+        
         if(!a){
             return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" ,success:false});
         }
@@ -47,7 +46,7 @@ export const POST = async (req, res) => {
         return NextResponse.json({message:"Assignment added successfully",status: "200",success:true});
         }
         catch(err){
-            console.log(err);
+            
         return NextResponse.json({message:"Some thing went wrong please try again after some time",status: "401" ,success:false});
         }
 }
@@ -57,7 +56,7 @@ export const PUT = async (req, res) => {
     const reqdata = await req.json();
     try{
         let a  = AuthorizeMd(headerlist.get("token"));
-        console.log(a)
+        
         if(!a){
             return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" });
         }
@@ -82,7 +81,7 @@ export const DELETE = async (req, res) => {
     const reqdata = await req.json();
     try{
         let a  = AuthorizeMd(headerlist.get("token"));
-        console.log(a)
+        
         if(!a){
             return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" });
         }

@@ -20,7 +20,7 @@ if(!notifications){
 return NextResponse.json({message:"Notifications Found",success:true,data:notifications})
 }
 catch(err){
-    console.log(err)
+    
     return NextResponse.json({message:"Internal Server Error",success:false})
 }
 }
@@ -52,7 +52,7 @@ export const POST = async (req) => {
         return NextResponse.json({message:"Notification Created",success:true})
     }
     catch(err){
-        console.log(err)
+        
         return NextResponse.json({message:"Internal Server Error",success:false})
     }
         

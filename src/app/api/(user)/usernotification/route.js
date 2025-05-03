@@ -22,7 +22,7 @@ export const POST = async (req) => {
         }
         return NextResponse.json({message:"Notifications Found",success:true,data:notifications})
     }catch(err){
-        console.log(err)
+        
         return NextResponse.json({message:"Internal Server Error",success:false})
     }
 }

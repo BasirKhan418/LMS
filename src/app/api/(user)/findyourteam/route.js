@@ -43,7 +43,7 @@ export const POST = async (req) => {
         })
     }
     catch (err) {
-        console.log(err)
+        
         return NextResponse.json({
             message: "Error in finding your team",
             success: false,

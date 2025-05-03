@@ -15,12 +15,12 @@ export const GET = async()=>{
         }
         await ConnectDb()
         const results = await Result.find({}).populate("batchid").populate("users").sort({createdAt:-1})
-        console.log(results)
+        
         if(results.length==0){
-            console.log("No results found")
+            
             return NextResponse.json({success:false,message:"No results found"})
         }
-        console.log("Results fetched successfully")
+        
         return NextResponse.json({success:true,results:results})
     }
     catch(err){
@@ -73,7 +73,7 @@ export const POST = async(req)=>{
                               $sort: { createdAt: -1 }
                           }
                       ]);
-                      console.log(users[0]);
+                    
         if(users.length==0){
             return NextResponse.json({success:false,message:"No users found"})
         }
@@ -126,7 +126,7 @@ function extractMonthNumber(monthStr) {
     return NextResponse.json({success:false,message:"You have already created results for this batch maximum 3 times. Please contact developer for more information"})
   }
   
-  console.log(sortedArr);
+ 
         
         
         const result =new Result({
@@ -141,7 +141,7 @@ function extractMonthNumber(monthStr) {
         
     }
     catch(err){
-        console.log(err)
+        
         return NextResponse.json({success:false,message:"Something went wrong"})
     }
 }

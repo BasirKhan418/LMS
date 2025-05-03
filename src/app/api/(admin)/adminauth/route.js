@@ -72,7 +72,7 @@ export const POST= async(req,res)=>{
     
    }
    catch(err){
-    console.log(err);
+   
     return NextResponse.json({message:"something went wrong"+err,success:false});
     
    }
@@ -80,7 +80,7 @@ export const POST= async(req,res)=>{
   //if type is verify then verify otp
   else{
    try{
-    console.log(reqdata)
+   
     let otpdata = await Otp.findOne({email:reqdata.email})
     if(otpdata==null){
       return NextResponse.json({success:false,message:"Admin not found."})
@@ -100,7 +100,7 @@ export const POST= async(req,res)=>{
     }
    }
    catch(err){
-    console.log(err)
+   
     return NextResponse.json({success:false,message:"Something went wrong please try again after sometime"})
    }
   }
