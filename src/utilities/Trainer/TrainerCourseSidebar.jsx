@@ -51,7 +51,8 @@ export default function AdminCourseSidebar({
   alldata,
   allcoursedata,
   crid,
-  isadmin
+  isadmin,
+  data
 }) {
   const router = useRouter();
   const [activeFolder, setActiveFolder] = useState("overview");
@@ -579,7 +580,7 @@ const fetchComments = async (id) => {
 
                 {activeFolder === "meeting" && (
                   <div className="">
-                   <AdminView content={content}/>
+                   <AdminView content={content} data={data}/>
                   </div>
                 )}
 

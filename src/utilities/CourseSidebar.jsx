@@ -739,7 +739,7 @@ export default function CourseSidebar({
 
                 {activeFolder === "meeting" && (
                   <div className="">
-                    <UserView content={content}/>
+                    <UserView content={content} userdata={userdata}/>
                   </div>
                 )}
 

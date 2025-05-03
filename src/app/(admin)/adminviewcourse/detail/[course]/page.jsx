@@ -4,6 +4,7 @@ import { Toaster, toast } from 'sonner';
 import HomePageSkl from '@/utilities/skeleton/HomePageSkl';
 import TrainerCourseSidebar from '@/utilities/Trainer/TrainerCourseSidebar';
 import { CourseData } from '../../../../../../functions/Coursedata';
+import { ValidatesFunc } from '../../../../../../functions/authfunc';
 // You need to either import the CourseData function
 // import { CourseData } from '@/services/api'; // Add proper path to your API service
 
@@ -13,7 +14,7 @@ const Page = props => {
   const [weeksdata, setWeeksdata] = useState([]);
   const [alldata, setAlldata] = useState([]);
   const [allcoursedata, setallCoursetdata] = useState([]);
-
+  const [data, setData] = useState([]);
   const fetchallcoursedata = async() => {
     try {
       setLoading(true);
@@ -44,10 +45,25 @@ const Page = props => {
   
     }
 
+    const validates = async(token)=>{
+      setLoading(true);
+      let data =  await ValidatesFunc(token);
+      setLoading(false);
+      console.log(data)
+      if(data.success){
+        setData(data.data[0])
+        console.log("settting up",data.data[0])
+      }
+      else{
+        toast.error(data.message);
+       
+    }
+  }
 
   useEffect(() => {
     fetchallcoursedata();
     setAllcourseData();
+    validates(localStorage.getItem("dilmsadmintoken"));
   }, []);
 
   return (
@@ -61,6 +77,7 @@ const Page = props => {
           allcoursedata={allcoursedata} 
           crid={params.course} 
           isadmin={true}
+          data={data}
         />
       }
     </div>

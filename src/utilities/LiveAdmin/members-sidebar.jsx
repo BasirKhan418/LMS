@@ -1,28 +1,52 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Badge } from "@/components/ui/badge"
 
-export function MembersSidebar({ totalMembers }) {
+export function MembersSidebar({ socket, streamId,usersData,setUsersData,currentMembers ,
+  setCurrentMembers }) {
   const [searchQuery, setSearchQuery] = useState("")
+  const [members, setMembers] = useState([])
+  const [totalMembers, setTotalMembers] = useState(0)
 
-  // Mock data
-  const members = [
-    { id: "1", name: "Sarah Johnson", isActive: true, joinedAt: new Date(Date.now() - 1000 * 60 * 30) },
-   
-  ]
-
-  const filteredMembers = members.filter((member) => member.name.toLowerCase().includes(searchQuery.toLowerCase()))
-
-  const activeMembers = filteredMembers.filter((member) => member.isActive)
-  const inactiveMembers = filteredMembers.filter((member) => !member.isActive)
-
+  useEffect(() => {
+    
+    // Only set up socket listeners if socket exists
+    if (socket) {
+      
+      
+      // Listen for users count updates
+      socket.on("streamUsers", (data) => {
+        console.log("Stream users updated:", data);
+        if (data.users && Array.isArray(data.users)) {
+         
+          console.log("Users data updated basir:", data.users);
+          setUsersData(data.users);
+          setCurrentMembers(data.users.length);
+        }
+      });
+      
+      // Clean up event listener on unmount
+      return () => {
+        if (socket) {
+         
+          socket.off("streamUsers");
+        }
+      };
+    }
+  }, [])
+  
   return (
     <div className="flex flex-col h-[600px] border rounded-lg overflow-hidden">
       <div className="p-3 border-b">
+        <div className="flex justify-between items-center mb-2">
+          <h3 className="text-md font-medium">Participants</h3>
+          <Badge variant="outline">{usersData&&usersData.length}</Badge>
+        </div>
         <div className="relative">
           <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -37,28 +61,19 @@ export function MembersSidebar({ totalMembers }) {
       <ScrollArea className="flex-1">
         <div className="p-3">
           <div className="mb-4">
-            <h3 className="text-sm font-medium text-muted-foreground mb-2">Active ({activeMembers.length})</h3>
+            <h3 className="text-sm font-medium text-muted-foreground mb-2">
+              Active ({usersData.length})
+            </h3>
             <div className="space-y-2">
-              {activeMembers.map((member) => (
-                <MemberItem key={member.id} member={member} />
+              {usersData.map((member,index) => (
+                <MemberItem key={index} member={member} />
               ))}
 
-              {activeMembers.length === 0 && (
+              {usersData.length === 0 && (
                 <p className="text-sm text-muted-foreground py-2">No active members found</p>
               )}
             </div>
           </div>
-
-          {inactiveMembers.length > 0 && (
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Inactive ({inactiveMembers.length})</h3>
-              <div className="space-y-2">
-                {inactiveMembers.map((member) => (
-                  <MemberItem key={member.id} member={member} />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </ScrollArea>
     </div>
@@ -67,15 +82,20 @@ export function MembersSidebar({ totalMembers }) {
 
 function MemberItem({ member }) {
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between p-2 rounded-md hover:bg-muted/50">
       <div className="flex items-center gap-2">
         <Avatar className="h-8 w-8">
           <AvatarImage src={member.avatar || "/placeholder.svg"} />
-          <AvatarFallback>{member.name.charAt(0)}</AvatarFallback>
+          <AvatarFallback className={member.isAdmin ? "bg-primary text-primary-foreground" : ""}>
+            {member.name.charAt(0)}
+          </AvatarFallback>
         </Avatar>
         <div>
-          <p className="text-sm font-medium">{member.name}</p>
-          <p className="text-xs text-muted-foreground">Joined {formatJoinTime(member.joinedAt)}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium">{member.name}</p>
+            {member.isAdmin && <Badge variant="outline" className="bg-primary/10 text-primary text-xs">Admin</Badge>}
+          </div>
+          <p className="text-xs text-muted-foreground">{member.email || member.role || "Joined " + formatJoinTime(member.joinedAt)}</p>
         </div>
       </div>
 
@@ -85,6 +105,10 @@ function MemberItem({ member }) {
 }
 
 function formatJoinTime(date) {
+  if (!(date instanceof Date) || isNaN(date)) {
+    return "recently"
+  }
+
   const minutes = Math.floor((Date.now() - date.getTime()) / (1000 * 60))
 
   if (minutes < 1) return "just now"
