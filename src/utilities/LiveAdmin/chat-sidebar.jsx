@@ -146,6 +146,8 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
       streamId: streamId,
       enabled: !isChatEnabled
     })
+    setIsChatEnabled(!isChatEnabled);
+    toast.info(`Chat has been ${!isChatEnabled ? "enabled" : "disabled"} by the instructor`)
   }
 
   const handleKeyDown = (e) => {
