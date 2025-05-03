@@ -21,7 +21,7 @@ export default function AdminView({ content, data,week,alldata }) {
   const [playerLoaded, setPlayerLoaded] = useState(false)
   const chatTogglingRef = useRef(false) // Prevent multiple rapid toggles
   const [showStreamInfo, setShowStreamInfo] = useState(false) // New state for admin early access
-  
+  const [attendanceLoader, setAttendanceLoader] = useState(false)
   // Initialize class info only once
   const [classInfo] = useState({
     title: content?.description || "Advanced React Patterns & Performance Optimization",
@@ -207,11 +207,61 @@ export default function AdminView({ content, data,week,alldata }) {
   const handlePlayerLoad = useCallback(() => {
     setPlayerLoaded(true);
   }, []);
- const handleTakeAttendance = () => {
-  console.log("Taking attendance...")
-  console.log("all data", alldata)
-  console.log("week data", week+1)
-  console.log("all users", usersData)
+ const handleTakeAttendance = async() => {
+  const users = usersData.filter(user=>user.isAdmin==false)
+  const usersarr = []
+  users.map((user)=>{
+    usersarr.push(user.id)
+  })
+ let duration = "";
+ if(week==0||week==1||week==2||week==3){
+  duration = "1 Month"
+ }
+  else if(week==4||week==5||week==6||week==7){
+  duration = "2 Month"
+  }
+  else if(week==8||week==9||week==10||week==11){
+  duration = "3 Month"
+  }
+  else{
+  duration = "4 Month"
+  }
+ const attendanceData = {
+  batchid:alldata.batch,
+  courseid:alldata._id,
+  classid:classInfo.streamSettings.streamId,
+  users:usersarr,
+  weekname:`${week+1} Week`,
+  duration:duration 
+ }
+
+ console.log(attendanceData)
+
+ //api call
+ try{
+  setAttendanceLoader(true)
+const res = await fetch("/api/attendancecrud", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": localStorage.getItem("dilmsadmintoken")
+  },
+  body: JSON.stringify(attendanceData)
+})
+const result = await res.json()
+setAttendanceLoader(false)
+if(result.success){
+  toast.success(result.message)
+}
+else{
+  toast.error(result.message)
+}
+ }
+ catch(err){
+  console.log(err)
+  toast.error("Something went wrong! Try again later: " + err);
+ }
+
  }
   return (
     <>
@@ -237,9 +287,9 @@ export default function AdminView({ content, data,week,alldata }) {
                   variant="primary"
                   onClick={handleTakeAttendance}
                   className="bg-green-600 hover:bg-green-700 text-white"
-                  disabled={!isLive}
+                  disabled={!isLive||usersData.length==1||!alldata.batch||attendanceLoader}
                 >
-                  Take Attendance
+                  {attendanceLoader ? "Taking Attendance..." : "Take Attendance"}
                 </Button>
               <Button
                 variant="destructive"
