@@ -22,14 +22,16 @@ export function LiveStreamView({
   socket, 
   userData, 
   onPlayerLoad, 
-  playerLoaded 
+  playerLoaded,
+  usersData,
+  setUsersData
 }) {
   const [activeTab, setActiveTab] = useState("chat")
   const [showPoll, setShowPoll] = useState(false)
   const [streamError, setStreamError] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
   const [currentMembers, setCurrentMembers] = useState(0)
-  const [usersData, setUsersData] = useState([])
+  
   // Reset error state when playbackId changes
   useEffect(() => {
     if (classInfo?.streamSettings?.playbackId) {

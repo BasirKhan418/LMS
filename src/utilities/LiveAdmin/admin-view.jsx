@@ -11,10 +11,11 @@ import { Toaster, toast } from "sonner"
 import { useRef } from "react"
 import { io } from "socket.io-client"
 import CompleteLiveStream from "@/app/server/CompleteLiveStream"
-export default function AdminView({ content, data }) {
+export default function AdminView({ content, data,week,alldata }) {
   const [isLive, setIsLive] = useState(false)
   const [isChatEnabled, setIsChatEnabled] = useState(true)
   const [activeView, setActiveView] = useState("dashboard")
+  const [usersData, setUsersData] = useState([])
   const socketRef = useRef(null)
   const [isConnected, setIsConnected] = useState(false)
   const [playerLoaded, setPlayerLoaded] = useState(false)
@@ -206,7 +207,12 @@ export default function AdminView({ content, data }) {
   const handlePlayerLoad = useCallback(() => {
     setPlayerLoaded(true);
   }, []);
-
+ const handleTakeAttendance = () => {
+  console.log("Taking attendance...")
+  console.log("all data", alldata)
+  console.log("week data", week+1)
+  console.log("all users", usersData)
+ }
   return (
     <>
       <div className="container mx-auto p-6">
@@ -229,7 +235,7 @@ export default function AdminView({ content, data }) {
               )}
                <Button
                   variant="primary"
-                  
+                  onClick={handleTakeAttendance}
                   className="bg-green-600 hover:bg-green-700 text-white"
                   disabled={!isLive}
                 >
@@ -291,6 +297,8 @@ export default function AdminView({ content, data }) {
     userData={data}
     onPlayerLoad={handlePlayerLoad}
     playerLoaded={playerLoaded}
+    usersData={usersData}
+    setUsersData={setUsersData}
   />
 )}
         </div>

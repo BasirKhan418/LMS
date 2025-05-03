@@ -11,7 +11,7 @@ export function UserView({ content, userdata }) {
   const socketRef = useRef(null)
   const [isConnected, setIsConnected] = useState(false)
   const [isLive, setIsLive] = useState(false)
-  
+  const [usersData, setUsersData] = useState([])
   const [classInfo, setClassInfo] = useState({
     title: content?.description || "Advanced React Patterns & Performance Optimization",
     startTime: content?.date && content?.time 
@@ -228,6 +228,8 @@ export function UserView({ content, userdata }) {
           classInfo={classInfo}
           socket={socketRef.current}
           userData={userdata}
+          usersData={usersData}
+          setUsersData={setUsersData}
         />
       )}
     </div>

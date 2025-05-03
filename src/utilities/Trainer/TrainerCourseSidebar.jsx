@@ -580,7 +580,7 @@ const fetchComments = async (id) => {
 
                 {activeFolder === "meeting" && (
                   <div className="">
-                   <AdminView content={content} data={data}/>
+                   <AdminView content={content} data={data} week={currentWeekindex} alldata={alldata}/>
                   </div>
                 )}
 
