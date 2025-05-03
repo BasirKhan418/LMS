@@ -11,7 +11,8 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import {toast }from "sonner"
+import { toast } from "sonner"
+
 export default function PendingTab({ results, onUpdateResults, onChangeStatus }) {
   const [openBatches, setOpenBatches] = useState({})
   const [userResults, setUserResults] = useState({})
@@ -50,6 +51,23 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
 
   const handleInputChange = (batchId, userId, field, value) => {
     setUserResults((prev) => {
+      // Ensure the batch and user objects exist
+      if (!prev[batchId]) {
+        prev[batchId] = {}
+      }
+      if (!prev[batchId][userId]) {
+        prev[batchId][userId] = {
+          _id: userId,
+          projectreview: "",
+          viva: "",
+          finalprojectreview: "",
+          finalviva: "",
+          attendance: "",
+          socialmediasharing: "",
+          totalmarks: "",
+        }
+      }
+
       const updatedBatchResults = {
         ...prev[batchId],
         [userId]: {
@@ -81,35 +99,37 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
     })
   }
 
-  const fetchAutomatedMarks = async(batchId, userId) => {
-    try{
-    const res = await fetch("/api/resultcrud/automatedmark", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Token": localStorage.getItem("dilmsadmintoken"),
-      },
-      body: JSON.stringify({
-        batchid: batchId,
-        userid: userId,
-      }),
-    })
-    const data = await res.json()
-    if(data.success){
-      toast.success("Automated marks fetched successfully for "+userId)
-      handleInputChange(batchId, userId, "attendance", data.attendance.toString())
-      handleInputChange(batchId, userId, "socialmediasharing", data.socialmedia.toString())
+  const fetchAutomatedMarks = async (batchId, userId, duration,techid) => {
+    
+    try {
+      const res = await fetch("/api/resultcrud/automatedmark", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Token": localStorage.getItem("dilmsadmintoken"),
+        },
+        body: JSON.stringify({
+          batchid: batchId,
+          userid: userId,
+          duration: duration
+        }),
+      })
+      const data = await res.json()
+
+      if (data.success) {
+        
+        toast.success("Automated marks fetched successfully for " + userId)
+        handleInputChange(techid, userId, "attendance", data.attendance.toString())
+        handleInputChange(techid, userId, "socialmediasharing", data.socialmedia.toString())
+      }
+      else {
+        toast.error("Error fetching automated marks")
+      }
     }
-    else{
-      toast.error("Error fetching automated marks")
-    }
-    }
-    catch(err){
+    catch (err) {
       console.log(err)
       toast.error("Error fetching automated marks")
     }
-
-
   }
 
   const handleSubmit = (batchId, status) => {
@@ -122,6 +142,13 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
         onChangeStatus(batchId, status)
       }
     }
+  }
+
+  // Helper function to safely get user result
+  const getUserResult = (batchId, userId) => {
+    return (userResults[batchId] && userResults[batchId][userId]) 
+      ? userResults[batchId][userId] 
+      : { projectreview: "", viva: "", finalprojectreview: "", finalviva: "", attendance: "", socialmediasharing: "", totalmarks: "0" }
   }
 
   if (results.length === 0) {
@@ -177,7 +204,9 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
 
                 <TabsContent value="users">
                   <ScrollArea className="h-[500px] pr-4">
-                    {result.users.map((user) => (
+                    {result.users.map((user) => {
+                      const userResult = getUserResult(result._id, user._id);
+                      return (
                       <Card key={user._id} className="mb-4 border border-slate-200 dark:border-slate-800">
                         <CardHeader className="pb-2">
                           <CardTitle className="text-base font-medium flex items-center justify-between">
@@ -185,7 +214,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => fetchAutomatedMarks(result._id, user._id)}
+                              onClick={() => fetchAutomatedMarks(result.batchid._id, user._id, user.month,result._id)}
                               className="text-xs flex items-center gap-1"
                             >
                               <RefreshCw className="h-3 w-3" />
@@ -205,7 +234,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                                 type="number"
                                 min="0"
                                 max="10"
-                                value={userResults[result._id]?.[user._id]?.projectreview || ""}
+                                value={userResult.projectreview}
                                 onChange={(e) =>
                                   handleInputChange(result._id, user._id, "projectreview", e.target.value)
                                 }
@@ -220,7 +249,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                                 type="number"
                                 min="0"
                                 max="5"
-                                value={userResults[result._id]?.[user._id]?.viva || ""}
+                                value={userResult.viva}
                                 onChange={(e) => handleInputChange(result._id, user._id, "viva", e.target.value)}
                                 className="h-8"
                               />
@@ -233,7 +262,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                                 type="number"
                                 min="0"
                                 max="30"
-                                value={userResults[result._id]?.[user._id]?.finalprojectreview || ""}
+                                value={userResult.finalprojectreview}
                                 onChange={(e) =>
                                   handleInputChange(result._id, user._id, "finalprojectreview", e.target.value)
                                 }
@@ -248,7 +277,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                                 type="number"
                                 min="0"
                                 max="5"
-                                value={userResults[result._id]?.[user._id]?.finalviva || ""}
+                                value={userResult.finalviva}
                                 onChange={(e) => handleInputChange(result._id, user._id, "finalviva", e.target.value)}
                                 className="h-8"
                               />
@@ -261,7 +290,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                                 type="number"
                                 min="0"
                                 max="5"
-                                value={userResults[result._id]?.[user._id]?.attendance || ""}
+                                value={userResult.attendance}
                                 onChange={(e) => handleInputChange(result._id, user._id, "attendance", e.target.value)}
                                 className="h-8"
                               />
@@ -274,7 +303,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                                 type="number"
                                 min="0"
                                 max="5"
-                                value={userResults[result._id]?.[user._id]?.socialmediasharing || ""}
+                                value={userResult.socialmediasharing}
                                 onChange={(e) =>
                                   handleInputChange(result._id, user._id, "socialmediasharing", e.target.value)
                                 }
@@ -287,13 +316,14 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                             <div>
                               <span className="text-sm font-medium">Total Marks:</span>
                               <span className="ml-2 text-lg font-bold">
-                                {userResults[result._id]?.[user._id]?.totalmarks || "0"}/60
+                                {userResult.totalmarks}/60
                               </span>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
-                    ))}
+                      );
+                    })}
                   </ScrollArea>
                 </TabsContent>
 
