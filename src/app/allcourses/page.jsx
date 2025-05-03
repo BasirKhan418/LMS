@@ -30,7 +30,7 @@ const Page = () => {
         }
       })
       const res = await response.json()
-      console.log("basir reg is ",res)
+      
       setLoading(false)
       
       if (res.success) {

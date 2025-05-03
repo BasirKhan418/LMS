@@ -23,7 +23,7 @@ export function EditUserModal({ user, isOpen, onClose, onSave,users }) {
   const handleSubmit = (e) => {
 
     e.preventDefault()
-    console.log(formData)
+
     onSave(formData)
   }
 

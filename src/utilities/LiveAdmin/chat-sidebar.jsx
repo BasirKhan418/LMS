@@ -30,7 +30,7 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
   // Socket connection and event handlers
   useEffect(() => {
     if (!socket) {
-      console.error("Socket instance not available for chat")
+      
       return
     }
 
@@ -39,27 +39,27 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
 
     // Set up event listeners
     socket.on("connect", () => {
-      console.log("Socket connected in ChatSidebar")
+     
       setIsConnected(true)
     })
 
     socket.on("disconnect", () => {
-      console.log("Socket disconnected in ChatSidebar")
+      
       setIsConnected(false)
     })
 
     socket.on("streamUsers", (data) => {
-      console.log("Stream users updated:", data);
+      
       if (data.users && Array.isArray(data.users)) {
         setCurrentMembers(data.users.length);
-        console.log("Users data updated basir:", data.users);
+        
         setUsersData(data.users);
       }
     });
 
     // Chat message event
     socket.on("streamMessage", (data) => {
-      console.log("Received stream message:", data)
+      
       const newMessage = {
         id: data.timestamp || Date.now(),
         user: {
@@ -78,7 +78,7 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
 
     // Chat state event (enabled/disabled)
     socket.on("streamChatState", (data) => {
-      console.log("Stream chat state updated:", data)
+      
       setIsChatEnabled(data.messagesEnabled)
       
       if (data.updatedBy && data.messagesEnabled !== isChatEnabled) {
@@ -89,7 +89,7 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
 
     // Chat notice event (e.g., errors)
     socket.on("streamChatNotice", (data) => {
-      console.log("Stream chat notice:", data)
+      
       toast.info(data.message)
     })
 
@@ -116,17 +116,8 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
   // Handle sending messages
   const handleSendMessage = () => {
     if (!message.trim() || (!isChatEnabled && !isAdmin) || !socket || !isConnected) return
-
-    console.log("Sending message:", message.trim())
     // Send message through socket
     socket.emit("streamMessage", {
-      streamId: streamId,
-      message: message.trim(),
-      userId: userData?._id,
-      userName: userData?.name,
-      isAdmin: isAdmin
-    })
-    console.log("Message sent:", {
       streamId: streamId,
       message: message.trim(),
       userId: userData?._id,

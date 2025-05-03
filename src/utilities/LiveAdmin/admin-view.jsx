@@ -69,7 +69,6 @@ export default function AdminView({ content, data,week,alldata }) {
   useEffect(() => {
     // Early return if required data is missing
     if (!process.env.NEXT_PUBLIC_WEBSOCKET_URL) {
-      console.error("WebSocket URL environment variable is not set");
       toast.error("Configuration error: Missing WebSocket URL");
       return;
     }
@@ -79,18 +78,18 @@ export default function AdminView({ content, data,week,alldata }) {
     const userName = data?.name;
 
     if (!streamId || !userId || !userName) {
-      console.error("Missing required data for live stream connection", { streamId, userId, userName });
+      
       toast.error("Missing information needed to join the live stream");
       return;
     }
 
     // Return early if socket is already initialized
     if (socketRef.current) {
-      console.log("Socket already initialized, skipping");
+    
       return;
     }
 
-    console.log("Initializing socket connection");
+   
     
     // Initialize socket connection
     try {
@@ -98,7 +97,7 @@ export default function AdminView({ content, data,week,alldata }) {
       
       // Handle connection events
       socketRef.current.on("connect", () => {
-        console.log("Socket connected successfully");
+        
         setIsConnected(true);
         
         // Join the live stream after successful connection
@@ -109,32 +108,30 @@ export default function AdminView({ content, data,week,alldata }) {
           isStreamAdmin: true,
         });
         
-        console.log("Sent joinLiveStream event with data:", {
-          streamId, userId, userName, isStreamAdmin: true
-        });
+       
       });
       
       socketRef.current.on("connect_error", (error) => {
-        console.error("Socket connection error:", error);
+       
         toast.error("Failed to connect to the live stream server");
         setIsConnected(false);
       });
       
       socketRef.current.on("disconnect", () => {
-        console.log("Socket disconnected");
+        
         setIsConnected(false);
       });
       
       // Handle stream events
       socketRef.current.on("streamUserJoined", (data) => {
-        console.log("User joined stream:", data);
+        
         // Only show toast for other users, not ourselves
         if (data.userId !== userId) {
           toast.success(`${data.userName} has joined the stream`);
         }
       });
     } catch (error) {
-      console.error("Error initializing socket:", error);
+      
       toast.error("Failed to initialize live stream connection");
       setIsConnected(false);
     }
@@ -142,7 +139,7 @@ export default function AdminView({ content, data,week,alldata }) {
     // Cleanup on unmount
     return () => {
       if (socketRef.current) {
-        console.log("Cleaning up socket connection...");
+        
         if (isConnected) {
           // Properly leave the stream before disconnecting
           socketRef.current.emit("leaveLiveStream", {
@@ -163,7 +160,7 @@ export default function AdminView({ content, data,week,alldata }) {
 
   const handleCompleteClass = async() => {
     const data = await CompleteLiveStream(classInfo.streamSettings.streamId);
-    console.log("Live stream marked as complete:", data);
+    
     setIsLive(false)
     socketRef.current.emit("completeLiveStream", {
       streamId: classInfo.streamSettings.streamId,
@@ -176,7 +173,7 @@ export default function AdminView({ content, data,week,alldata }) {
   const toggleChatEnabled = useCallback((enabled) => {
     // Prevent multiple rapid toggles
     if (chatTogglingRef.current) {
-      console.log("Toggle already in progress, ignoring");
+      
       return;
     }
     
@@ -191,7 +188,7 @@ export default function AdminView({ content, data,week,alldata }) {
     
     // Emit chat toggle event if socket is connected
     if (socketRef.current && isConnected) {
-      console.log(`Emitting toggleStreamChat event: ${newEnabledState}`);
+     
       socketRef.current.emit("toggleStreamChat", {
         streamId: classInfo.streamSettings.streamId,
         enabled: newEnabledState
@@ -235,7 +232,6 @@ export default function AdminView({ content, data,week,alldata }) {
   duration:duration 
  }
 
- console.log(attendanceData)
 
  //api call
  try{
@@ -258,7 +254,7 @@ else{
 }
  }
  catch(err){
-  console.log(err)
+
   toast.error("Something went wrong! Try again later: " + err);
  }
 

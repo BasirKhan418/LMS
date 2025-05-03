@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const CompleteLiveStream = async (liveStreamId) => {
-  console.log(`Completing Live Stream: ${liveStreamId}`);
+  
   try {
     const tokenId = process.env.NEXT_PUBLIC_MUX_TOKEN_ID;
     const tokenSecret = process.env.NEXT_PUBLIC_MUX_TOKEN_SECRET;
@@ -19,11 +19,10 @@ const CompleteLiveStream = async (liveStreamId) => {
       }
     );
 
-    console.log("Live stream marked as complete.");
+   
     return response.data;
 
   } catch (error) {
-    console.error("Error completing live stream:", error.response?.data || error.message);
     throw error;
   }
 };

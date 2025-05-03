@@ -19,7 +19,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 export function ProjectDialog({ initialProject,open,setOpen } = {}) {
-console.log("ProjectDialog", initialProject, open, setOpen)
+
 const [project, setProject] = useState({
     title: initialProject?.title || "",
     description: initialProject?.description || "",
@@ -37,8 +37,7 @@ const [project, setProject] = useState({
   }
 
   const handleSubmit = () => {
-    // Here you would typically save the project data
-    console.log("Project updated:", project)
+
     setOpen(false)
   }
 

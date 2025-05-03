@@ -35,7 +35,7 @@ export function UserView({ content, userdata }) {
   useEffect(() => {
     // Ensure we have the required data to connect
     if (!process.env.NEXT_PUBLIC_WEBSOCKET_URL) {
-      console.error("WebSocket URL environment variable is not set");
+      
       toast.error("Configuration error: Missing WebSocket URL");
       return;
     }
@@ -45,7 +45,7 @@ export function UserView({ content, userdata }) {
     const userName = userdata?.name;
 
     if (!streamId || !userId || !userName) {
-      console.error("Missing required data for live stream connection", { streamId, userId, userName });
+      
       toast.error("Missing information needed to join the live stream");
       return;
     }
@@ -73,13 +73,13 @@ export function UserView({ content, userdata }) {
       });
       
       socketRef.current.on("connect_error", (error) => {
-        console.error("Socket connection error:", error);
+        
         toast.error("Failed to connect to the live stream server");
       });
       
       // Handle stream events
       socketRef.current.on("streamUserJoined", (data) => {
-        console.log("User joined stream:", data);
+     
         if (data.userId !== userId) {
 
           toast.success(`${data.userName} has joined the stream`);
@@ -92,9 +92,9 @@ export function UserView({ content, userdata }) {
       });
 
       socketRef.current.on("completeLiveStreamMessage", (data) => {
-        console.log("Live stream completed message:", data);
+        
        if(data.status ==="completed"){
-        console.log("Live stream completed:", data);
+       
         toast.success("The live stream has been completed successfully.");
         setTimeout(()=>{
           toast.success("class has ended successfully. Recording will be available soon.");
@@ -107,11 +107,11 @@ export function UserView({ content, userdata }) {
       });
       
       socketRef.current.on("streamChatNotice", (data) => {
-        console.log("Stream chat notice:", data);
+        
         toast.info(data.message);
       });
     } catch (error) {
-      console.error("Error initializing socket:", error);
+      
       toast.error("Failed to initialize live stream connection");
     }
 

@@ -28,10 +28,10 @@ export default function TrainerSidebar({children}) {
   const [data,setData] = useState(null);
   const validates = async(token)=>{
     let data =  await TrainerValidatesFunc(token);
-    console.log(data)
+    
     if(data.success){
       setData(data.data)
-      console.log(data.data)
+      
     }
     else{
       toast.error(data.message);

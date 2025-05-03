@@ -21,8 +21,6 @@ const ProjectPage = (props) => {
   //find submit date
 
   function findSubmitdate(startDate, months) {
-    console.log("start date is", startDate)
-    console.log("months is", months)
     // Parse the start date
     const start = new Date(startDate);
     
@@ -45,8 +43,7 @@ const ProjectPage = (props) => {
     // Reset time portion for accurate date comparison
     endDate.setHours(0, 0, 0, 0);
     
-    // Return true if current date is >= end date
-    console.log("result inside functiomn", currentDate >= endDate)
+    
     return currentDate >= endDate;
   }
   const [submitted, setSubmitted] = useState(false)
@@ -62,12 +59,12 @@ const ProjectPage = (props) => {
         }
       })
       const data = await res.json()
-      console.log("data is", data)
+     
       if (data.success) {
         setProjectData(data.data)
         setUserData(data.userdata)
         const result = findSubmitdate(data.user.startdate, data.user.month) ? setIsEligible(false) : setIsEligible(true)
-        console.log("result is", result)
+        
         if (data.submission) {
           setSubmission(data.submission)
           setSubmitted(true)
@@ -78,7 +75,7 @@ const ProjectPage = (props) => {
         toast.error(data.message)
       }
     } catch (err) {
-      console.log(err)
+      
       toast.error("Something went wrong, please try again later")
     } finally {
       setLoading(false)

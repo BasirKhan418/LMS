@@ -67,7 +67,6 @@ const res = await fetch(`/api/contentcrud?id=${params.addcourse}`,{
 })
 const result = await res.json()
 setLoading(false)
-console.log(result)
 setWeeks(result.data.content)
 //calculating the content indexing
 let temp = 0;
@@ -288,7 +287,6 @@ fetchallcoursedata()
   //saving all data into the data base
   const handleSubmit = async()=>{
     const data = {content:weeks,id:params.addcourse}
-    console.log(data)
     try{
       setLoading(true)  
      const res = await fetch("/api/contentcrud",{
@@ -300,7 +298,7 @@ fetchallcoursedata()
         body:JSON.stringify(data)
      })
      const result = await res.json()
-     console.log(result)  
+    
       setLoading(false)
       if(result.success){
         toast.success(result.message)
@@ -317,7 +315,7 @@ fetchallcoursedata()
   //upload content on database
   const updateondatabase = async(videoid,playbackid)=>{
    let data = {name:courseName,folderid:params.addcourse,content:{title:createcontentform.name,videoid,playbackid,description:createcontentform.description}}
-   console.log(data)
+
   const res = await fetch("/api/addvideos",{
     method:"POST",
     headers:{
@@ -327,7 +325,7 @@ fetchallcoursedata()
     body:JSON.stringify(data)
   })
   const result = await res.json();
-  console.log(result)
+ 
   if(result.success){
     toast.success(result.message)
        
@@ -366,19 +364,16 @@ fetchallcoursedata()
           const { loaded, total } = progressEvent;
           const percentCompleted = Math.floor((loaded * 100) / total);
           setUploadProgress(percentCompleted);
-          console.log('Upload progress:', percentCompleted);
+         
         },
         
       });
      
-      console.log('upload data asset:',upload)
-       console.log('Video uploaded asset:', uploadVideo);
+
 
       const assetId = upload;
-      console.log('Asset ID:', assetId);
+      
       const [asset,assetid] = await FetchAsset(upload);
-
-      console.log("assest is upload  asset",asset)
 
       setVideoId(asset);
       //asset.data.data.asset_id
@@ -396,7 +391,7 @@ fetchallcoursedata()
 
   const createLiveStream = async()=>{
     const [streamKey,streamid,playback_ids] = await CreateLiveStream()
-    console.log(streamKey,streamid,playback_ids)
+    
     setcreatecontentform({...createcontentform,streamid:streamid,playbackid:playback_ids,rtmpkey:streamKey,rtmpurl:"rtmps://global-live.mux.com:443/app"})
   }
   return (

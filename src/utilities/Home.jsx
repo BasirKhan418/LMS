@@ -249,7 +249,7 @@ function getRelativeTime(dateTimeString) {
   };
   //fetch Attendance 
   const fetchAttendance = async (batchid, duration,userid) => {
-    console.log("fetching attendance",batchid,duration,userid)
+    
   try{
     setLoading(true);
  const res = await fetch("/api/attendance/percentage", {
@@ -265,11 +265,10 @@ function getRelativeTime(dateTimeString) {
     }),
  })
  const data = await res.json();
- console.log("Attendance data",data)
+
  setLoading(false);
   if (data.success) {
-    console.log("Attendance data",data.data)
-    console.log("Attendance percentage",data.userAttendance.attendancePercentage)
+    
    setAttendancePercentage(data.userAttendance.attendancePercentage)
   }
   else{
@@ -295,7 +294,7 @@ function getRelativeTime(dateTimeString) {
 
     if (res.success) {
       setData(res.data);
-      console.log(res);
+      
       fetchAttendance(res.batch._id, res.user.month,res.user._id);
       findYourTeam(res.batch._id, res.user._id);
       findAllNotification(res.batch._id);
@@ -303,7 +302,7 @@ function getRelativeTime(dateTimeString) {
         (item) => item.courseid.coursetype == "live"
       );
       fetchAllAssignment(result && result.courseid._id, res.user._id);
-      console.log(result);
+     
       setUser(res.user);
       // fetchAllAssignment(res.data && res.data[0].courseid._id, res.user._id);
     } else {
@@ -339,7 +338,7 @@ function getRelativeTime(dateTimeString) {
       year: "numeric",
     });
   };
-console.log("attendance percentage",attendancepercentage)
+
   return (
     <>
       <Toaster position="top-center" expand={false} />

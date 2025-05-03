@@ -117,7 +117,7 @@ export default function Component() {
       }
     } catch (error) {
       toast.error("Failed to fetch profile data");
-      console.error(error);
+      
     } finally {
       setLoading(false);
     }
@@ -160,7 +160,7 @@ export default function Component() {
       }
     } catch (error) {
       toast.error("An error occurred while updating profile");
-      console.error(error);
+      
     } finally {
       setPostLoading(false);
     }
@@ -186,7 +186,7 @@ export default function Component() {
       }
     }
     catch(err){
-      console.error("Error updating duration:", err);
+      
       toast.error("Failed to update duration. Please try again.");
     }
   }
@@ -220,7 +220,6 @@ const options = {
   image: "/9.png",
   order_id: res.order.id,
   handler: async function(response) {
-   console.log("Payment response:", response);
   const data = await VerifyRazorpaySign(response.razorpay_order_id, response.razorpay_payment_id, response.razorpay_signature);
   if (data.status) {
     toast.success("Payment successful!");
@@ -271,7 +270,7 @@ setTimeout(() => {
   }
     }
     catch(err){
-      console.error("Error during payment process:", err);
+  
       toast.error("Payment failed. Please try again.");
 
     }

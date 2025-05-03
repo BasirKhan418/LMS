@@ -137,7 +137,7 @@ export default function TeamManagement() {
         body: JSON.stringify({ batchid: teamId }),
       })
       const data = await res.json();
-      console.log(data)
+    
       setLoading(false)
       if (data.success) {
         setIsViewModalOpen(true);
@@ -168,7 +168,7 @@ export default function TeamManagement() {
         body: JSON.stringify({ batchid: teamId }),
       })
       const data = await res.json();
-      console.log(data)
+      
       setLoading(false)
       if (data.success) {
         const workbook = new excel.Workbook();
@@ -218,7 +218,7 @@ export default function TeamManagement() {
     }
     catch(err){
       setLoading(false) 
-      console.log(err)
+     
       toast.error("Error exporting team");
     }
   }

@@ -17,9 +17,9 @@ export function MembersSidebar({ socket, streamId, usersData, setUsersData, curr
     if (socket) {
       // Listen for users count updates
       socket.on("streamUsers", (data) => {
-        console.log("Stream users updated:", data);
+       
         if (data.users && Array.isArray(data.users)) {
-          console.log("Users data updated basir:", data.users);
+          
           setUsersData(data.users);
           setCurrentMembers(data.users.length);
         }

@@ -27,13 +27,13 @@ const page = () => {
         const data = await res.json();
         if (data.success) {
           setTeam(data.data);
-          console.log("team", data.data);
+          
         } else {
           toast.error(data.message);
         }
       } catch (err) {
         toast.error("Error in finding your team");
-        console.log(err);
+     
       }
     };
 
@@ -52,7 +52,7 @@ const page = () => {
     
         if (res.success) {
           setData(res.data);
-          console.log(res);
+          
           findYourTeam(res.batch._id, res.user._id);
           setUser(res.user);
           // fetchAllAssignment(res.data && res.data[0].courseid._id, res.user._id);

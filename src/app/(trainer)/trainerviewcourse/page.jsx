@@ -18,7 +18,7 @@ const Page = () => {
     const fetchallCourse = async(batch)=>{
     setLoading(true)
      let data = await CourseData();
-     console.log("course data from trainer",data)
+     
      setLoading(false)  
      const filteredData = data.data.filter((item) => batch.includes(item.batch));
      setCoursesData(filteredData);
@@ -28,7 +28,7 @@ const Page = () => {
         setLoading(true);
         let data =  await TrainerValidatesFunc(token);
         setLoading(false);
-        console.log(data)
+        
         if(data.success){
           setData(data.data)
             fetchallCourse(data.data[0].batches);
@@ -50,7 +50,7 @@ const Page = () => {
       validates(localStorage.getItem("dilmsadmintoken"))
       
         },[])
-        console.log(coursesData)
+      
   return (
     <>
     <Toaster position='top-center' expand={false}/>

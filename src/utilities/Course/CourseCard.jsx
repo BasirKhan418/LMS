@@ -42,7 +42,7 @@ export function CourseCard({ course, user, data,batchdetails }) {
         toast.error(res.message);
       }
     } catch(err) {
-      console.log(err);   
+      
       setLoading(false);
       toast.error("Internal server error");
     }

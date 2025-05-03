@@ -29,10 +29,9 @@ export default function AdminSidebar({children}) {
   const [data,setData] = useState(null);
   const validates = async(token)=>{
     let data =  await ValidatesFunc(token);
-    console.log(data)
     if(data.success){
       setData(data.data)
-      console.log(data.data)
+     
     }
     else{
       toast.error(data.message);

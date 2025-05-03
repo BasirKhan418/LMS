@@ -56,7 +56,7 @@ export default function ResultsPage() {
       }
     }
     catch(err){
-      console.log(err)
+      
       toast.error("Something went wrong while fetching batches")
     }
   }
@@ -82,7 +82,7 @@ export default function ResultsPage() {
         }
     }
     catch(err){
-        console.log(err)
+        
         toast.error("Something went wrong while fetching results")
     }
   }
@@ -123,7 +123,7 @@ export default function ResultsPage() {
         }   
     }
     catch(err){
-        console.log(err)
+        
         setIsLoading(false)
         toast.error("Something went wrong while creating results")
     }
@@ -151,7 +151,7 @@ export default function ResultsPage() {
      }
    }
    catch(err){
-    console.log(err)
+   
     toast.error("Something went wrong while updating results")
    }
   }
@@ -193,7 +193,7 @@ export default function ResultsPage() {
           }
         }
         catch(err){
-          console.log(err)
+         
           toast.error("Something went wrong while changing status")
         }
       }
@@ -227,7 +227,7 @@ export default function ResultsPage() {
           }
         }
         catch(err){
-          console.log(err)
+          
           toast.error("Something went wrong while publishing results")
         }
       }

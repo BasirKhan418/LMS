@@ -136,7 +136,7 @@ export default function CourseCreationModal({ course, onSave, open, setOpen, id,
       }
     } catch (error) {
       toast.error("Error uploading image")
-      console.error(error)
+      
     } finally {
       setLoading(false);
     }

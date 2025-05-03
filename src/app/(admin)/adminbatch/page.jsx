@@ -34,7 +34,7 @@ setIsLoading(false)
   }
   }
   catch(err){
-    console.log(err)
+    
     toast.error("Something went wrong while fetching batches")
   }
 }
@@ -71,7 +71,7 @@ else{
 }
   }
   catch(err){
-    console.log(err)
+   
     toast.error("Something went wrong while creating batch")
   }
   }
@@ -88,7 +88,6 @@ const data = await fetch("/api/batchcrud", {
   body: JSON.stringify(updatedBatch),
 })
 const res = await data.json()
-console.log(res)
 setIsLoading(false)
 if (res.success) {
   fetchBatches()
@@ -156,7 +155,7 @@ catch(err){
       body: JSON.stringify({ batchid: batch._id }),
     })
     const res = await data.json()
-    console.log(res)
+    
     setIsLoading(false)
     if (res.success) {
       setUsers(res.users)

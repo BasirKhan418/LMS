@@ -4,7 +4,6 @@ import UserAssignment from '@/utilities/Assignment/UserAssignment'
 import useAuth from '../../../../hooks/useAuth';
 const page = props => {
   const params = use(props.params);
-  console.log("params details is",params.details)
   const [data,loading] = useAuth();
   return (
     <div>

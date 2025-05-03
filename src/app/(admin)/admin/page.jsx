@@ -17,7 +17,7 @@ const Page = () => {
       setLoading(true);
       let data =  await ValidatesFunc(token);
       setLoading(false);
-      console.log(data)
+      
       if(data.success){
         setData(data.data)
       }
@@ -75,7 +75,7 @@ const Page = () => {
         })
         const res = await data.json()
         setLoading(false)
-        console.log("fetched res is ",res)
+        
         if (res.success) {
           setSentNotifications(res.data)
         } else {
@@ -83,7 +83,7 @@ const Page = () => {
         }
       }
       catch(err){
-        console.log(err)
+       
         toast.error("Something went wrong while fetching notifications")
       }
     }

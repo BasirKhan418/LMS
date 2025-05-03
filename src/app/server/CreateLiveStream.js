@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const CreateLiveStream = async () => {
-  console.log("Creating Live Stream...");
+  
   try {
     const tokenId = process.env.NEXT_PUBLIC_MUX_TOKEN_ID;
     const tokenSecret = process.env.NEXT_PUBLIC_MUX_TOKEN_SECRET;
@@ -28,12 +28,12 @@ const CreateLiveStream = async () => {
     const streamid = data.id;
     const playback_ids = data.playback_ids[0]?.id;
 
-    console.log(streamKey, streamid, playback_ids);
+    
 
     return [streamKey, streamid, playback_ids];
 
   } catch (error) {
-    console.error("Error creating live stream:", error.response?.data || error.message);
+    
     throw error;
   }
 };

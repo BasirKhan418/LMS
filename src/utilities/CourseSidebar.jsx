@@ -136,7 +136,7 @@ export default function CourseSidebar({
         toast.error(res.message);
       }
     } catch (err) {
-      console.error("Authentication error:", err);
+      
       toast.error("Failed to authenticate user");
     } finally {
       setLoading(false);
@@ -163,7 +163,7 @@ export default function CourseSidebar({
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error fetching comments:", error);
+     
       toast.error("Failed to load comments");
     }
   };
@@ -171,7 +171,7 @@ export default function CourseSidebar({
   const updateProgress = async () => {
     // Check if content and content.name exist before proceeding
     if (!content || !content.name) {
-      console.log("No content selected to update progress");
+      
       return;
     }
     
@@ -198,7 +198,7 @@ export default function CourseSidebar({
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error updating progress:", error);
+      
       toast.error("Failed to update progress");
     }
   };

@@ -81,7 +81,7 @@ const Chat = ({ aiopen, setaiopen }) => {
       }
     } catch (err) {
       toast.error("Too many requests, please try again later!" + err);
-      console.error(err);
+      
     }
   }
 

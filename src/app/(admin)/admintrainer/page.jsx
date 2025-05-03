@@ -48,7 +48,7 @@ export default function TrainersPage() {
         },
       })
       let data = await res.json()
-      console.log(data)
+      
       setLoading(false)
       if (data.success) {
         setTrainers(data.trainers)
@@ -175,7 +175,7 @@ export default function TrainersPage() {
 
   // Open delete confirmation dialog
   const openDeleteDialog = (trainerId) => {
-    console.log(trainerId)  
+     
     setTrainerToDelete(trainerId)
     setDeleteDialogOpen(true)
   }

@@ -42,7 +42,7 @@ export default function NotificationPage() {
       }
       }
       catch(err){
-        console.log(err)
+       
         toast.error("Something went wrong while fetching batches")
       }
     }
@@ -75,7 +75,7 @@ const fetchNotifications = async () => {
     })
     const res = await data.json()
     setIsLoading(false)
-    console.log("fetched res is ",res)
+    
     if (res.success) {
       setSentNotifications(res.data)
     } else {
@@ -83,7 +83,7 @@ const fetchNotifications = async () => {
     }
   }
   catch(err){
-    console.log(err)
+   
     toast.error("Something went wrong while fetching notifications")
   }
 }
@@ -133,7 +133,7 @@ useEffect(()=>{
     }
     }
     catch(err){
-      console.log(err)
+      
       toast.error("Something went wrong while sending notification. Please contact to the developer")
     }
 

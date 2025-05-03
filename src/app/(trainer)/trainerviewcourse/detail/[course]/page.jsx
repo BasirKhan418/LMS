@@ -48,7 +48,6 @@ const setAllcourseData = async()=>{
     setLoading(true);
     let data =  await TrainerValidatesFunc(token);
     setLoading(false);
-    console.log(data)
     if(data.success){
       setData(data.data[0])
         

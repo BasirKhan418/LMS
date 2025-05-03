@@ -60,7 +60,7 @@ export default function Page(props) {
     }
     else{
       toast.error(data.message)
-      console.log(data)
+     
     }
   }
   //fetch all submitted assignment
@@ -81,7 +81,7 @@ export default function Page(props) {
     }
     else{
       toast.error(data.message)
-      console.log(data)
+     
     }
   }
   //end
@@ -90,7 +90,6 @@ export default function Page(props) {
     fetchAllAssignment()
     fetchAllSubmittedAssignment()
   },[])
-  console.log(allAssignment)
   //end
   const [activeTab, setActiveTab] = useState("create")
   const [aiopen,setaiopen] = useState(false)
@@ -317,7 +316,7 @@ else{
   }
   //evalute by ai 
   const handleAiGrade = async(item)=>{
-    console.log(item)
+  
     try{
       setOpengradeaimodal(true)
     const chatSession = model.startChat({
@@ -328,7 +327,7 @@ else{
     const result = await chatSession.sendMessage(prompt);
     setOpengradeaimodal(false)
     let data = JSON.parse(result.response.text())
-    console.log("ai data is ",data)
+  
     setGradeForm({
       title:item.asid.title,
       desc:item.asid.desc,

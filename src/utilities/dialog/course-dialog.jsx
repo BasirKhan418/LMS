@@ -99,7 +99,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
         image: "/9.png",
         order_id: data.order.id,
         handler: async function(response) {
-         console.log("Payment response:", response);
+         
         const data = await VerifyRazorpaySign(response.razorpay_order_id, response.razorpay_payment_id, response.razorpay_signature);
         if (data.status) {
           toast.success("Payment successful!");
@@ -143,7 +143,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
       }, 100);
       
     } catch (error) {
-      console.error("Error during payment:", error);
+      
       setLoading(false);
       toast.error("Error processing payment. Please try again.");
     }
@@ -177,7 +177,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
         toast.error(data.message || "Payment verification failed");
       }
     } catch (error) {
-      console.error("Error verifying payment:", error);
+      
       toast.error("Error verifying payment. Please contact support.");
     } finally {
       setLoading(false);

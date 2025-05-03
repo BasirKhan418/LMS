@@ -19,7 +19,7 @@ const AttendanceView = () => {
          }
         })
        const res = await response.json();
-       console.log(res)
+       
         setIsLoading(false);
        if(res.success){
 
@@ -49,7 +49,7 @@ const AttendanceView = () => {
             body: JSON.stringify({ batchid, userid, duration })
         });
       const mockResponse = await res.json(); // Simulate API response
-      console.log("mockResponse",mockResponse)
+      
       if(mockResponse.success) {
         setAttendanceData(mockResponse);
       }

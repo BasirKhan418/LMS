@@ -45,7 +45,7 @@ export default function ResultsPage() {
     setIsLoading(true)
     let data = await TrainerValidatesFunc(token)
     setIsLoading(false)
-    console.log(data)
+    
     if(data.success){
       fetchResults(data.data[0].batches)
       setData(data.data[0])
@@ -85,13 +85,13 @@ export default function ResultsPage() {
       }
     }
     catch(err){
-      console.log(err)
+  
       toast.error("Something went wrong while fetching batches")
     }
   }
   
   const fetchResults = async (batch) => {
-    console.log(batch)  
+     
     try{
       setIsLoading(true)
       const data = await fetch("/api/resultcrud", {
@@ -112,7 +112,7 @@ export default function ResultsPage() {
       }
     }
     catch(err){
-      console.log(err)
+      
       toast.error("Something went wrong while fetching results")
     }
   }
@@ -153,7 +153,7 @@ export default function ResultsPage() {
       }   
     }
     catch(err){
-      console.log(err)
+     
       setIsLoading(false)
       toast.error("Something went wrong while creating results")
     }
@@ -181,7 +181,7 @@ export default function ResultsPage() {
       }
     }
     catch(err){
-      console.log(err)
+   
       toast.error("Something went wrong while updating results")
     }
   }
@@ -215,7 +215,7 @@ export default function ResultsPage() {
           })
           setIsLoading(false)
           const data1 = await res.json()
-          console.log(data1)
+         
           if(data1.success){
             toast.success(data1.message)
             fetchResults(data.batches)
@@ -225,7 +225,7 @@ export default function ResultsPage() {
           }
         }
         catch(err){
-          console.log(err)
+         
           toast.error("Something went wrong while changing status")
         }
       }
@@ -259,7 +259,7 @@ export default function ResultsPage() {
           }
         }
         catch(err){
-          console.log(err)
+          
           toast.error("Something went wrong while publishing results")
         }
       }

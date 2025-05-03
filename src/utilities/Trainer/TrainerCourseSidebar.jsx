@@ -174,7 +174,7 @@ const fetchComments = async (id) => {
         toast.error(result.message);
       }
     } catch (error) {
-      console.error("Error fetching comments:", error);
+   
       toast.error("Failed to load comments");
     }
   };

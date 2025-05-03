@@ -56,7 +56,6 @@ export default function Component() {
             }
             else{
                 setVideoData(result.data[0].content)
-            console.log(result.data[0].content)
             toast.success(result.message)
             }
         }
@@ -91,7 +90,7 @@ export default function Component() {
     const updateondatabase = async(videoid,playbackid)=>{
         const name = courseDatas.find((item)=>item._id==videocontent.folderid)
        let data = {name:name.title,folderid:name._id,content:{...videocontent,videoid,playbackid}}
-       console.log(data)
+    
     const res = await fetch("/api/addvideos",{
         method:"POST",
         headers:{
@@ -101,7 +100,7 @@ export default function Component() {
         body:JSON.stringify(data)
     })
     const result = await res.json();
-    console.log(result)
+    
     if(result.success){
         toast.success(result.message)
             setUploadModal(false)
@@ -148,19 +147,16 @@ export default function Component() {
         const { loaded, total } = progressEvent;
         const percentCompleted = Math.floor((loaded * 100) / total);
         setUploadProgress(percentCompleted);
-        console.log('Upload progress:', percentCompleted);
+        
       },
       
     });
-   
-    console.log('upload data asset:',upload)
-     console.log('Video uploaded asset:', uploadVideo);
+
 
     const assetId = upload;
-    console.log('Asset ID:', assetId);
+ 
     const [asset,assetid] = await FetchAsset(upload);
 
-    console.log("assest is upload  asset",asset)
     //asset.data.data.asset_id
   const [dataid,playbackid] =await FetchAssetDetails(assetid);
       updateondatabase(dataid,playbackid);

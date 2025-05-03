@@ -37,7 +37,7 @@ export default function Home() {
       }
     }
     catch(err){
-      console.log(err)
+      
       toast.error("Something went wrong while fetching batches")
     }
   }
@@ -108,7 +108,7 @@ export default function Home() {
       }
     } catch(err) {
       setLoading(false);
-      console.log(err);
+     
       toast.error("Something went wrong please try again: " + err);
     }
   }
@@ -149,7 +149,7 @@ export default function Home() {
       }
     } catch(err) {
       setLoading(false);
-      console.log(err);
+      
       toast.error("Something went wrong please try again: " + err);
     }
   }
@@ -217,7 +217,7 @@ export default function Home() {
       }
     } catch(err) {
       setLoading(false);
-      console.log(err);
+     
       toast.error("Something went wrong please try again: " + err);
     }
   }
@@ -230,7 +230,7 @@ export default function Home() {
       setCourses(data.data);
     } catch (error) {
       toast.error("Failed to fetch courses");
-      console.error(error);
+      
     } finally {
       setLoading(false);
     }

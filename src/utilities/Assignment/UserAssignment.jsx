@@ -18,7 +18,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 const AssignmentCard = ({ assignment, type, onClick,id }) => {
-  console.log("id om user",id)
+  
   const statusColors = {
     pending: "bg-amber-100 text-amber-700",
     submitted: "bg-blue-100 text-blue-700",

@@ -48,7 +48,7 @@ export function Login() {
     } catch (error) {
       setLoading(false);
       toast.error("An error occurred. Please try again.");
-      console.error(error);
+      
     }
   }
   
@@ -71,7 +71,7 @@ export function Login() {
     } catch (error) {
       setLoading(false);
       toast.error("An error occurred. Please try again.");
-      console.error(error);
+      
     }
   }
 

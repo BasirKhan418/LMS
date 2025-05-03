@@ -59,9 +59,6 @@ export default function EvaluatedTab({ results, onPublishResult, isadmin }) {
       setUrlError("Please enter a valid URL")
       return
     }
-
-    // If validation passes, publish result and close modal
-    console.log("Publishing result with stipend URL:", stipendUrl)
     onPublishResult(currentResultId, stipendUrl)
     setPublishModalOpen(false)
   }

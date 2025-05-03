@@ -47,7 +47,7 @@ const handleOtpSend = async(e)=>{
     }
     else{
       toast.error(data.data.message);
-       console.log(data)
+       
     }
 }
 catch(err){
@@ -71,11 +71,11 @@ let data = await axios.post("/api/adminauth",{email:email.toLowerCase(),type:"ve
     }
     else{
       toast.error(data.data.message);
-       console.log(data)
+     
     }
 
 }
-console.log(otp);
+
   return (
     <div className="">
      <Toaster position="top-center"  expand={false}/>
@@ -160,7 +160,7 @@ console.log(otp);
       </div>
       <div className="hidden bg-muted lg:block">
         <Image
-          src="/lms.png"
+          src="/infotactlearning.gif"
           alt="Image"
           width="1920"
           height="1080"

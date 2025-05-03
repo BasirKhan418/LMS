@@ -127,7 +127,7 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
       }
     }
     catch (err) {
-      console.log(err)
+      
       toast.error("Error fetching automated marks")
     }
   }

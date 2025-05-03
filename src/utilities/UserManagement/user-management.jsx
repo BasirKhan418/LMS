@@ -43,7 +43,7 @@ export default function UserManagement() {
       })
       const data = await response.json()
       setIsLoading(false)
-      console.log(data)
+      
       if(data.success){
         setUsers(data.users)
         setFilteredUsers(data.users)

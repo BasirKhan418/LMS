@@ -30,7 +30,7 @@ const response = await fetch("/api/admincrud",{
     }
 });
 const data = await response.json()
-console.log(data)
+
 setLoading(false)
 if(!data.success){
     toast.error(data.message)
@@ -82,7 +82,7 @@ fetchAdmins()
   }
 
   const handleUpdateAdmin = async(updatedAdmin) => {
-    console.log("updated admin",updatedAdmin)
+  
     try{
     const response = await fetch("/api/admincrud", {
         method: "PUT",
@@ -139,7 +139,7 @@ setLoading(true)
   }
 
   const openEditModal = (admin) => {
-    console.log("edfit item",admin)
+   
     setAdminToEdit(admin)
     setIsCreateModalOpen(true)
   }

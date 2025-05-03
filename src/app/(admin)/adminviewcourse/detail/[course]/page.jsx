@@ -49,10 +49,10 @@ const Page = props => {
       setLoading(true);
       let data =  await ValidatesFunc(token);
       setLoading(false);
-      console.log(data)
+    
       if(data.success){
         setData(data.data[0])
-        console.log("settting up",data.data[0])
+        
       }
       else{
         toast.error(data.message);

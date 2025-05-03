@@ -28,7 +28,6 @@ export default function Page() {
     const result = await res.json();
     if(result.success){
     setAllData(result.data)
-    console.log(result.data)
     }
   }
   useEffect(()=>{
@@ -48,11 +47,10 @@ const handleChange = (e) => {
   })
 }
 const handleSubmit = async (e) => {
-  console.log(notificationData)
+  
   e.preventDefault()
   const arr = [];
   arr.push(notificationData.token)
-  console.log(arr)
   setLoading(true)
   const res = await fetch("/api/send-notification",{
     method:"POST",

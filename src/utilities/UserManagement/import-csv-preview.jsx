@@ -10,7 +10,7 @@ export function ImportPreviewModal({ isOpen, onClose, data, onConfirm }) {
   // Limit preview to first 10 rows
   const previewData = data.slice(0, 10)
   const totalRows = data.length
-  console.log("Preview Data:", previewData)
+  
 
   // Get all unique keys from the data for table headers
   const allKeys = previewData.reduce((keys, item) => {
@@ -26,7 +26,7 @@ export function ImportPreviewModal({ isOpen, onClose, data, onConfirm }) {
   const sortedKeys = ["name", "email", "domain", "ispaid", "gender", "number", "month"].concat(
     allKeys.filter((key) => !["name", "email", "domain", "ispaid", "gender", "number", "month", "id"].includes(key)),
   )
-  console.log("Sorted Keys:", sortedKeys)
+ 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

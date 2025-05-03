@@ -43,7 +43,7 @@ export function LiveStreamView({
     if (socket) {
       // Listen for chat state updates
       socket.on("streamChatState", (data) => {
-        console.log("Stream chat state updated:", data);
+        
         if (data.messagesEnabled !== undefined && typeof setIsChatEnabled === 'function') {
           setIsChatEnabled(data.messagesEnabled);
         } else {
@@ -55,10 +55,10 @@ export function LiveStreamView({
       
       // Listen for users count updates
       socket.on("streamUsers", (data) => {
-        console.log("Stream users updated:", data);
+        
         if (data.users && Array.isArray(data.users)) {
           setCurrentMembers(data.users.length);
-          console.log("Users data updated basir:", data.users);
+         
           setUsersData(data.users);
         }
       });
@@ -74,7 +74,7 @@ export function LiveStreamView({
   }, [classInfo?.streamSettings?.playbackId, socket, setIsChatEnabled])
 
   const handleError = (error) => {
-    console.error("Mux Player Error:", error);
+    
     setStreamError(true)
     setIsLoading(false)
   }
@@ -174,7 +174,7 @@ export function LiveStreamView({
                 Notes
               </Button>
               <Button className="flex items-center gap-2 px-4" onClick={()=>{
-                console.log("Slides button clicked", classInfo.slide)
+                
                  if (!classInfo.slide) {
                   toast.error("No slides available for this class yet.")
                   return

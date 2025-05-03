@@ -25,7 +25,7 @@ const Page = () => {
         setLoading(true);
         let data =  await ValidatesFunc(token);
         setLoading(false);
-        console.log(data)
+        
         if(data.success){
           setData(data.data)
         }
@@ -46,7 +46,7 @@ const Page = () => {
       validates(localStorage.getItem("dilmsadmintoken"))
       fetchallCourse();
         },[])
-        console.log(coursesData)
+       
   return (
     <>
     <Toaster position='top-center' expand={false}/>

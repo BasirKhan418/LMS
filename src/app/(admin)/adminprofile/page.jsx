@@ -14,7 +14,6 @@ export default function Page() {
   const [avname,setavname] = useState("DI")
   //validate function
   const validatesFunc = async(token)=>{
-    console.log(token);
     setLoading(true);
    const response = await fetch("/api/adminhomeauth",{
     method:"POST",
@@ -35,8 +34,7 @@ export default function Page() {
     // Extract the initials from the first and second words
     let initials = nameParts[0][0].toUpperCase() + nameParts[1][0].toUpperCase();
     
-    // Log the initials
-    console.log(initials);
+
     
     // Set the initials to the state variable (assuming setavname is a state setter function)
     setavname(initials);
@@ -52,7 +50,7 @@ export default function Page() {
     setLoading(true);
     let data = await CourseData();
     setLoading(false);
-    console.log("courses are",data);
+  
     if(data.success){
       setCourses(data.data)
     }
@@ -64,7 +62,7 @@ export default function Page() {
 validatesFunc(localStorage.getItem("dilmsadmintoken"))
 fetchCoursedata();
   },[])
-  console.log(data)
+ 
   return (
     <>
     <Toaster position='top-center' expand={false}/>

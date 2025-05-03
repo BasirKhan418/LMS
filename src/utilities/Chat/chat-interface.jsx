@@ -24,7 +24,7 @@ export default function ChatInterface({user, team}) {
     
     // Handle connection event
     socketRef.current.on("connect", () => {
-      console.log("Socket connected:", socketRef.current.id)
+      
       
       // Join the team room with user information
       if (team && team._id && user && user._id) {
@@ -38,7 +38,7 @@ export default function ChatInterface({user, team}) {
 
     // Handle online users count update
     socketRef.current.on("onlineUsers", (data) => {
-      console.log("Online users update:", data)
+      
       if (data.teamid === team?._id) {
         setOnlineUsers(data.users || []) // Store the actual users array, not just count
       }
@@ -46,7 +46,7 @@ export default function ChatInterface({user, team}) {
     
     // Handle typing users update
     socketRef.current.on("typingUsers", (data) => {
-      console.log("Typing users update:", data)
+      
       if (data.teamid === team?._id) {
         setTypingUsers(data.users)
       }
@@ -54,7 +54,7 @@ export default function ChatInterface({user, team}) {
     
     // Handle incoming messages
     socketRef.current.on("message", (data) => {
-      console.log("Message received:", data)
+      
       setMessages(prevMessages => [...prevMessages, data])
     })
 
@@ -81,7 +81,7 @@ export default function ChatInterface({user, team}) {
       })
       
       const data = await res.json()
-      console.log("Fetched messages:", data)
+      
       
       if (data.success) {
         setMessages(data.data)
@@ -89,7 +89,7 @@ export default function ChatInterface({user, team}) {
         toast.error(data.message)
       }
     } catch (err) {
-      console.error("Error fetching messages:", err)
+      
       toast.error("Error in fetching messages")
     }
   }

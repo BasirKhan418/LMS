@@ -14,7 +14,7 @@ import HomePageSkl from "@/utilities/skeleton/HomePageSkl"
 import { ProjectDialog } from "@/utilities/dialog/project-dialog"
 export default function Page({params}) {
   const tdata = use(params)
-  console.log("param is",tdata.add)
+  
   const [activeTab, setActiveTab] = useState("create")
   const [aiopen,setaiopen] = useState(false)
   const [modalOpendata,setModalOpendata] = useState({})
@@ -64,7 +64,7 @@ const res = await fetch("/api/project", {
   }
 
     catch(err){
-      console.log(err)
+     
       toast.error("Some thing went wrong please try again after some time")
     }
     
@@ -92,7 +92,7 @@ const res = await fetch("/api/project", {
         toast.error(data.message)
       }
     } catch (err) {
-      console.log(err)
+      
       toast.error("Some thing went wrong please try again after some time")
     }
   }
@@ -111,7 +111,7 @@ const res = await fetch("/api/project", {
         },
       })
       const data = await res.json()
-      console.log("submitted data is  0",data)
+    
       setLoading(false)
       if (data.success) {
         setSubmittedProjectData(data.data)
@@ -120,7 +120,7 @@ const res = await fetch("/api/project", {
         toast.error(data.message)
       }
     } catch (err) {
-      console.log(err)
+     
       toast.error("Some thing went wrong please try again after some time")
     }
   }
