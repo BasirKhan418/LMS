@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 
-export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,participantCount}) {
+export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,participantCount,setCurrentMembers,setUsersData}) {
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const [isChatEnabled, setIsChatEnabled] = useState(true)
@@ -47,6 +47,15 @@ export function ChatSidebar({ isAdmin, socket, streamId, userData,users ,partici
       console.log("Socket disconnected in ChatSidebar")
       setIsConnected(false)
     })
+
+    socket.on("streamUsers", (data) => {
+      console.log("Stream users updated:", data);
+      if (data.users && Array.isArray(data.users)) {
+        setCurrentMembers(data.users.length);
+        console.log("Users data updated basir:", data.users);
+        setUsersData(data.users);
+      }
+    });
 
     // Chat message event
     socket.on("streamMessage", (data) => {

@@ -218,6 +218,8 @@ export function LiveStreamView({
                   userData={userData}
                   users={usersData}
                   participantCount={usersData.length} 
+                  setCurrentMembers={setCurrentMembers}
+                  setUsersData={setUsersData}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-64 p-4 border rounded-md">
@@ -242,7 +244,7 @@ export function LiveStreamView({
                 setUsersData={setUsersData}
                 currentMembers={currentMembers}
                 setCurrentMembers={setCurrentMembers}
-                
+
               />
             </TabsContent>
           </Tabs>

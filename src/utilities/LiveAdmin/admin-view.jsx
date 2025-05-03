@@ -148,9 +148,6 @@ export default function AdminView({ content, data }) {
 
   const handleCompleteClass = () => {
     toast.success("Class has ended successfully!")
-    setIsLive(false)
-    setPlayerLoaded(false)
-    // In a real app, you would handle ending the stream here
   }
 
   // Using useCallback to prevent recreation of this function on each render
