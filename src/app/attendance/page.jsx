@@ -56,12 +56,6 @@ const AttendanceView = () => {
       else{
         setAttendanceData({});
       }
-
-      // Use this to simulate API success
-      
-      
-      // Use this to simulate API failure
-      // throw new Error("Failed to fetch attendance data");
       
       setIsLoading(false);
     } catch (err) {

@@ -14,6 +14,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
+import CourseCompletionCertificate from "./CourseCompletionCertificate";
+import CourseCompletionAlert from "./CourseCompletionAlert";
 import {
   Card,
   CardHeader,
@@ -509,6 +511,9 @@ export default function CourseSidebar({
                 <Button
                   variant="outline"
                   className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
+                  onClick={()=>{
+                    setActiveFolder("certificate");
+                  }}
                 >
                   <LiaCertificateSolid className="h-4 w-4 mr-2" />
                   Certificate
@@ -746,6 +751,11 @@ export default function CourseSidebar({
                 {activeFolder === "project" && (
                   <div className="max-w-6xl mx-auto">
                     <Project />
+                  </div>
+                )}
+                {activeFolder === "certificate" && (
+                  <div className="max-w-6xl mx-auto">
+                    {progress==100?<CourseCompletionCertificate name={userdata.name} impid={userdata._id} courseTitle={alldata.title}/>:<CourseCompletionAlert progress={progress} title={alldata.title}/>}
                   </div>
                 )}
               </>
