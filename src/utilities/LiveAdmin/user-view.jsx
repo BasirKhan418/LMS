@@ -21,7 +21,7 @@ export function UserView({ content, userdata }) {
     category: content?.type || "Web Development",
     attendees: 42,
     notes: content?.videonotes,
-    slides: content?.slides,
+    slide: content?.slide,
     streamSettings: {
       rtmpUrl: content?.rtmpurl || "",
       streamId: content?.streamid || "",
@@ -80,12 +80,27 @@ export function UserView({ content, userdata }) {
       // Handle stream events
       socketRef.current.on("streamUserJoined", (data) => {
         console.log("User joined stream:", data);
-        toast.success(`${data.userName} has joined the stream`);
+        if (data.userId !== userId) {
+
+          toast.success(`${data.userName} has joined the stream`);
+        }
+        
       });
       
       socketRef.current.on("streamChatState", (data) => {
         console.log("Stream chat state updated:", data);
       });
+
+      socketRef.current.on("completeLiveStreamMessage", (data) => {
+        console.log("Live stream completed message:", data);
+       if(data.status ==="completed"){
+        console.log("Live stream completed:", data);
+        toast.success("The live stream has been completed successfully.");
+        setTimeout(()=>{
+          toast.success("class has ended successfully. Recording will be available soon.");
+        },3000)
+       }
+      })
       
       socketRef.current.on("streamMessage", (data) => {
         console.log("New stream message:", data);
@@ -123,6 +138,7 @@ export function UserView({ content, userdata }) {
       const startTime = new Date(classInfo.startTime);
       if (now >= startTime) {
         setIsLive(true);
+        
       }
     };
 
@@ -202,7 +218,7 @@ export function UserView({ content, userdata }) {
 
             {/* Animated waiting message */}
             <div className="text-center animate-pulse">
-              <p className="text-muted-foreground">Waiting for {classInfo.instructor} to start the session...</p>
+              <p className="text-muted-foreground">Waiting for instructor to start the session...</p>
             </div>
           </div>
         </div>

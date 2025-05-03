@@ -120,7 +120,7 @@ export function LiveStreamView({
               <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
                 <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
                 <h3 className="text-xl font-semibold mb-2">Stream Not Available</h3>
-                <p className="text-gray-400 mb-6">The live stream hasn't started yet or there was an error connecting.</p>
+                <p className="text-gray-400 mb-6">The live stream hasn't started yet or ended or there was an error connecting.</p>
                 <Button 
                   onClick={handleRetry} 
                   className="flex items-center gap-2"
@@ -154,12 +154,12 @@ export function LiveStreamView({
             <div className="flex-grow"></div>
             <div className="flex gap-3 mt-3 sm:mt-0">
               <Button variant="outline" className="flex items-center gap-2 px-4" onClick={()=>{
-                if (!classInfo.notes) {
+                if (!classInfo.link) {
                   toast.error("No notes available for this class yet.")
                   return
                 }
 
-                window.open(classInfo.notes, "_blank")
+                window.open(classInfo.link, "_blank")
               }}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 20h9"></path>
@@ -168,11 +168,12 @@ export function LiveStreamView({
                 Notes
               </Button>
               <Button className="flex items-center gap-2 px-4" onClick={()=>{
-                 if (!classInfo.notes) {
+                console.log("Slides button clicked", classInfo.slide)
+                 if (!classInfo.slide) {
                   toast.error("No slides available for this class yet.")
                   return
                 }
-                window.open(classInfo.slides, "_blank")
+                window.open(classInfo.slide, "_blank")
               }}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"></path>

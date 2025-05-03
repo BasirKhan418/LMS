@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Toaster, toast } from "sonner"
 import { useRef } from "react"
 import { io } from "socket.io-client"
-
+import CompleteLiveStream from "@/app/server/CompleteLiveStream"
 export default function AdminView({ content, data }) {
   const [isLive, setIsLive] = useState(false)
   const [isChatEnabled, setIsChatEnabled] = useState(true)
@@ -19,6 +19,7 @@ export default function AdminView({ content, data }) {
   const [isConnected, setIsConnected] = useState(false)
   const [playerLoaded, setPlayerLoaded] = useState(false)
   const chatTogglingRef = useRef(false) // Prevent multiple rapid toggles
+  const [showStreamInfo, setShowStreamInfo] = useState(false) // New state for admin early access
   
   // Initialize class info only once
   const [classInfo] = useState({
@@ -38,19 +39,27 @@ export default function AdminView({ content, data }) {
     link: content?.link || ""
   })
 
-  // Simulate class going live after timer ends
+  // Check if it's within 5 minutes of start time
   useEffect(() => {
-    const checkTime = () => {
+    const checkPreStartTime = () => {
       const now = new Date()
       const startTime = new Date(classInfo.startTime)
+      const fiveMinutesBefore = new Date(startTime.getTime() - 5 * 60 * 1000)
+      
+      // Show stream info if we're within 5 minutes of start time
+      if (now >= fiveMinutesBefore) {
+        setShowStreamInfo(true)
+      }
+      
+      // Additionally, auto-start the class when the actual start time arrives
       if (now >= startTime && !isLive) {
         setIsLive(true)
         toast.success("Class is now live! You can now start streaming.")
       }
     }
 
-    const interval = setInterval(checkTime, 1000)
-    checkTime() // Check immediately on mount
+    const interval = setInterval(checkPreStartTime, 1000)
+    checkPreStartTime() // Check immediately on mount
 
     return () => clearInterval(interval)
   }, [classInfo.startTime, isLive])
@@ -146,8 +155,21 @@ export default function AdminView({ content, data }) {
     };
   }, []); // Empty dependency array to ensure socket setup runs only once
 
-  const handleCompleteClass = () => {
-    toast.success("Class has ended successfully!")
+  const handleStartClassEarly = () => {
+    setIsLive(true)
+    toast.success("Class has been started early!")
+  }
+
+  const handleCompleteClass = async() => {
+    const data = await CompleteLiveStream(classInfo.streamSettings.streamId);
+    console.log("Live stream marked as complete:", data);
+    setIsLive(false)
+    socketRef.current.emit("completeLiveStream", {
+      streamId: classInfo.streamSettings.streamId,
+      userId: data._id,
+      playbackId: data.playbackId
+    });
+    toast.success("Class has been completed!")
   }
 
   // Using useCallback to prevent recreation of this function on each render
@@ -186,7 +208,6 @@ export default function AdminView({ content, data }) {
 
   return (
     <>
-      <Toaster position="top-right" richColors closeButton={false} />
       <div className="container mx-auto p-6">
         <div className="flex flex-col gap-6">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -196,8 +217,23 @@ export default function AdminView({ content, data }) {
             </div>
 
             <div className="flex items-center gap-4">
-            
-
+              {!isLive && showStreamInfo && (
+                <Button
+                  variant="primary"
+                  onClick={handleStartClassEarly}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Start Class Early
+                </Button>
+              )}
+               <Button
+                  variant="primary"
+                  
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  disabled={!isLive}
+                >
+                  Take Attendance
+                </Button>
               <Button
                 variant="destructive"
                 onClick={handleCompleteClass}
@@ -219,13 +255,16 @@ export default function AdminView({ content, data }) {
                 <ClassTimer targetDate={classInfo.startTime} onComplete={() => setIsLive(true)} compact />
               </div>
 
-              <RTMPInfo 
-                disabled={true} 
-                rtmpUrl={classInfo.streamSettings.rtmpUrl}
-                streamKey={classInfo.streamSettings.rtmpKey}
-                streamId={classInfo.streamSettings.streamId}
-                playbackId={classInfo.streamSettings.playbackId}
-              />
+              {/* Show RTMP info early to admins if within 5 minutes of start time */}
+              {showStreamInfo && (
+                <RTMPInfo 
+                  disabled={false} 
+                  rtmpUrl={classInfo.streamSettings.rtmpUrl}
+                  streamKey={classInfo.streamSettings.rtmpKey}
+                  streamId={classInfo.streamSettings.streamId}
+                  playbackId={classInfo.streamSettings.playbackId}
+                />
+              )}
             </div>
           ) : (
             <div className="mb-6">
