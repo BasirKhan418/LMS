@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import AuthorizeMd from "../../../../middleware/AuthorizeMd";
+import AuthorizeMd from "../../../../../middleware/AuthorizeMd";
 import { headers } from "next/headers";
-import Attendance from "../../../../models/Attendance";
-import ConnectDb from "../../../../middleware/db";
+import Attendance from "../../../../../models/Attendance";
+import ConnectDb from "../../../../../middleware/db";
+import ConnectRedis from "../../../../../middleware/ConnectRedis";
 export const POST = async (req) => {
     try {
 
         await ConnectDb();
-        
+        let redis = await ConnectRedis();
         const { batchid, duration, userid } = await req.json();
         
         // Validate required parameters
@@ -27,7 +28,16 @@ export const POST = async (req) => {
                 success: false 
             });
         }
-        
+        let result = await redis.get(`attendance:${batchid}:${userid}`);
+        if (result) {
+            return NextResponse.json({
+                message: "Attendance records fetched successfully",
+                success: true,
+                data: JSON.parse(result).attendanceRecords,
+                fetchedDurations: JSON.parse(result).durationsToFetch,
+                userAttendance: JSON.parse(result).userAttendanceData
+            });
+        }
 
         // Parse the duration number from the payload (e.g., "2 Month" -> 2)
         const monthNumber = parseInt(duration.split(' ')[0]) || 1;
@@ -87,7 +97,15 @@ export const POST = async (req) => {
                 };
             });
         }
-
+        
+        let newObj = {
+            attendanceRecords: attendanceRecords,
+            userAttendanceData: userAttendanceData,
+            durationsToFetch: durationsToFetch
+        }
+        await redis.set(`attendance:${batchid}:${userid}`, JSON.stringify(newObj), {
+            EX: 60 * 60 * 24 // Cache for 24 hours
+        });
 
         return NextResponse.json({
             message: "Attendance records fetched successfully",

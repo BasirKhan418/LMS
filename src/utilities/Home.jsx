@@ -34,6 +34,7 @@ export default function Home() {
   const [attendance, setAttendance] = useState(87); // Added attendance state
   const [allNotification, setAllNotification] = useState([]);
   const [notificationCount, setNotificationCount] = useState(3);
+  const [attendancepercentage, setAttendancePercentage] = useState(0); // Added attendance percentage state
   const [team, setTeam] = useState({
     team: [],
   }); // Added team state
@@ -246,6 +247,39 @@ function getRelativeTime(dateTimeString) {
       console.log(err);
     }
   };
+  //fetch Attendance 
+  const fetchAttendance = async (batchid, duration,userid) => {
+    console.log("fetching attendance",batchid,duration,userid)
+  try{
+    setLoading(true);
+ const res = await fetch("/api/attendance/percentage", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": localStorage.getItem("dilmstoken"),
+    },
+    body: JSON.stringify({
+      batchid: batchid,
+      duration: duration,
+      userid:userid
+    }),
+ })
+ const data = await res.json();
+ console.log("Attendance data",data)
+ setLoading(false);
+  if (data.success) {
+    console.log("Attendance data",data.data)
+    console.log("Attendance percentage",data.userAttendance.attendancePercentage)
+   setAttendancePercentage(data.userAttendance.attendancePercentage)
+  }
+  else{
+  console.log(data.message)
+  }
+  }
+  catch(err){
+    console.log(err)
+  }
+  }
   // Validate user with home auth
   const validatesFunc = async (token) => {
     setLoading(true);
@@ -262,6 +296,7 @@ function getRelativeTime(dateTimeString) {
     if (res.success) {
       setData(res.data);
       console.log(res);
+      fetchAttendance(res.batch._id, res.user.month,res.user._id);
       findYourTeam(res.batch._id, res.user._id);
       findAllNotification(res.batch._id);
       const result = res.data.find(
@@ -304,7 +339,7 @@ function getRelativeTime(dateTimeString) {
       year: "numeric",
     });
   };
-
+console.log("attendance percentage",attendancepercentage)
   return (
     <>
       <Toaster position="top-center" expand={false} />
@@ -413,10 +448,10 @@ function getRelativeTime(dateTimeString) {
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center gap-2">
-                    <div className="text-3xl font-bold">{attendance}%</div>
+                    <div className="text-3xl font-bold">{attendancepercentage}%</div>
                   </div>
                   <div className="mt-2">
-                    <Progress value={attendance} className="h-2 bg-muted" />
+                    <Progress value={attendancepercentage} className="h-2 bg-muted" />
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
                     Overall Attendance
