@@ -7,81 +7,73 @@ const AttendanceView = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDuration, setSelectedDuration] = useState('All');
+   //fetch user first
+   const validatefun = async()=>{
+    try{
+        setIsLoading(true);
+        const response = await fetch("/api/homeauth",{
+         method:"POST",
+         headers:{
+           "content-type":"application/json",
+           "token":localStorage.getItem("dilmstoken")
+         }
+        })
+       const res = await response.json();
+       console.log(res)
+        setIsLoading(false);
+       if(res.success){
 
+       fetchAttendanceData(res.batch._id,res.user._id,res.user.month)
+      
+       }
+       else{
+         console.log(res.message)
+       }
+    }
+    catch(err){
+     setIsLoading(false);
+      
+    }
+  
+ }
+  //getch attandance data from API
+  const fetchAttendanceData = async (batchid,userid,duration) => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/attendance',{
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+              "Authorization": localStorage.getItem("dilmstoken")
+          },
+            body: JSON.stringify({ batchid, userid, duration })
+        });
+      const mockResponse = await res.json(); // Simulate API response
+      console.log("mockResponse",mockResponse)
+      if(mockResponse.success) {
+        setAttendanceData(mockResponse);
+      }
+      else{
+        setAttendanceData({});
+      }
+
+      // Use this to simulate API success
+      
+      
+      // Use this to simulate API failure
+      // throw new Error("Failed to fetch attendance data");
+      
+      setIsLoading(false);
+    } catch (err) {
+      setError(err.message || "Failed to fetch attendance data");
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
     // Simulating API fetch - in real implementation, replace with actual API call
-    const fetchAttendanceData = async () => {
-      try {
-        setIsLoading(true);
-        // In a real implementation, you would fetch data from your API endpoint
-        // const response = await fetch('your-api-endpoint');
-        // const data = await response.json();
-        
-        // For demo purposes, using sample data or simulating an error
-        const mockResponse = {
-          "message": "Attendance records fetched successfully",
-          "success": true,
-          "data": [
-            {
-              "_id": "6815e1b4f6bea0d2fea6cc95",
-              "weekname": "1 Week",
-              "duration": "1 Month",
-              "batchid": "67f7fbfdcf5388812b3047bf",
-              "users": ["68149a91527e519b22787981"],
-              "courseid": "67ee00aa314d19e2ed2bd023",
-              "classid": "YJIhWs8Pz40000J027IUzlKkN8Lfir6vNFteyZAmbjyuHI",
-              "createdAt": "2025-05-03T09:28:20.934Z",
-              "updatedAt": "2025-05-03T09:51:40.868Z",
-              "__v": 0
-            },
-            {
-              "_id": "6815eb42fcd000188db1a843",
-              "weekname": "1 Week",
-              "duration": "2 Month",
-              "batchid": "67f7fbfdcf5388812b3047bf",
-              "users": ["68149a91527e519522787981"],
-              "courseid": "67ee00aa314d19e2ed2bd023",
-              "classid": "YJIhWs8Pz40000J027IUzlKkN8Lfir6vNFteyZAmbjyuHI",
-              "createdAt": "2025-05-03T09:28:20.934Z",
-              "updatedAt": "2025-05-03T09:51:40.868Z",
-              "__v": 0
-            }
-          ],
-          "fetchedDurations": ["1 Month", "2 Month"],
-          "userAttendance": {
-            "userId": "68149a91527e519b22787981",
-            "totalClasses": 2,
-            "attendedClasses": 1,
-            "attendancePercentage": 50,
-            "attendanceByMonth": {
-              "1 Month": {
-                "totalClasses": 1,
-                "attendedClasses": 1,
-                "attendancePercentage": 100
-              },
-              "2 Month": {
-                "totalClasses": 1,
-                "attendedClasses": 0,
-                "attendancePercentage": 0
-              }
-            }
-          }
-        };
+    
 
-        // Use this to simulate API success
-        setAttendanceData(mockResponse);
-        
-        // Use this to simulate API failure
-        // throw new Error("Failed to fetch attendance data");
-        
-        setIsLoading(false);
-      } catch (err) {
-        setError(err.message || "Failed to fetch attendance data");
-        setIsLoading(false);
-      }
-    };
-
-    fetchAttendanceData();
+    validatefun();
   }, []);
 
   // Function to determine if a user was present in a class
