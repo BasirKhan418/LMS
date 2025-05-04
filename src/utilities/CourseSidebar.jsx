@@ -332,6 +332,15 @@ export default function CourseSidebar({
     }
   };
 
+  // Toggle sidebar for mobile and desktop
+  const toggleSidebar = () => {
+    if (window.innerWidth < 768) {
+      setIsMenuOpen(!isMenuOpen);
+    } else {
+      setIsSidebarOpen(!isSidebarOpen);
+    }
+  };
+
   // Initialize data
   useEffect(() => {
     validateUser();
@@ -354,9 +363,9 @@ export default function CourseSidebar({
 
       <div className="flex h-screen w-full overflow-hidden bg-gray-50 dark:bg-gray-900">
         {/* Mobile Overlay */}
-        {isMenuOpen && window.innerWidth < 768 && (
+        {isMenuOpen && (
           <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
             onClick={() => setIsMenuOpen(false)}
           />
         )}
@@ -365,14 +374,17 @@ export default function CourseSidebar({
         <div
           className={`fixed inset-y-0 left-0 z-50 w-72 transform bg-white dark:bg-gray-800 shadow-lg transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } ${isMenuOpen ? "translate-x-0 md:translate-x-0" : "md:translate-x-0"}`}
+          } ${isMenuOpen ? "translate-x-0" : ""} md:translate-x-0`}
         >
           <div className="flex h-full flex-col">
             {/* Sidebar Header */}
             <div className="flex items-center justify-between p-4 border-b bg-gray-300">
               <div className="flex items-center space-x-2">
                 <div className="flex items-center justify-center h-10 w-48" onClick={()=>{
-                  setActiveFolder("overview")
+                  setActiveFolder("overview");
+                  if (window.innerWidth < 768) {
+                    setIsMenuOpen(false);
+                  }
                 }}>
                   <img src="/9.png" alt="Logo" className="h-36 w-36 absolute" />
                 </div>
@@ -513,6 +525,9 @@ export default function CourseSidebar({
                   className="w-full text-blue-600 border-blue-200 hover:bg-blue-50"
                   onClick={()=>{
                     setActiveFolder("certificate");
+                    if (window.innerWidth < 768) {
+                      setIsMenuOpen(false);
+                    }
                   }}
                 >
                   <LiaCertificateSolid className="h-4 w-4 mr-2" />
@@ -542,10 +557,14 @@ export default function CourseSidebar({
           <header className="sticky top-0 z-10 flex h-16 items-center justify-between border-b bg-white dark:bg-gray-800 px-4 shadow-sm">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                onClick={toggleSidebar}
                 className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
               >
-                {isSidebarOpen ? <ChevronLeft className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                {isSidebarOpen && window.innerWidth >= 768 ? (
+                  <ChevronLeft className="h-5 w-5" />
+                ) : (
+                  <Menu className="h-5 w-5" />
+                )}
               </button>
               
               <div className="hidden md:block">
@@ -564,12 +583,7 @@ export default function CourseSidebar({
             </div>
 
             <div className="md:hidden">
-              <button
-                onClick={() => setIsMenuOpen(true)}
-                className="rounded-md p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
+              <h1 className="text-sm font-semibold truncate hidden md:block">{activemenu || alldata?.title}</h1>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -639,7 +653,11 @@ export default function CourseSidebar({
                               onClick={() => {
                                 if (weeksdata && weeksdata.length > 0) {
                                   setMenuWeek(weeksdata[0].name);
-                                  setIsSidebarOpen(true);
+                                  if (window.innerWidth < 768) {
+                                    setIsMenuOpen(true);
+                                  } else {
+                                    setIsSidebarOpen(true);
+                                  }
                                 }
                               }}
                               className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -692,7 +710,11 @@ export default function CourseSidebar({
                                   className="w-full mt-4 border-blue-200 text-blue-600 hover:bg-blue-50"
                                   onClick={() => {
                                     setMenuWeek(week.name);
-                                    setIsSidebarOpen(true);
+                                    if (window.innerWidth < 768) {
+                                      setIsMenuOpen(true);
+                                    } else {
+                                      setIsSidebarOpen(true);
+                                    }
                                   }}
                                 >
                                   View Content

@@ -317,7 +317,7 @@ setTimeout(() => {
                 </div>
               </div>
             </div>
-            <div className="ml-auto flex flex-col md:flex-row gap-4 items-center mt-4 md:mt-0">
+            <div className="ml-auto flex  md:flex-row gap-4 items-center mt-4 md:mt-0 justify-center ">
               <div className="bg-white rounded-lg p-4 flex flex-col items-center shadow-sm">
                 <div className="text-3xl font-bold">{data.length || 0}</div>
                 <div className="text-muted-foreground text-sm">Enrolled Courses</div>
