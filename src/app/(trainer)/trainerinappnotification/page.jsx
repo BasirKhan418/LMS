@@ -42,7 +42,7 @@ export default function NotificationPage() {
       }
       }
       catch(err){
-      
+       
         toast.error("Something went wrong while fetching batches")
       }
     }
@@ -90,6 +90,38 @@ const fetchNotifications = async () => {
 useEffect(()=>{
   fetchNotifications()
 },[])
+//scgedule notification function
+  const handleSchedule = async(title,message,sendTime,category,batchid) => {
+    try{
+      setLoading(true)
+      const res = await fetch(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/schedule/notification`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+        },
+        body: JSON.stringify({
+          title,
+          message,
+          sendTime,
+          category,
+          batchid,
+        }),
+      })
+      const data = await res.json()
+      setLoading(false)
+      console.log(data)
+      if (data.success) {
+        toast.success("Notification scheduled successfully")
+      } else {
+        toast.error(data.message)
+      }
+    }
+    catch(err){
+      toast.error("Something went wrong while scheduling notification"+err)
+    }
+
+  }
   //  send function
   const handleSend = async() => {
     if (!title || !description || (!sendNow && !sendTime) || !category || !batch) {
@@ -106,6 +138,7 @@ useEffect(()=>{
       category,
       batch,
     }
+    await handleSchedule(title,description,sendNow ? currentTime : sendTime,category,batch)
     try{
    const res = await fetch("/api/notificationcrud", {
       method: "POST",
@@ -119,6 +152,7 @@ useEffect(()=>{
     setLoading(false)
 
     if(data.success){
+      
       toast.success("Notification queued successfully")
       setTitle("")
       setDescription("")
@@ -133,7 +167,7 @@ useEffect(()=>{
     }
     }
     catch(err){
-     
+      
       toast.error("Something went wrong while sending notification. Please contact to the developer")
     }
 

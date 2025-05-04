@@ -170,7 +170,7 @@ export function Login() {
         <div className="hidden lg:block lg:flex-1">
           <div className="h-full w-full relative">
             <Image
-              src="/lms.png"
+              src="/infotactlearning.gif"
               alt="Login Image"
               fill
               className="object-cover dark:brightness-75"

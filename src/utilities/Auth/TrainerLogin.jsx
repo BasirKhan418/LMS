@@ -154,7 +154,7 @@ export function TrainerLogin() {
                 </div>
                 <div className="hidden bg-muted lg:block">
                     <Image
-                        src="/lms.png"
+                        src="/infotactlearning.gif"
                         alt="Image"
                         width="1920"
                         height="1080"
