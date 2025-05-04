@@ -13,6 +13,7 @@ import UploadModal from "@/utilities/Course/UploadModal"
 import Chat from "@/utilities/Ai/Chat"
 import axios from "axios"
 import MuxGetUrlFunc from "@/app/server/Mux"
+import CreateLiveStream from "@/app/server/CreateLiveStream"
 import {
   Dialog,
   DialogContent,
@@ -44,13 +45,16 @@ import {
 } from "@/components/ui/select"
 
 import ProfielSpinner from "@/utilities/Spinner/ProfielSpinner"
-import { set } from "mongoose"
 import { FetchAsset, FetchAssetDetails } from "@/app/server/FetchMux"
 export default function Component(props) {
   const params = use(props.params);
   //name
   const [courseName,setCourseName] = useState("")
   const [indexing,setindexing] = useState(0)
+  const [rtmpkey,setRtmpkey] = useState("")
+  const [rtmpurl,setRtmpurl] = useState("")
+  const [streamid,setStreamid] = useState("")
+  const [courseData,setCourseData] = useState(null)
   //useEffect
   const fetchallcoursedata = async()=>{
 try{
@@ -64,6 +68,7 @@ const res = await fetch(`/api/contentcrud?id=${params.addcourse}`,{
 })
 const result = await res.json()
 setLoading(false)
+setCourseData(result.data)
 setWeeks(result.data.content)
 //calculating the content indexing
 let temp = 0;
@@ -97,14 +102,23 @@ fetchallcoursedata()
   const [videoId, setVideoId] = useState('')
   const [playbackid, setPlaybackid] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [createcontentform,setcreatecontentform] = useState({
-    name:"",
-    description:"",
-    link:"",
-    type:"",
-    comment:[],
-    index:indexing
-  })
+  const [createcontentform, setcreatecontentform] = useState({
+    name: "",
+    type: "",
+    description: "",
+    link: "",
+    index: indexing || "",
+    date: "",
+    time: "",
+    slide: "",
+    playbackid: "",
+    streamid: "",
+    rtmpkey: "",
+    rtmpurl: "rtmps://global-live.mux.com:443/app",
+    videoid: "",
+    poster: "",
+    videonotes: ""
+  });
   const [uploadModal,setUploadModal] = useState(false)
   const [createweekform,setcreateweekform] = useState({
     name:"",
@@ -275,7 +289,6 @@ fetchallcoursedata()
   //saving all data into the data base
   const handleSubmit = async()=>{
     const data = {content:weeks,id:params.addcourse}
-   
     try{
       setLoading(true)  
      const res = await fetch("/api/contentcrud",{
@@ -304,7 +317,7 @@ fetchallcoursedata()
   //upload content on database
   const updateondatabase = async(videoid,playbackid)=>{
    let data = {name:courseName,folderid:params.addcourse,content:{title:createcontentform.name,videoid,playbackid,description:createcontentform.description}}
- 
+
   const res = await fetch("/api/addvideos",{
     method:"POST",
     headers:{
@@ -314,7 +327,7 @@ fetchallcoursedata()
     body:JSON.stringify(data)
   })
   const result = await res.json();
-
+ 
   if(result.success){
     toast.success(result.message)
        
@@ -353,16 +366,16 @@ fetchallcoursedata()
           const { loaded, total } = progressEvent;
           const percentCompleted = Math.floor((loaded * 100) / total);
           setUploadProgress(percentCompleted);
-          
+         
         },
         
       });
+     
+
 
       const assetId = upload;
-     
+      
       const [asset,assetid] = await FetchAsset(upload);
-
-   
 
       setVideoId(asset);
       //asset.data.data.asset_id
@@ -375,6 +388,120 @@ fetchallcoursedata()
      toast.error("Something went wrong! try again later"+error)
     }
   };
+
+  //create live stream
+
+  const createLiveStream = async()=>{
+    const [streamKey,streamid,playback_ids] = await CreateLiveStream()
+    
+    setcreatecontentform({...createcontentform,streamid:streamid,playbackid:playback_ids,rtmpkey:streamKey,rtmpurl:"rtmps://global-live.mux.com:443/app"})
+  }
+//convert into utc timezone
+function convertToISOFormat(dateStr, timeStr) {
+  // Create a Date object using the local timezone
+  const dateObj = new Date(`${dateStr}T${timeStr}:00`);
+  
+  // Convert to ISO string (which ends with Z, indicating UTC)
+  return dateObj.toISOString();
+}
+///date genertor functions
+function generateDateFiveMinutesFromNow() {
+  // Get current time
+  const now = new Date();
+  
+  // Add 5 minutes (5 * 60 * 1000 milliseconds)
+  const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
+  
+  // Return in ISO format
+  return fiveMinutesLater.toISOString();
+}
+
+function getFiveMinutesBefore(isoDateString) {
+  // Parse the input date string
+  const date = new Date(isoDateString);
+  
+  // Subtract 5 minutes (5 * 60 * 1000 milliseconds)
+  const fiveMinutesBefore = new Date(date.getTime() - 5 * 60 * 1000);
+  
+  // Return in ISO format
+  return fiveMinutesBefore.toISOString();
+}
+
+function getTenMinutesBefore(isoDateString) {
+  // Parse the input date string
+  const date = new Date(isoDateString);
+  
+  // Subtract 10 minutes (10 * 60 * 1000 milliseconds)
+  const tenMinutesBefore = new Date(date.getTime() - 10 * 60 * 1000);
+  
+  // Return in ISO format
+  return tenMinutesBefore.toISOString();
+}
+
+//schedule api,
+
+const scheduleClassApi=async(payload,sendTime)=>{
+try{
+   const res = await fetch(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/schedule/class`,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "token":localStorage.getItem("dilmsadmintoken")
+    },
+    body:JSON.stringify({...payload,sendTime})
+   })
+    const result = await res.json()
+    if(result.success){
+      toast.success(result.message)
+    }
+    else{
+      toast.error(result.message)
+    }
+}
+catch(err){
+toast.error("Something went wrong! try again later"+err)
+}
+}
+
+  const scheduleThisClass = async()=>{
+   if(createcontentform.name==""||createcontentform.description==""||createcontentform.date==""||createcontentform.time==""||courseData.batchid==""){
+    toast.error("it is not possible to schedule class without date and time and batch id")
+    
+  }
+  let result = convertToISOFormat(createcontentform.date,createcontentform.time);
+  console.log("result",result)
+  let duration = "";
+  if(index==0||index==1||index==2||index==3){
+    duration=1;
+  }
+  else if(index==4||index==5||index==6||index==7){
+    duration=2;
+  }
+  else if(index==8||index==9||index==10||index==11){
+    duration=3;
+  }
+  else if(index==12||index==13||index==14||index==15){
+    duration=4;
+  }
+
+  let date1 = generateDateFiveMinutesFromNow();
+  let date2 = getFiveMinutesBefore(result);
+  let date3 = getTenMinutesBefore(result);
+  console.log("date1",date1)  
+  console.log("date2",date2)
+  console.log("date3",date3)
+  const payload = {
+    title:createcontentform.name,
+    message:createcontentform.description,
+    date:result,
+    batchid:courseData.batch,
+    coursename:courseName,
+    duration:duration,
+  }
+  await scheduleClassApi(payload,date1)
+  await scheduleClassApi(payload,date2)
+  await scheduleClassApi(payload,date3)
+}
   return (
     <>
      <Toaster position="top-center" expand={false}/>
@@ -519,209 +646,263 @@ fetchallcoursedata()
         </DialogFooter>
       </DialogContent>
     </Dialog>
-    {/* create content dialog starts from here */}
     <Dialog open={createcontentbool}>
-      <DialogContent className="sm:max-w-[625px] ">
-        <div className="absolute right-4 top-4 cursor-pointer" >
-        <X onClick={()=>{
-          setcreatecontentbool(false)
-          setupdate(false)
-          setcreatecontentform({name:"",type:"",description:"",link:"",index:indexing})
-          setindex("")
-          setweekindex("")
-          }}/>
+  <DialogContent className="sm:max-w-[625px] max-h-[80vh] overflow-y-auto">
+    <div className="absolute right-4 top-2 cursor-pointer z-10">
+      <X onClick={()=>{
+        setcreatecontentbool(false)
+        setupdate(false)
+        setcreatecontentform({name:"",type:"",description:"",link:"",index:indexing})
+        setindex("")
+        setweekindex("")
+      }}/>
+    </div>
+    <DialogHeader className="sticky top-2 bg-background pt-4 pb-2 z-10">
+      <DialogTitle>Create Content Video, Assignments, Meetings and Projects</DialogTitle>
+      <DialogDescription>
+        Make changes to your Video, Assignments, Meetings and Projects here. Click save when you're done.
+      </DialogDescription>
+    </DialogHeader>
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="name" className="text-right">
+          Name
+        </Label>
+        <Input
+          id="name"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.name}
+          className="col-span-3"
+          placeholder="Weekly Video"
+        />
+      </div>
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="type" className="text-right">
+          Type
+        </Label>
+        <Select id="type" value={createcontentform.type} onValueChange={(value) =>
+          handlecreatecontentformchnage({ target: { id: 'type', value } })
+        } >
+          <SelectTrigger className="lg:w-[425px]" >
+            <SelectValue placeholder="Select a Type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup >
+              <SelectLabel>Content Type</SelectLabel>
+              <SelectItem value="video">Video</SelectItem>
+              <SelectItem value="ytvideo">Yt Video</SelectItem>
+              <SelectItem value="assignment">Assignment</SelectItem>
+              <SelectItem value="meeting">Meeting</SelectItem>
+              <SelectItem value="project">Projects</SelectItem>
+              <SelectItem value="note">Notes</SelectItem>
+              <SelectItem value="test">Test</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="description" className="text-right">
+          Description
+        </Label>
+        <Input
+          id="description"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.description}
+          className="col-span-3"
+          placeholder="This is the first week of the course"
+        />
+      </div>
+      {createcontentform.type=="video" || createcontentform.type=="ytvideo"|| createcontentform.type=="meeting"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="slide" className="text-right">
+          Slide Link
+        </Label>
+        <Input
+          id="slide"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.slide}
+          className="col-span-3"
+          placeholder="https://www.google.com/slides"
+        />
+      </div>}
+      {createcontentform.type=="video"&& <div className="grid grid-cols-4 items-center gap-4 relative">
+        <Label htmlFor="slide" className="text-right">
+          Upload Video
+        </Label>
+        
+        <Input
+          id="video"
+          onChange={handleVideoChange}
+          type="file"
+          className="col-span-3"
+        />
+        <div className="flex justify-center items-center absolute right-0">
+        <Button onClick={uploadvideo}>
+          Upload
+        </Button>
         </div>
-        <DialogHeader>
-          <DialogTitle>Create Content Video,Assigments ,Meetings and Projects</DialogTitle>
-          <DialogDescription>
-            Make changes to your Video,Assigments ,Meetings and Projects here. Click save when you're done.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
-            
-            <Label htmlFor="name" className="text-right">
-              Name
-            </Label>
-            <Input
-              id="name"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.name}
-              className="col-span-3"
-              placeholder="Weekly Video"
-            />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="type" className="text-right">
-              Type
-            </Label>
-            <Select id="type" value={createcontentform.type} onValueChange={(value) =>
-        handlecreatecontentformchnage({ target: { id: 'type', value } })
-      } >
-      <SelectTrigger className="lg:w-[425px]" >
-        <SelectValue placeholder="Select a Type" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectGroup >
-          <SelectLabel>Content Type</SelectLabel>
-          <SelectItem value="video">Video</SelectItem>
-          <SelectItem value="ytvideo">Yt Video</SelectItem>
-          <SelectItem value="assignment">Assignment</SelectItem>
-          <SelectItem value="meeting">Meeting</SelectItem>
-          <SelectItem value="project">Projects</SelectItem>
-          <SelectItem value="note">Notes</SelectItem>
-          <SelectItem value="test">Test</SelectItem>
-        </SelectGroup>
-      </SelectContent>
-    </Select>
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="description" className="text-right">
-              Description
-            </Label>
-            <Input
-              id="description"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.description}
-              className="col-span-3"
-              placeholder="This is the first week of the course"
-            />
-          </div>
-       {  createcontentform.type=="video" || createcontentform.type=="ytvideo"&&<div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="slide" className="text-right">
-              Slide Link
-            </Label>
-            <Input
-              id="slide"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.slide}
-              className="col-span-3"
-              placeholder="https://www.google.com/slides"
-            />
-          </div>}
-          {  createcontentform.type=="video"&& <div className="grid grid-cols-4 items-center gap-4 relative">
-            <Label htmlFor="slide" className="text-right">
-              Upload Video
-            </Label>
-            
-            <Input
-              id="video"
-              onChange={handleVideoChange}
-              type="file"
-              className="col-span-3"
-            />
-            <div className="flex justify-center items-center absolute right-0">
-            <Button onClick={uploadvideo}>
-              Upload
-            </Button>
-            </div>
-          
-          </div>}
-          {  createcontentform.type=="meeting"&& <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="date" className="text-right">
-              Date
-            </Label>
-            <input
-              id="date"
-              type="date"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.date}
-             className="col-span-3 border-2 shadow-sm rounded-md px-2 py-1"
-              placeholder="24/05/2024"
-            />
-          </div>}
-          {  createcontentform.type=="meeting"&& <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="time" className="text-right">
-              Time
-            </Label>
-            <input
-              id="time"
-              type="time"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.time}
-              className="col-span-3 border-2 shadow-sm rounded-md px-2 py-1"
-              placeholder="12:00"
-            />
-          </div>}
-         { createcontentform.type!="video"&&<div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="link" className="text-right">
-              Link
-            </Label>
-            <Input
-              id="link"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.link}
-              className="col-span-3"
-              placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-            />
-          </div>}
-          { createcontentform.type=="video"&&<div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="playbackid" className="text-right">
-              PlayBack Id
-            </Label>
-            <Input
-              id="playbackid"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.playbackid}
-              className="col-span-3"
-              placeholder=""
-            />
-          </div>}
-          { createcontentform.type=="video"&&<div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="link" className="text-right">
-              Video Id
-            </Label>
-            <Input
-              id="videoid"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.videoid}
-              className="col-span-3"
-              placeholder=""
-            />
-          </div>}
-          { createcontentform.type=="video"&&<div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="poster" className="text-right">
-              Thumbnail/Poster
-            </Label>
-            <Input
-              id="poster"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.poster}
-              className="col-span-3"
-              placeholder="Enter Your Thumbnail Link Here..."
-            />
-          </div>}
-          { createcontentform.type=="video"||createcontentform.type=="ytvideo"&&<div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="videonotes" className="text-right">
-              Video Notes
-            </Label>
-            <Input
-              id="videonotes"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.videonotes}
-              className="col-span-3"
-              placeholder="Add Note Link Here..."
-            />
-          </div>}
-          {<div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="videonotes" className="text-right">
-              Content Index
-            </Label>
-            <Input
-              id="index"
-              onChange={handlecreatecontentformchnage}
-              value={createcontentform.index}
-              className="col-span-3"
-              placeholder="Add index here..."
-            />
-          </div>}
-        </div>
-        <DialogFooter>
-         {!update&& <Button onClick={handlecreatecontentsubmit}>Save changes</Button>}
-         {update&& <Button onClick={updatecontentmodal}>Update changes</Button>}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      
+      </div>}
+      {createcontentform.type=="meeting"&& <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="date" className="text-right">
+          Date
+        </Label>
+        <input
+          id="date"
+          type="date"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.date}
+          className="col-span-3 border-2 shadow-sm rounded-md px-2 py-1"
+          placeholder="24/05/2024"
+        />
+      </div>}
+      {createcontentform.type=="meeting"&& <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="time" className="text-right">
+          Time
+        </Label>
+        <input
+          id="time"
+          type="time"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.time}
+          className="col-span-3 border-2 shadow-sm rounded-md px-2 py-1"
+          placeholder="12:00"
+        />
+      </div>}
+      {createcontentform.type!="video"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="link" className="text-right">
+          Link
+        </Label>
+        <Input
+          id="link"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.link}
+          className="col-span-3"
+          placeholder="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+        />
+      </div>}
+      {createcontentform.type=="video" &&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="playbackid" className="text-right">
+          PlayBack Id
+        </Label>
+        <Input
+          id="playbackid"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.playbackid}
+          className="col-span-3"
+          placeholder=""
+        />
+      </div>}
+      {createcontentform.type=="meeting"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="playbackid" className="text-right">
+          PlayBack Id
+        </Label>
+        <Input
+          id="playbackid"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.playbackid}
+          className="col-span-3"
+          placeholder=""
+        />
+      </div>}
+      {createcontentform.type=="meeting"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="link" className="text-right">
+          Stream Id
+        </Label>
+        <Input
+          id="streamid"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.streamid}
+          className="col-span-3"
+          placeholder=""
+        />
+      </div>}
+      {createcontentform.type=="meeting"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="link" className="text-right">
+          RTMP Key
+        </Label>
+        <Input
+          id="rtmpkey"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.rtmpkey}
+          className="col-span-3"
+          placeholder=""
+        />
+      </div>}
+      {createcontentform.type=="meeting"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="link" className="text-right">
+          RTMP Url
+        </Label>
+        <Input
+          id="rtmpurl"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.rtmpurl}
+          className="col-span-3"
+          placeholder=""
+        />
+      </div>}
+      {createcontentform.type=="meeting"&&<div className=" flex justify-end items-center gap-2">
+        <Button className="bg-black rounded " size="sm" onClick={createLiveStream}> 
+          Create a Live Session
+        </Button>
+        <Button className="bg-black rounded " size="sm" onClick={scheduleThisClass}> 
+          Schedule This Class
+        </Button>
+      </div>}
+      {createcontentform.type=="video"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="link" className="text-right">
+          Video Id
+        </Label>
+        <Input
+          id="videoid"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.videoid}
+          className="col-span-3"
+          placeholder=""
+        />
+      </div>}
+      {createcontentform.type=="video"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="poster" className="text-right">
+          Thumbnail/Poster
+        </Label>
+        <Input
+          id="poster"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.poster}
+          className="col-span-3"
+          placeholder="Enter Your Thumbnail Link Here..."
+        />
+      </div>}
+      {createcontentform.type=="video"||createcontentform.type=="ytvideo"&&<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="videonotes" className="text-right">
+          Video Notes
+        </Label>
+        <Input
+          id="videonotes"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.videonotes}
+          className="col-span-3"
+          placeholder="Add Note Link Here..."
+        />
+      </div>}
+      {<div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="videonotes" className="text-right">
+          Content Index
+        </Label>
+        <Input
+          id="index"
+          onChange={handlecreatecontentformchnage}
+          value={createcontentform.index}
+          className="col-span-3"
+          placeholder="Add index here..."
+        />
+      </div>}
+    </div>
+    <DialogFooter className="sticky bottom-0 bg-background pb-4 pt-2 z-10">
+      {!update&& <Button onClick={handlecreatecontentsubmit}>Save changes</Button>}
+      {update&& <Button onClick={updatecontentmodal}>Update changes</Button>}
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
     {/* alerts starts here */}
     <AlertDialog open={alertopen}>
 

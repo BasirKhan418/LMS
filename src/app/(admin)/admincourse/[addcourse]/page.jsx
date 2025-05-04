@@ -54,6 +54,7 @@ export default function Component(props) {
   const [rtmpkey,setRtmpkey] = useState("")
   const [rtmpurl,setRtmpurl] = useState("")
   const [streamid,setStreamid] = useState("")
+  const [courseData,setCourseData] = useState(null)
   //useEffect
   const fetchallcoursedata = async()=>{
 try{
@@ -67,6 +68,7 @@ const res = await fetch(`/api/contentcrud?id=${params.addcourse}`,{
 })
 const result = await res.json()
 setLoading(false)
+setCourseData(result.data)
 setWeeks(result.data.content)
 //calculating the content indexing
 let temp = 0;
@@ -394,6 +396,112 @@ fetchallcoursedata()
     
     setcreatecontentform({...createcontentform,streamid:streamid,playbackid:playback_ids,rtmpkey:streamKey,rtmpurl:"rtmps://global-live.mux.com:443/app"})
   }
+//convert into utc timezone
+function convertToISOFormat(dateStr, timeStr) {
+  // Create a Date object using the local timezone
+  const dateObj = new Date(`${dateStr}T${timeStr}:00`);
+  
+  // Convert to ISO string (which ends with Z, indicating UTC)
+  return dateObj.toISOString();
+}
+///date genertor functions
+function generateDateFiveMinutesFromNow() {
+  // Get current time
+  const now = new Date();
+  
+  // Add 5 minutes (5 * 60 * 1000 milliseconds)
+  const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000);
+  
+  // Return in ISO format
+  return fiveMinutesLater.toISOString();
+}
+
+function getFiveMinutesBefore(isoDateString) {
+  // Parse the input date string
+  const date = new Date(isoDateString);
+  
+  // Subtract 5 minutes (5 * 60 * 1000 milliseconds)
+  const fiveMinutesBefore = new Date(date.getTime() - 5 * 60 * 1000);
+  
+  // Return in ISO format
+  return fiveMinutesBefore.toISOString();
+}
+
+function getTenMinutesBefore(isoDateString) {
+  // Parse the input date string
+  const date = new Date(isoDateString);
+  
+  // Subtract 10 minutes (10 * 60 * 1000 milliseconds)
+  const tenMinutesBefore = new Date(date.getTime() - 10 * 60 * 1000);
+  
+  // Return in ISO format
+  return tenMinutesBefore.toISOString();
+}
+
+//schedule api,
+
+const scheduleClassApi=async(payload,sendTime)=>{
+try{
+   const res = await fetch(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/schedule/class`,{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "token":localStorage.getItem("dilmsadmintoken")
+    },
+    body:JSON.stringify({...payload,sendTime})
+   })
+    const result = await res.json()
+    if(result.success){
+      toast.success(result.message)
+    }
+    else{
+      toast.error(result.message)
+    }
+}
+catch(err){
+toast.error("Something went wrong! try again later"+err)
+}
+}
+
+  const scheduleThisClass = async()=>{
+   if(createcontentform.name==""||createcontentform.description==""||createcontentform.date==""||createcontentform.time==""||courseData.batchid==""){
+    toast.error("it is not possible to schedule class without date and time and batch id")
+    
+  }
+  let result = convertToISOFormat(createcontentform.date,createcontentform.time);
+  console.log("result",result)
+  let duration = "";
+  if(index==0||index==1||index==2||index==3){
+    duration=1;
+  }
+  else if(index==4||index==5||index==6||index==7){
+    duration=2;
+  }
+  else if(index==8||index==9||index==10||index==11){
+    duration=3;
+  }
+  else if(index==12||index==13||index==14||index==15){
+    duration=4;
+  }
+
+  let date1 = generateDateFiveMinutesFromNow();
+  let date2 = getFiveMinutesBefore(result);
+  let date3 = getTenMinutesBefore(result);
+  console.log("date1",date1)  
+  console.log("date2",date2)
+  console.log("date3",date3)
+  const payload = {
+    title:createcontentform.name,
+    message:createcontentform.description,
+    date:result,
+    batchid:courseData.batch,
+    coursename:courseName,
+    duration:duration,
+  }
+  await scheduleClassApi(payload,date1)
+  await scheduleClassApi(payload,date2)
+  await scheduleClassApi(payload,date3)
+}
   return (
     <>
      <Toaster position="top-center" expand={false}/>
@@ -735,6 +843,9 @@ fetchallcoursedata()
       {createcontentform.type=="meeting"&&<div className=" flex justify-end items-center gap-2">
         <Button className="bg-black rounded " size="sm" onClick={createLiveStream}> 
           Create a Live Session
+        </Button>
+        <Button className="bg-black rounded " size="sm" onClick={scheduleThisClass}> 
+          Schedule This Class
         </Button>
       </div>}
       {createcontentform.type=="video"&&<div className="grid grid-cols-4 items-center gap-4">
