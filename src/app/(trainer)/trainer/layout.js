@@ -21,11 +21,11 @@ export const metadata = {
     title: "Trainer Profile - Infotact  | Learn Infotact ",
     description:
       "Manage and update your Trainer profile on Infotact . View your platform activity, adjust Trainer settings, and personalize your learning platform management experience.",
-    url: "https://learn.Infotact .com/Trainerprofile",
+    url: "https://infotactlearning.in/trainer",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
         alt: "Trainer Profile - Infotact ",
@@ -38,11 +38,11 @@ export const metadata = {
     title: "Trainer Profile - Infotact  | Learn Infotact ",
     description:
       "Access and manage your profile as an Trainer on Infotact . Update personal details, modify settings, and ensure smooth platform management.",
-    images: "/alogo.png",
+    images: "/infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.Infotact .com/Trainerprofile",
+    canonical: "https://infotactlearning.in/trainer",
   },
 };
 const layout = ({children}) => {

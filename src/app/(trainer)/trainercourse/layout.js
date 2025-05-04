@@ -19,11 +19,11 @@ export const metadata = {
     title: "Add Course Content - Infotact | Learn Infotact",
     description:
       "Admins can upload and manage course content including videos, articles, and assignments. Enhance the learning experience for students.",
-    url: "https://learn.Infotact.com/admincourse",
+    url: "https://infotactlearning.in/trainercourse",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
         alt: "Add Course Content - Admin Panel",
@@ -36,11 +36,11 @@ export const metadata = {
     title: "Add Course Content - Infotact | Learn Infotact",
     description:
       "Upload and manage course content on Infotact. Admins can add videos, documents, and other resources to enrich the student learning experience.",
-    images: "/alogo.png",
+    images: "/infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.Infotact.com/admincourse",
+    canonical: "https://infotactlearning.in/trainercourse",
   },
 };
   

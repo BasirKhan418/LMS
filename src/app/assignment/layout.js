@@ -1,10 +1,10 @@
 import React from 'react'
 export const metadata = {
-  title: "Assignments - DevSomeWare | Learn DevSomeWare",
+  title: "Assignments - Infotact | Learn Infotact",
   description:
-    "Submit and track your assignments on DevSomeWare's Learning Platform. Review your progress, get personalized feedback, and improve your skills through hands-on assignments and challenges.",
+    "Submit and track your assignments on Infotact's Learning Platform. Review your progress, get personalized feedback, and improve your skills through hands-on assignments and challenges.",
   keywords: [
-    "DevSomeWare Assignments",
+    "Infotact Assignments",
     "Assignments Submission",
     "Tech Assignments",
     "Online Assignments",
@@ -19,31 +19,31 @@ export const metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Assignments - DevSomeWare | Learn DevSomeWare",
+    title: "Assignments - Infotact | Learn Infotact",
     description:
-      "Submit assignments, track progress, and get feedback on DevSomeWare. Enhance your skills by completing real-world challenges and receiving constructive reviews.",
-    url: "https://learn.devsomeware.com/assignment",
+      "Submit assignments, track progress, and get feedback on Infotact. Enhance your skills by completing real-world challenges and receiving constructive reviews.",
+    url: "https://infotactlearning.in/assignment",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
-        alt: "DevSomeWare Assignments Page",
+        alt: "Infotact Assignments Page",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@DevSomeware",
-    title: "Assignments - DevSomeWare | Learn DevSomeWare",
+    site: "@Infotact",
+    title: "Assignments - Infotact | Learn Infotact",
     description:
-      "Manage your assignments on DevSomeWare. Submit your work, get feedback, and track your learning progress with hands-on challenges in tech and development.",
-    images: "/alogo.png",
+      "Manage your assignments on Infotact. Submit your work, get feedback, and track your learning progress with hands-on challenges in tech and development.",
+    images: "/infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.devsomeware.com/assignment",
+    canonical: "https://infotactlearning.in/assignment",
   },
 };
   

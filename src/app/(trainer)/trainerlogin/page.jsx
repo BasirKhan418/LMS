@@ -22,7 +22,7 @@ export const metadata = {
     type: "website",
     images: [
       {
-        url: "/1.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
         alt: "Infotact Trainer Login",
@@ -31,15 +31,15 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@DevSomeware",
+    site: "@Infotact",
     title: "Trainer Login - Infotact | Learn Infotact",
     description:
       "Access the trainer panel of Infotact to manage platform content, courses, projects, and users securely.",
-    images: "/alogo.png",
+    images: "/infotactlearning.gif",
   },
   robots: "noindex, nofollow",
   alternates: {
-    canonical: "https://learn.devsomeware.com/adminlogin",
+    canonical: "https://infotactlearning.in/trainerlogin",
   },
 };
 

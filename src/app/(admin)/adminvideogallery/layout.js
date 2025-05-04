@@ -1,11 +1,11 @@
 import React from 'react'
 export const metadata = {
-  title: "Admin Video Gallery - DevSomeWare | Learn DevSomeWare",
+  title: "Admin Video Gallery - Infotact | Learn Infotact",
   description:
-    "Manage and view all video content in the DevSomeWare Video Gallery. Upload, organize, and update educational videos for your LMS platform to enhance learning experience.",
+    "Manage and view all video content in the Infotact Video Gallery. Upload, organize, and update educational videos for your LMS platform to enhance learning experience.",
   keywords: [
     "Admin Video Gallery",
-    "DevSomeWare Video Gallery",
+    "Infotact Video Gallery",
     "Manage Video Content",
     "Video Upload Admin",
     "Educational Videos",
@@ -18,31 +18,31 @@ export const metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Admin Video Gallery - DevSomeWare | Learn DevSomeWare",
+    title: "Admin Video Gallery - Infotact | Learn Infotact",
     description:
-      "Upload, organize, and manage your educational video content through the DevSomeWare Admin Video Gallery. Enhance the learning experience with seamless video management.",
-    url: "https://learn.devsomeware.com/adminvideogallery",
+      "Upload, organize, and manage your educational video content through the Infotact Admin Video Gallery. Enhance the learning experience with seamless video management.",
+    url: "https://infotactlearning.in/adminvideogallery",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
-        alt: "Admin Video Gallery - DevSomeWare",
+        alt: "Admin Video Gallery - Infotact",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@DevSomeware",
-    title: "Admin Video Gallery - DevSomeWare | Learn DevSomeWare",
+    site: "@Infotact",
+    title: "Admin Video Gallery - Infotact | Learn Infotact",
     description:
-      "View and manage all educational video content in your DevSomeWare Video Gallery. Upload and organize videos to enhance the learning experience.",
-    images: "/alogo.png",
+      "View and manage all educational video content in your Infotact Video Gallery. Upload and organize videos to enhance the learning experience.",
+    images: "/infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.devsomeware.com/adminvideo-gallery",
+    canonical: "https://infotactlearning.in/adminvideogallery",
   },
 };
   

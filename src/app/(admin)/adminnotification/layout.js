@@ -1,8 +1,8 @@
 import React from 'react'
 export const metadata = {
-  title: "Send Notification - DevSomeWare | Learn DevSomeWare",
+  title: "Send Notification - Infotact | Learn Infotact",
   description:
-    "Send important notifications to users on DevSomeWare. Admins can notify students about course updates, deadlines, events, and more.",
+    "Send important notifications to users on Infotact. Admins can notify students about course updates, deadlines, events, and more.",
   keywords: [
     "Send Notification",
     "Admin Notifications",
@@ -16,14 +16,14 @@ export const metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "Send Notification - DevSomeWare | Learn DevSomeWare",
+    title: "Send Notification - Infotact | Learn Infotact",
     description:
-      "Admins can send platform-wide notifications to users on DevSomeWare. Keep students informed about courses, deadlines, and more.",
-    url: "https://learn.devsomeware.com/adminotification",
+      "Admins can send platform-wide notifications to users on Infotact. Keep students informed about courses, deadlines, and more.",
+    url: "https://infotactlearning.in/adminotification",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
         alt: "Send Notification - Admin Panel",
@@ -32,15 +32,15 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@DevSomeware",
-    title: "Send Notification - DevSomeWare | Learn DevSomeWare",
+    site: "@Infotact",
+    title: "Send Notification - Infotact | Learn Infotact",
     description:
       "Manage notifications for students and instructors. Send alerts and reminders about courses, assignments, and other platform events.",
-    images: "/alogo.png",
+    images: "/infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.devsomeware.com/adminnotification",
+    canonical: "https://infotactlearning.in/adminnotification",
   },
 };
 

@@ -1,14 +1,14 @@
 
 
 export const metadata = {
-  title: "All Courses - DevSomeWare | Learn DevSomeWare",
+  title: "All Courses - Infotact | Learn Infotact",
   description:
-    "Explore a wide range of courses on DevSomeWare's Learning Platform. Learn tech skills, advance your career, and access expert-led training in various fields like software development, cloud computing, and more.",
+    "Explore a wide range of courses on Infotact's Learning Platform. Learn tech skills, advance your career, and access expert-led training in various fields like software development, cloud computing, and more.",
   keywords: [
-    "All Courses DevSomeWare",
+    "All Courses Infotact",
     "Online Courses",
     "Tech Courses",
-    "Learn DevSomeWare",
+    "Learn Infotact",
     "Software Development Courses",
     "Cloud Computing Courses",
     "Programming Courses",
@@ -20,31 +20,31 @@ export const metadata = {
     icon: "/favicon.ico",
   },
   openGraph: {
-    title: "All Courses - DevSomeWare | Learn DevSomeWare",
+    title: "All Courses - Infotact | Learn Infotact",
     description:
-      "Discover and browse through all available courses on DevSomeWare. Start learning tech skills, programming, cloud computing, and more to boost your career.",
-    url: "https://learn.devsomeware.com/allcourses",
+      "Discover and browse through all available courses on Infotact. Start learning tech skills, programming, cloud computing, and more to boost your career.",
+    url: "https://infotactlearning.in/allcourses",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
-        alt: "Browse All Courses on DevSomeWare",
+        alt: "Browse All Courses on Infotact",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    site: "@DevSomeware",
-    title: "All Courses - DevSomeWare | Learn DevSomeWare",
+    site: "@Infotact",
+    title: "All Courses - Infotact | Learn Infotact",
     description:
-      "Browse through all courses on DevSomeWare. Learn new tech skills and enhance your career with expert-led courses in various subjects.",
-    images: "/alogo.png",
+      "Browse through all courses on Infotact. Learn new tech skills and enhance your career with expert-led courses in various subjects.",
+    images: "infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.devsomeware.com/allcourses",
+    canonical: "https://infotactlearning.in/allcourses",
   },
 };
 

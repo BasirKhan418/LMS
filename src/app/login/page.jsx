@@ -23,11 +23,11 @@ export const metadata = {
     title: "Login - Infotact Learning",
     description:
       "Log in to your Infotact account and unlock your learning dashboard. Access courses, track your progress, and connect with mentors and peers.",
-    url: "https://login.devsomeware.com/login",
+    url: "https://infotactlearning.in/login",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
         alt: "Infotact Login Page",
@@ -36,15 +36,15 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@DevSomeware",
+    site: "@Infotact",
     title: "Login - Learn Infotact",
     description:
       "Login to Infotact to access a personalized learning experience. Track your courses, connect with experts, and enhance your skills.",
-    images: "/alogo.png",
+    images: "/infotactlearning.gif",
   },
   robots: "noindex, nofollow", // Login page usually shouldn’t be indexed by search engines.
   alternates: {
-    canonical: "https://login.devsomeware.com/login",
+    canonical: "https://infotactlearning.in/login",
   },
 };
 

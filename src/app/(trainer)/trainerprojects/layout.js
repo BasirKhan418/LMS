@@ -20,11 +20,11 @@ export const metadata = {
     title: "Add Project - Infotact | Learn Infotact",
     description:
       "Create and manage tech projects on Infotact. Add challenges, instructions, and resources for students to build real-world solutions.",
-    url: "https://learn.Infotact.com/adminprojects",
+    url: "https://infotactlearning.in/trainerprojects",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
         alt: "Add Project - Admin Panel",
@@ -37,11 +37,11 @@ export const metadata = {
     title: "Add Project - Infotact | Learn Infotact",
     description:
       "Create and manage tech projects for students on Infotact. Help students apply their skills to solve real-world problems with hands-on projects.",
-    images: "/alogo.png",
+    images: "/infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.Infotact.com/adminprojects",
+    canonical: "https://infotactlearning.in/trainerprojects",
   },
 };
   

@@ -24,11 +24,11 @@ export const metadata = {
     title: "Learn - Infotact | Infotact Learning Platform",
     description:
       "Join Infotact's Learning Platform to enhance your skills with curated courses. Learn from industry experts, collaborate with peers, and boost your career with quality online education.",
-    url: "https://learn.devsomeware.com",
+    url: "https://infotactlearning.in",
     type: "website",
     images: [
       {
-        url: "/alogo.png",
+        url: "/infotactlearning.gif",
         width: 1200,
         height: 630,
         alt: "Infotact Learning Platform",
@@ -37,15 +37,15 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    site: "@DevSomeware",
+    site: "@Infotact",
     title: "Learn - Infotact | Infotact Learning Platform",
     description:
       "Explore Infotact's LMS to start your learning journey. Access expert-led courses, build skills, and advance your career in tech.",
-    images: "/alogo.png",
+    images: "/infotactlearning.gif",
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://learn.devsomeware.com",
+    canonical: "https://infotactlearning.in",
   },
 };
 
