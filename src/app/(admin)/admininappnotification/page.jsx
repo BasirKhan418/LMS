@@ -93,6 +93,7 @@ useEffect(()=>{
 //scgedule notification function
   const handleSchedule = async(title,message,sendTime,category,batchid) => {
     try{
+      setLoading(true)
       const res = await fetch(`${process.env.NEXT_PUBLIC_WEBSOCKET_URL}/api/schedule/notification`, {
         method: "POST",
         headers: {
@@ -108,6 +109,7 @@ useEffect(()=>{
         }),
       })
       const data = await res.json()
+      setLoading(false)
       console.log(data)
       if (data.success) {
         toast.success("Notification scheduled successfully")
@@ -137,37 +139,37 @@ useEffect(()=>{
       batch,
     }
     await handleSchedule(title,description,sendNow ? currentTime : sendTime,category,batch)
-  //   try{
-  //  const res = await fetch("/api/notificationcrud", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
-  //     },
-  //     body: JSON.stringify(newNotification),
-  //  })
-  //   const data = await res.json()
-  //   setLoading(false)
+    try{
+   const res = await fetch("/api/notificationcrud", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `${localStorage.getItem("dilmsadmintoken")}`,
+      },
+      body: JSON.stringify(newNotification),
+   })
+    const data = await res.json()
+    setLoading(false)
 
-  //   if(data.success){
+    if(data.success){
       
-  //     toast.success("Notification queued successfully")
-  //     setTitle("")
-  //     setDescription("")
-  //     setSendTime("")
-  //     setCategory("")
-  //     setBatch("")
-  //     fetchNotifications()
-  //     setSendNow(false)
-  //   }
-  //   else{
-  //     toast.error(data.message)
-  //   }
-  //   }
-  //   catch(err){
+      toast.success("Notification queued successfully")
+      setTitle("")
+      setDescription("")
+      setSendTime("")
+      setCategory("")
+      setBatch("")
+      fetchNotifications()
+      setSendNow(false)
+    }
+    else{
+      toast.error(data.message)
+    }
+    }
+    catch(err){
       
-  //     toast.error("Something went wrong while sending notification. Please contact to the developer")
-  //   }
+      toast.error("Something went wrong while sending notification. Please contact to the developer")
+    }
 
     
   }
