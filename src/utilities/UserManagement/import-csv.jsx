@@ -99,48 +99,64 @@ export function ImportCSV({ onImport, users }) {
   }
 
   const parseCSV = (csvData) => {
-    const lines = csvData.split("\n")
-    const headers = lines[0].split(",").map((header) => header.trim())
-
+    const lines = csvData.split("\n");
+    const headers = lines[0].split(",").map((header) => header.trim());
+  
     // Validate headers
-    const requiredHeaders = ["name", "email", "domain", "gender", "number", "month","ispaid"]
-    const missingHeaders = requiredHeaders.filter((header) => !headers.includes(header))
-
+    const requiredHeaders = ["name", "email", "domain", "gender", "number", "month", "ispaid"];
+    const missingHeaders = requiredHeaders.filter((header) => !headers.includes(header));
+  
     if (missingHeaders.length > 0) {
-      throw new Error(`Missing required headers: ${missingHeaders.join(", ")}`)
+      throw new Error(`Missing required headers: ${missingHeaders.join(", ")}`);
     }
-
-    const users = []
-
+  
+    const users = [];
+  
     for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue
-
-      const values = lines[i].split(",").map((value) => value.trim())
-
+      if (!lines[i].trim()) continue;
+  
+      const values = lines[i].split(",").map((value) => value.trim());
+  
       if (values.length !== headers.length) {
-        throw new Error(`Line ${i + 1} has an incorrect number of values`)
+        throw new Error(`Line ${i + 1} has an incorrect number of values`);
       }
-
+  
       const user = {
         id: `imported-${Date.now()}-${i}`,
-      }
-
+      };
+  
       headers.forEach((header, index) => {
         if (header === "ispaid") {
-          user[header] = values[index].toLowerCase() === "true"
-        }  else {
-          user[header] = values[index]
+          user[header] = values[index].toLowerCase() === "true";
+        } else if (header === "startdate" && values[index]) {
+          // Convert date from DD-MM-YYYY to a proper Date object
+          try {
+            const [day, month, year] = values[index].split("-");
+            // Create date as YYYY-MM-DD format (month is 1-indexed in the input)
+            const dateObj = new Date(`${year}-${month}-${day}`);
+            
+            // Check if the date is valid
+            if (isNaN(dateObj.getTime())) {
+              throw new Error(`Invalid date format at line ${i + 1}: ${values[index]}`);
+            }
+            
+            user[header] = dateObj;
+          } catch (error) {
+            throw new Error(`Failed to parse date at line ${i + 1}: ${values[index]}, ${error.message}`);
+          }
+        } else {
+          user[header] = values[index];
         }
-      })
-
+      });
+  
       // Set default values for missing fields
-      if (user.ispaid === undefined) user.ispaid = false
-
-      users.push(user)
+      if (user.ispaid === undefined) user.ispaid = false;
+  
+      users.push(user);
     }
-
-    return users
-  }
+  
+    return users;
+  };
 
   const downloadSampleCSV = () => {
     const headers = [
@@ -153,10 +169,11 @@ export function ImportCSV({ onImport, users }) {
       "month",
       "paymentid",
       "orderid",
+      "startdate",
     ]
     const sampleData = [
-      "John Doe,john@example.com,example.com,true,Male,+1234567890,1 month,pay_123456,ord_123456",
-      "Jane Smith,jane@test.com,test.com,false,Female,+0987654321,3 months,pay_654321,ord_654321",
+      "John Doe,john@example.com,example.com,true,Male,+1234567890,1 month,pay_123456,ord_123456,22-10-2025",
+      "Jane Smith,jane@test.com,test.com,false,Female,+0987654321,3 months,pay_654321,ord_654321,22-05-2025",
     ]
 
     const csvContent = [headers.join(","), ...sampleData].join("\n")

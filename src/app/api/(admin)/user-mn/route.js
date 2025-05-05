@@ -33,7 +33,7 @@ export const POST = async(req,res)=>{
         return NextResponse.json({message:"Users imported successfully",status:200,success:true})
     }
     catch(err){
-        
+        console.log(err)
         return NextResponse.json({success:false,message:"Something went wrong please try again later"})
     }
 }
