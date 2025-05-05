@@ -4,7 +4,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { IoCloseSharp } from "react-icons/io5";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Textarea } from "@/components/ui/textarea";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 
 const Chat = ({ aiopen, setaiopen }) => {
@@ -115,8 +115,7 @@ const Chat = ({ aiopen, setaiopen }) => {
   return (
     <>
       <Toaster position="top-center" expand={false} />
-      <Sheet open={aiopen} variants="bottom">
-        <SheetTitle className="hidden">menu</SheetTitle>
+      <Sheet open={aiopen} onOpenChange={setaiopen}>
         <SheetContent className="w-full h-full p-0">
           <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900">
             {/* Header */}
@@ -133,12 +132,7 @@ const Chat = ({ aiopen, setaiopen }) => {
                   </div>
                 </div>
               </div>
-              <button 
-                className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                onClick={() => setaiopen(false)}
-              >
-                <IoCloseSharp className="text-2xl text-slate-600 dark:text-slate-300" />
-              </button>
+             
             </header>
 
             {/* Chat Messages */}
@@ -201,7 +195,7 @@ const Chat = ({ aiopen, setaiopen }) => {
             <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
               <form onSubmit={handleSubmit} className="relative">
                 <Textarea
-                  placeholder="Ask me anything about technology or coding..."
+                  placeholder="Ask your query ?"
                   name="message"
                   id="message"
                   onChange={handleChange}

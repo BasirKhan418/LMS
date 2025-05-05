@@ -84,82 +84,116 @@ export function TrainerLogin() {
     }
 
     return (
-        <div className="">
+        <div className="min-h-screen">
             <Toaster position="top-center" expand={false}/>
-            {loading ? <div className="absolute flex justify-center items-center h-full w-full"><ProfileSpinner/></div> : ""}
-            <div className={`w-full lg:grid lg:grid-cols-2 ${loading ? "opacity-30" : ""}`}>
-                <div className="flex items-center justify-center py-12">
-                    <div className="mx-auto grid w-[350px] gap-6">
+            
+            {loading && (
+                <div className="fixed inset-0 z-50 flex justify-center items-center bg-white/70 dark:bg-black/70">
+                    <ProfileSpinner/>
+                </div>
+            )}
+            
+            <div className={`w-full min-h-screen lg:grid lg:grid-cols-2 ${loading ? "opacity-30" : ""}`}>
+                <div className="flex items-center justify-center p-4 sm:p-6 md:p-8 lg:p-12">
+                    <div className="w-full max-w-md mx-auto grid gap-4 sm:gap-6">
                         <div className="grid gap-2 text-center">
-                            <div className="flex justify-center items-center my-4">
-                                <img
-                                    src="/9.png" 
-                                    alt="My Image"
-                                    className="lg:h-48 lg:w-48 lg:absolute w-48 h-16"
-                                />
+                            {/* Logo Container - Improved responsiveness */}
+                            <div className="flex justify-center my-2 sm:my-4">
+                                <div className="relative w-40 h-14 xs:w-44 xs:h-16 sm:w-48 sm:h-20">
+                                    <Image
+                                        src="/9.png"
+                                        alt="Logo"
+                                        layout="fill"
+                                        objectFit="contain"
+                                        priority
+                                    />
+                                </div>
                             </div>
-                            <h1 className="text-3xl font-bold mt-16">Trainer Login to Infotact-Learning</h1>
-                            <p className="text-balance text-muted-foreground">
-                                Enter your email to login to your admin account.
+                            
+                            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mt-4 sm:mt-6 md:mt-8">
+                                Trainer Login to Infotact-Learning
+                            </h1>
+                            <p className="text-xs sm:text-sm text-balance text-muted-foreground">
+                                Enter your email to login to your trainer account.
                             </p>
                         </div>
+                        
                         <div className="grid gap-4">
-                            {!isOtpSent && <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    placeholder="m@example.com"
-                                    onChange={handleChange}
-                                    value={email}
-                                    required
-                                />
-                            </div>}
-                            {isOtpSent && <div className="grid gap-2 flex justify-center">
-                                <Label htmlFor="email">Otp (One Time Password)</Label>
-                                <InputOTP maxLength={6} onChange={(value) => {setOtp(value)}}>
-                                    <InputOTPGroup className="text-4xl">
-                                        <InputOTPSlot index={0} />
-                                        <InputOTPSlot index={1} />
-                                        <InputOTPSlot index={2} />
-                                    </InputOTPGroup>
-                                    <InputOTPSeparator/>
-                                    <InputOTPGroup>
-                                        <InputOTPSlot index={3} />
-                                        <InputOTPSlot index={4} />
-                                        <InputOTPSlot index={5} />
-                                    </InputOTPGroup>
-                                </InputOTP>
-                            </div>}
+                            {!isOtpSent && (
+                                <div className="grid gap-2">
+                                    <Label htmlFor="email">Email</Label>
+                                    <Input
+                                        id="email"
+                                        type="email"
+                                        name="email"
+                                        placeholder="m@example.com"
+                                        onChange={handleChange}
+                                        value={email}
+                                        required
+                                    />
+                                </div>
+                            )}
                             
-                            {!isOtpSent && <Button 
-                                type="submit" 
-                                className="w-full" 
-                                variant="default" 
-                                onClick={handleOtpSend}
-                            >
-                                {loading ? "Sending..." : "Send OTP"}
-                            </Button>}
-                            {isOtpSent && <Button 
-                                type="submit" 
-                                className="w-full"
-                                variant="default"
-                                onClick={handleVerifyOtp}
-                            >
-                                {loading ? "Verifying..." : "Login"}
-                            </Button>}
+                            {isOtpSent && (
+                                <div className="grid gap-3">
+                                    <Label htmlFor="otp" className="text-center">
+                                        OTP (One Time Password)
+                                    </Label>
+                                    <div className="flex justify-center">
+                                        <InputOTP maxLength={6} onChange={(value) => {setOtp(value)}}>
+                                            <InputOTPGroup className="text-2xl sm:text-3xl md:text-4xl">
+                                                <InputOTPSlot index={0} />
+                                                <InputOTPSlot index={1} />
+                                                <InputOTPSlot index={2} />
+                                            </InputOTPGroup>
+                                            <InputOTPSeparator/>
+                                            <InputOTPGroup className="text-2xl sm:text-3xl md:text-4xl">
+                                                <InputOTPSlot index={3} />
+                                                <InputOTPSlot index={4} />
+                                                <InputOTPSlot index={5} />
+                                            </InputOTPGroup>
+                                        </InputOTP>
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <div className="pt-2">
+                                {!isOtpSent && (
+                                    <Button 
+                                        type="submit" 
+                                        className="w-full" 
+                                        variant="default" 
+                                        onClick={handleOtpSend}
+                                    >
+                                        {loading ? "Sending..." : "Send OTP"}
+                                    </Button>
+                                )}
+                                
+                                {isOtpSent && (
+                                    <Button 
+                                        type="submit" 
+                                        className="w-full"
+                                        variant="default"
+                                        onClick={handleVerifyOtp}
+                                    >
+                                        {loading ? "Verifying..." : "Login"}
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
+                
                 <div className="hidden bg-muted lg:block">
-                    <Image
-                        src="/infotactlearning.gif"
-                        alt="Image"
-                        width="1920"
-                        height="1080"
-                        className="h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-                    />
+                    <div className="relative h-full w-full">
+                        <Image
+                            src="/infotactlearning.gif"
+                            alt="Image"
+                            fill
+                            className="object-cover dark:brightness-[0.2] dark:grayscale"
+                            priority
+                        />
+                    </div>
                 </div>
             </div>
         </div>

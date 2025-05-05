@@ -32,6 +32,8 @@ import {
   Sun,
   CheckCircle2,
   ArrowRightLeft,
+  MoreVertical,
+  Calendar,
 } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -40,8 +42,14 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Separator } from "@/components/ui/separator"
-import { Toaster,toast } from "sonner"
+import { Toaster, toast } from "sonner"
 import ProfilePageSkeleton from "@/utilities/skeleton/ProfilePageSkeleton"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function TeamManagement() {
   const [teams, setTeams] = useState([])
@@ -179,7 +187,7 @@ export default function TeamManagement() {
           { header: "Domain", key: "domain", width: 30 },
           { header: "Duration", key: "duration", width: 30 },
           { header: "Team Leader Name", key: "leader", width: 30 },
-          { header: "Members", key: "member", width: 60,height:200 },         
+          { header: "Members", key: "member", width: 60, height: 200 },         
         ];
         data.data.forEach((team) => {
           worksheet.addRow({
@@ -218,7 +226,6 @@ export default function TeamManagement() {
     }
     catch(err){
       setLoading(false) 
-     
       toast.error("Error exporting team");
     }
   }
@@ -310,165 +317,272 @@ export default function TeamManagement() {
     }
   }
 
+  // Helper component for team card on mobile
+  const TeamCard = ({ team, isCreated = false }) => (
+    <Card className="w-full mb-4 shadow-sm border border-muted/40">
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-start">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
+              {getRandomIcon()}
+            </div>
+            <CardTitle className="text-base md:text-lg">{team.name}</CardTitle>
+          </div>
+          {isCreated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleViewTeam(team._id)}>
+                  <Eye className="h-4 w-4 mr-2" /> View Team
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => exportTeam(team._id)}>
+                  <Download className="h-4 w-4 mr-2" /> Export
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => handleCreateTeam(team._id)}
+              className="transition-all hover:scale-105"
+            >
+              <Plus className="h-4 w-4 mr-1" /> Create
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent className="pt-2">
+        <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <span>Domain:</span>
+            <span className="font-medium text-foreground">{team.domain}</span>
+          </div>
+          <div className="flex items-center gap-1 text-muted-foreground">
+            <Calendar className="h-3 w-3" />
+            <span>{new Date(team.date).toLocaleDateString("en-IN", { 
+              day: "numeric", 
+              month: "short", 
+              year: "numeric" 
+            })}</span>
+          </div>
+        </div>
+        <div className="mt-2">
+          <Badge 
+            variant={isCreated ? "success" : "outline"} 
+            className={isCreated ? "bg-green-500 hover:bg-green-600 text-white" : "bg-muted"}
+          >
+            {isCreated ? "Created" : "Not Created"}
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted/20">
       {/* Header */}
       <Toaster richColors={true} position="top-center" closeIcon={false} />
 
-      <main className="container py-8">
-        <div className="mb-8 space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">Team Formation Dashboard</h2>
-          <p className="text-muted-foreground">Create, view, and manage your teams in one place.</p>
+      <main className="container px-4 py-4 md:py-8">
+        <div className="mb-4 md:mb-8 space-y-1 md:space-y-2">
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Team Formation Dashboard</h2>
+          <p className="text-sm md:text-base text-muted-foreground">Create, view, and manage your teams in one place.</p>
         </div>
 
-        <Tabs defaultValue="not-created" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
+        <Tabs defaultValue="not-created" className="space-y-4 md:space-y-6">
+          <TabsList className="grid w-full grid-cols-2 max-w-full md:w-[400px]">
             <TabsTrigger value="not-created">Not Created Teams</TabsTrigger>
             <TabsTrigger value="created">Created Teams</TabsTrigger>
           </TabsList>
 
           {/* Not Created Teams */}
-          <>
-          
-          {loading?<ProfilePageSkeleton/>:<TabsContent value="not-created" className="space-y-4">
-            <Card className="overflow-hidden border-none shadow-md">
-              <CardHeader className="bg-muted/50">
-                <CardTitle>Not Created Teams</CardTitle>
-                <CardDescription>Teams that have not been created yet</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Batch Name</TableHead>
-                        <TableHead>Domain</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {teams
-                        .filter((team) => !team.isteamcreated)
-                        .map((team) => (
-                          <TableRow key={team._id} className="hover:bg-muted/50">
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
-                                {getRandomIcon()}
+          {loading ? <ProfilePageSkeleton /> : (
+            <TabsContent value="not-created" className="space-y-4">
+              <Card className="overflow-hidden border-none shadow-md">
+                <CardHeader className="bg-muted/50 py-4 md:py-6">
+                  <CardTitle className="text-lg md:text-xl">Not Created Teams</CardTitle>
+                  <CardDescription className="text-sm">Teams that have not been created yet</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {/* Desktop view - Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Batch Name</TableHead>
+                          <TableHead>Domain</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Created</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {teams
+                          .filter((team) => !team.isteamcreated)
+                          .map((team) => (
+                            <TableRow key={team._id} className="hover:bg-muted/50">
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
+                                  {getRandomIcon()}
+                                  </div>
+                                  {team.name}
                                 </div>
-                                {team.name}
-                              </div>
-                            </TableCell>
-                            <TableCell>{team.domain}</TableCell>
-                            <TableCell>
-                              {new Date(team.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
-                            }
-                            </TableCell>
-                            <TableCell>
-                              <Badge variant="outline" className="bg-muted">
-                                Not Created
-                              </Badge>
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="default"
-                                size="sm"
-                                onClick={() => handleCreateTeam(team._id)}
-                                className="transition-all hover:scale-105"
-                              >
-                                <Plus className="h-4 w-4 mr-1" /> Create Team
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>}
-          </>
+                              </TableCell>
+                              <TableCell>{team.domain}</TableCell>
+                              <TableCell>
+                                {new Date(team.date).toLocaleDateString("en-IN", { 
+                                  day: "numeric", 
+                                  month: "long", 
+                                  year: "numeric" 
+                                })}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="outline" className="bg-muted">
+                                  Not Created
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="default"
+                                  size="sm"
+                                  onClick={() => handleCreateTeam(team._id)}
+                                  className="transition-all hover:scale-105"
+                                >
+                                  <Plus className="h-4 w-4 mr-1" /> Create Team
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  {/* Mobile view - Cards */}
+                  <div className="md:hidden p-4 space-y-4">
+                    {teams
+                      .filter((team) => !team.isteamcreated)
+                      .map((team) => (
+                        <TeamCard key={team._id} team={team} isCreated={false} />
+                      ))}
+                      
+                    {teams.filter((team) => !team.isteamcreated).length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No teams to create
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
 
           {/* Created Teams */}
-          { loading?<ProfilePageSkeleton/>:<TabsContent value="created" className="space-y-4">
-            <Card className="overflow-hidden border-none shadow-md">
-              <CardHeader className="bg-muted/50">
-                <CardTitle>Created Teams</CardTitle>
-                <CardDescription>Teams that have been created</CardDescription>
-              </CardHeader>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Batch Name</TableHead>
-                        <TableHead>Domain</TableHead>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {teams
-                        .filter((team) => team.isteamcreated)
-                        .map((team) => (
-                          <TableRow key={team._id} className="hover:bg-muted/50">
-                            <TableCell className="font-medium">
-                              <div className="flex items-center gap-2">
-                                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
-                                  {getRandomIcon()}
+          {loading ? <ProfilePageSkeleton /> : (
+            <TabsContent value="created" className="space-y-4">
+              <Card className="overflow-hidden border-none shadow-md">
+                <CardHeader className="bg-muted/50 py-4 md:py-6">
+                  <CardTitle className="text-lg md:text-xl">Created Teams</CardTitle>
+                  <CardDescription className="text-sm">Teams that have been created</CardDescription>
+                </CardHeader>
+                <CardContent className="p-0">
+                  {/* Desktop view - Table */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Batch Name</TableHead>
+                          <TableHead>Domain</TableHead>
+                          <TableHead>Date</TableHead>
+                          <TableHead>Created</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {teams
+                          .filter((team) => team.isteamcreated)
+                          .map((team) => (
+                            <TableRow key={team._id} className="hover:bg-muted/50">
+                              <TableCell className="font-medium">
+                                <div className="flex items-center gap-2">
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-lg">
+                                    {getRandomIcon()}
+                                  </div>
+                                  {team.name}
                                 </div>
-                                {team.name}
-                              </div>
-                            </TableCell>
-                            <TableCell>{team.domain}</TableCell>
-                            <TableCell> {new Date(team.date).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
-                            }</TableCell>
-                            <TableCell>
-                              <Badge variant="success" className="bg-green-500 hover:bg-green-600 text-white">
-                                Yes
-                              </Badge>
-                            </TableCell>
-                            <TableCell className="space-x-2">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => handleViewTeam(team._id)}
-                                className="transition-all hover:scale-105 m-2"
-                              >
-                                <Eye className="h-4 w-4 mr-1" /> View Team
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => exportTeam(team._id)}
-                                className="transition-all hover:scale-105 m-2"
-                              >
-                                <Download className="h-4 w-4 mr-1 " /> Export
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>}
+                              </TableCell>
+                              <TableCell>{team.domain}</TableCell>
+                              <TableCell>
+                                {new Date(team.date).toLocaleDateString("en-IN", { 
+                                  day: "numeric", 
+                                  month: "long", 
+                                  year: "numeric" 
+                                })}
+                              </TableCell>
+                              <TableCell>
+                                <Badge variant="success" className="bg-green-500 hover:bg-green-600 text-white">
+                                  Yes
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="space-x-2">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleViewTeam(team._id)}
+                                  className="transition-all hover:scale-105"
+                                >
+                                  <Eye className="h-4 w-4 mr-1" /> View
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => exportTeam(team._id)}
+                                  className="transition-all hover:scale-105"
+                                >
+                                  <Download className="h-4 w-4 mr-1" /> Export
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  {/* Mobile view - Cards */}
+                  <div className="md:hidden p-4 space-y-4">
+                    {teams
+                      .filter((team) => team.isteamcreated)
+                      .map((team) => (
+                        <TeamCard key={team._id} team={team} isCreated={true} />
+                      ))}
+                      
+                    {teams.filter((team) => team.isteamcreated).length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No created teams
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          )}
         </Tabs>
 
         {/* Create Team Modal */}
         <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-          <DialogContent className="sm:max-w-[425px]">
+          <DialogContent className="sm:max-w-[425px] w-[95vw] max-w-[95vw] sm:w-full">
             <DialogHeader>
               <DialogTitle>Create Team</DialogTitle>
               <DialogDescription>Set the maximum team size and create your team.</DialogDescription>
             </DialogHeader>
             <div className="py-4 space-y-4">
               <div className="flex items-center justify-center p-6 bg-muted/30 rounded-lg">
-                <div className="text-5xl">{ "👥"}</div>
+                <div className="text-5xl">{"👥"}</div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="max-team-size">Maximum Team Size</Label>
@@ -480,23 +594,23 @@ export default function TeamManagement() {
                 />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>
+            <DialogFooter className="flex-col sm:flex-row gap-2">
+              <Button variant="outline" onClick={() => setIsCreateModalOpen(false)} className="w-full sm:w-auto">
                 Cancel
               </Button>
-              <Button onClick={confirmCreateTeam}>{loading?"Creating ...":"Create"}</Button>
+              <Button onClick={confirmCreateTeam} className="w-full sm:w-auto">{loading ? "Creating..." : "Create"}</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
 
         {/* View Teams Modal */}
         <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-          <DialogContent className="sm:max-w-[700px] max-h-[90vh]">
+          <DialogContent className="sm:max-w-[700px] w-[95vw] max-w-[95vw] sm:w-full max-h-[90vh]">
             <DialogHeader>
               <DialogTitle>Team Members</DialogTitle>
               <DialogDescription>View and manage team members</DialogDescription>
             </DialogHeader>
-            <ScrollArea className="h-[400px] pr-4">
+            <ScrollArea className="h-[50vh] md:h-[400px] pr-4">
               <div className="space-y-4">
                 {fetchedTeams
                   .map((team) => (
@@ -507,28 +621,27 @@ export default function TeamManagement() {
                             {getRandomIcon()}
                           </div>
                           <div>
-                            <h3 className="text-lg font-medium">{team.teamname}</h3>
-                            <div className="">
-                            <p className="text-sm text-muted-foreground">{team.batchid.domain}</p>
-                            <p className="text-sm text-muted-foreground">{team.month}</p>
+                            <h3 className="text-base md:text-lg font-medium">{team.teamname}</h3>
+                            <div className="flex flex-col md:flex-row md:gap-2">
+                              <p className="text-xs md:text-sm text-muted-foreground">{team.batchid.domain}</p>
+                              <p className="text-xs md:text-sm text-muted-foreground md:before:content-['•'] md:before:mx-1 md:before:text-muted-foreground/50">{team.month}</p>
                             </div>
-                            
                           </div>
                         </div>
                         {expandedTeam === team._id ? (
-                          <ChevronUp className="h-5 w-5" onClick={()=>{toggleTeamView(team._id)}}/>
+                          <ChevronUp className="h-5 w-5" onClick={() => {toggleTeamView(team._id)}}/>
                         ) : (
-                          <ChevronDown className="h-5 w-5" onClick={()=>{toggleTeamView(team._id)}}/>
+                          <ChevronDown className="h-5 w-5" onClick={() => {toggleTeamView(team._id)}}/>
                         )}
                       </CollapsibleTrigger>
                       <CollapsibleContent>
-                        <div className="space-y-2 p-4 border-t bg-muted/20">
+                        <div className="space-y-2 p-3 md:p-4 border-t bg-muted/20">
                           {team.team.map((member) => (
                             <div
                               key={member._id}
-                              className="flex items-center justify-between p-3 border rounded-md bg-background hover:bg-muted/30 transition-colors"
+                              className="flex flex-col md:flex-row md:items-center md:justify-between p-3 border rounded-md bg-background hover:bg-muted/30 transition-colors"
                             >
-                              <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-3 mb-2 md:mb-0">
                                 <Avatar>
                                   <AvatarImage
                                     src={`/placeholder.svg?height=40&width=40&text=${member.avatar}`}
@@ -537,27 +650,26 @@ export default function TeamManagement() {
                                   <AvatarFallback>{member.name[0]}</AvatarFallback>
                                 </Avatar>
                                 <div>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 flex-wrap">
                                     <p className="font-medium">{member.name}</p>
-                                    {team.teamleaderid._id==member._id && (
+                                    {team.teamleaderid._id === member._id && (
                                       <Badge variant="outline" className="bg-primary/10 text-primary">
                                         Team Lead
                                       </Badge>
                                     )}
                                   </div>
-                                  <p className="text-sm text-muted-foreground">{member.email}</p>
+                                  <p className="text-xs md:text-sm text-muted-foreground">{member.email}</p>
                                 </div>
                               </div>
-                              <div className="flex space-x-2">
+                              <div className="flex justify-end">
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => handleUpdateMember(team._id, member,team.teamleaderid)}
+                                  onClick={() => handleUpdateMember(team._id, member, team.teamleaderid)}
                                   className="transition-all hover:scale-105"
                                 >
                                   <Pencil className="h-4 w-4 mr-1" /> Update
                                 </Button>
-                               
                               </div>
                             </div>
                           ))}
@@ -568,7 +680,7 @@ export default function TeamManagement() {
               </div>
             </ScrollArea>
             <DialogFooter>
-              <Button onClick={() => setIsViewModalOpen(false)}>Close</Button>
+              <Button onClick={() => setIsViewModalOpen(false)} className="w-full sm:w-auto">Close</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

@@ -76,14 +76,25 @@ export default function Home() {
   }
 
   const handleSaveCourse = async(course) => {
-    // Add batch field check to the validation
-    if(course.title===""||course.desc===""||course.skills===""||course.price===""||course.img===""||
+    if (course.courseType=="recording"){
+        if(course.title===""||course.desc===""||course.skills===""||course.price===""||course.img===""||
        course.grouplink===""||course.seats===""||course.duration===""||course.isopen===""||
        course.discount===""||course.feature===""||course.ytvideo===""||course.startdate===""||
-       course.content===""||!course.batch){
+       course.content===""){
       toast.error("Please fill all fields");
       return;
     }
+    }
+    else{
+      if(course.title===""||course.desc===""||course.skills===""||course.price===""||course.img===""||
+        course.grouplink===""||course.seats===""||course.duration===""||course.isopen===""||
+        course.discount===""||course.feature===""||course.ytvideo===""||course.startdate===""||
+        course.content===""||course.batch===""){
+       toast.error("Please fill all fields");
+       return;
+     }
+    }
+    console.log(course);
     
     try {
       setLoading(true);
@@ -119,7 +130,7 @@ export default function Home() {
     if(course.title===""||course.desc===""||course.skills===""||course.price===""||course.img===""||
        course.grouplink===""||course.seats===""||course.duration===""||course.isopen===""||
        course.discount===""||course.feature===""||course.ytvideo===""||course.startdate===""||
-       course.content===""||!course.batch){
+       course.content===""){
       toast.error("Please fill all fields");
       return;
     }
@@ -242,7 +253,7 @@ export default function Home() {
 
   return (
     <main className="container mx-auto py-8 px-4">
-      <Toaster richColors/>
+      
       <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
         <h1 className="text-4xl font-bold">Course Management</h1>
         <CourseCreationModal 

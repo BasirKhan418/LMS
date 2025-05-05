@@ -123,6 +123,20 @@ useEffect(()=>{
 
   }
   //  send function
+  function convertToISOFormat(timestamp) {
+    // Check if the input follows the expected format
+    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(timestamp)) {
+      throw new Error('Invalid timestamp format. Expected format: YYYY-MM-DDTHH:MM');
+    }
+    
+    // Create a Date object from the timestamp
+    // Since the input doesn't specify a timezone, it will be interpreted in the local timezone
+    const date = new Date(timestamp);
+    
+    // Convert to ISO string format (YYYY-MM-DDTHH:MM:SS.sssZ)
+    return date.toISOString();
+  }
+
   const handleSend = async() => {
     if (!title || !description || (!sendNow && !sendTime) || !category || !batch) {
         toast.error("Please fill in all fields before sending.")
@@ -138,7 +152,10 @@ useEffect(()=>{
       category,
       batch,
     }
-    await handleSchedule(title,description,sendNow ? currentTime : sendTime,category,batch)
+    const resultdate = convertToISOFormat(newNotification.sentTime)
+    console.log(resultdate)
+    console.log(newNotification)
+    await handleSchedule(title,description,resultdate,category,batch);
     try{
    const res = await fetch("/api/notificationcrud", {
       method: "POST",

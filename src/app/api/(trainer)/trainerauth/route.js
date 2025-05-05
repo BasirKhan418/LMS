@@ -67,7 +67,7 @@ export const POST= async(req,res)=>{
     }
     //if user is not registered then send message user not found
     else{
-      return NextResponse.json({message:"Admin not found",success:false});
+      return NextResponse.json({message:"Trainer not found",success:false});
     }
     
    }

@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ChevronDown, ChevronUp, RefreshCw, Save } from "lucide-react"
+import { ChevronDown, ChevronUp, RefreshCw, Save, Search } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -16,6 +16,7 @@ import { toast } from "sonner"
 export default function PendingTab({ results, onUpdateResults, onChangeStatus }) {
   const [openBatches, setOpenBatches] = useState({})
   const [userResults, setUserResults] = useState({})
+  const [searchQuery, setSearchQuery] = useState("")
 
   const toggleBatch = (batchId) => {
     setOpenBatches((prev) => ({
@@ -151,6 +152,15 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
       : { projectreview: "", viva: "", finalprojectreview: "", finalviva: "", attendance: "", socialmediasharing: "", totalmarks: "0" }
   }
 
+  // Filter users based on search query
+  const filterUsers = (users, query) => {
+    if (!query.trim()) return users;
+    return users.filter(user => 
+      user.name.toLowerCase().includes(query.toLowerCase()) ||
+      user.email.toLowerCase().includes(query.toLowerCase())
+    );
+  }
+
   if (results.length === 0) {
     return (
       <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800">
@@ -203,8 +213,36 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                 </TabsList>
 
                 <TabsContent value="users">
+                  {/* Search Bar */}
+                  <div className="mb-4 relative">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <Input
+                        type="text"
+                        placeholder="Search by student name or email..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 h-10"
+                      />
+                      {searchQuery && (
+                        <Button
+                          variant="ghost"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                          onClick={() => setSearchQuery("")}
+                        >
+                          ×
+                        </Button>
+                      )}
+                    </div>
+                    {searchQuery && (
+                      <p className="text-sm text-slate-500 mt-2">
+                        Showing {filterUsers(result.users, searchQuery).length} of {result.users.length} students
+                      </p>
+                    )}
+                  </div>
+
                   <ScrollArea className="h-[500px] pr-4">
-                    {result.users.map((user) => {
+                    {filterUsers(result.users, searchQuery).map((user) => {
                       const userResult = getUserResult(result._id, user._id);
                       return (
                       <Card key={user._id} className="mb-4 border border-slate-200 dark:border-slate-800">
@@ -324,6 +362,20 @@ export default function PendingTab({ results, onUpdateResults, onChangeStatus })
                       </Card>
                       );
                     })}
+                    
+                    {filterUsers(result.users, searchQuery).length === 0 && (
+                      <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <Search className="h-12 w-12 text-slate-300 mb-4" />
+                        <p className="text-slate-600 dark:text-slate-400">No students found matching "{searchQuery}"</p>
+                        <Button 
+                          variant="link" 
+                          onClick={() => setSearchQuery("")}
+                          className="mt-2"
+                        >
+                          Clear search
+                        </Button>
+                      </div>
+                    )}
                   </ScrollArea>
                 </TabsContent>
 

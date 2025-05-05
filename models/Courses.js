@@ -1,4 +1,5 @@
 import mongoose, { Schema } from "mongoose";
+
 const CoursesSchema = new mongoose.Schema({
   title: { type: String, required: true },
   desc: { type: String, required: true },
@@ -14,9 +15,9 @@ const CoursesSchema = new mongoose.Schema({
   ytvideo: { type: String },
   startdate: { type: String },
   content: { type: Array },
-  batch:  { type: Schema.Types.ObjectId, ref: 'Batch',required:false },
-  domain: { type: String, required: false},
-  coursetype: { type: String,required:true, enum: ['live', 'recorded'] },
+  batch:  { type: Schema.Types.ObjectId, ref: 'Batch', required: false },
+  domain: { type: String, required: false },
+  coursetype: { type: String, required: true },
 }, { timestamps: true });
 
 export default mongoose.models.Courses || mongoose.model('Courses', CoursesSchema);

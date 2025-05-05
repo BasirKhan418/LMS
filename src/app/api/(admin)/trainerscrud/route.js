@@ -44,6 +44,7 @@ export const POST = async(req,res)=>{
                 email:reqdata.email,
                 phone:reqdata.phone,
                 batches:reqdata.batches,
+                token:"sampletpken"
             })
             await trainers.save();
             SendEmail(reqdata.email,reqdata.name);
