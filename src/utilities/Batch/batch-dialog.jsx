@@ -67,23 +67,30 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
   function handleSubmit(values) {
     if (defaultValues) {
       onSubmit({
-        _id: defaultValues._id,  // Use _id instead of id to match API expectations
+        _id: defaultValues._id,
         name: values.name,
         domain: values.domain,
-        date: values.date.toISOString(),  // Send full ISO date
+        date: values.date.toISOString(),
       })
     } else {
       onSubmit({
         name: values.name,
         domain: values.domain,
-        date: values.date.toISOString(),  // Send full ISO date
+        date: values.date.toISOString(),
       })
     }
   }
 
+  // Add this function to prevent calendar click events from closing the dialog
+  const handleCalendarSelect = (date, field) => {
+    field.onChange(date);
+    // This stops event propagation to prevent the dialog from closing
+    return false;
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>Fill in the details for the batch. Click save when you're done.</DialogDescription>
@@ -116,13 +123,13 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
                       </SelectTrigger>
                     </FormControl>
                    <SelectContent>
-                          <SelectItem value="Web Development">Software Development</SelectItem>
-                          <SelectItem value="Python Development">Python Development</SelectItem>
-                          <SelectItem value="Data Science & Machine Learning">Data Science & Machine Learning</SelectItem>
-                          <SelectItem value="Cyber Security">Cyber Security</SelectItem>
-                          <SelectItem value="UI/UX Design">UI/UX Design</SelectItem>
-                          <SelectItem value="Data Analytics">Data Analytics</SelectItem>
-                        </SelectContent>
+                      <SelectItem value="Web Development">Software Development</SelectItem>
+                      <SelectItem value="Python Development">Python Development</SelectItem>
+                      <SelectItem value="Data Science & Machine Learning">Data Science & Machine Learning</SelectItem>
+                      <SelectItem value="Cyber Security">Cyber Security</SelectItem>
+                      <SelectItem value="UI/UX Design">UI/UX Design</SelectItem>
+                      <SelectItem value="Data Analytics">Data Analytics</SelectItem>
+                    </SelectContent>
                   </Select>
                   <FormMessage />
                 </FormItem>
@@ -146,8 +153,13 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                    <PopoverContent className="w-auto p-0" align="start" onClick={(e) => e.stopPropagation()}>
+                      <Calendar 
+                        mode="single" 
+                        selected={field.value} 
+                        onSelect={(date) => handleCalendarSelect(date, field)}
+                        initialFocus 
+                      />
                     </PopoverContent>
                   </Popover>
                   <FormMessage />

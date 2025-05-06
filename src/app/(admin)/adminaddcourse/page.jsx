@@ -126,14 +126,24 @@ export default function Home() {
   
   // handleupdatecourse
   const handleUpdate = async(course, id) => {
-    // Add batch field check to the validation
+    if (course.courseType=="recording"){
+      if(course.title===""||course.desc===""||course.skills===""||course.price===""||course.img===""||
+     course.grouplink===""||course.seats===""||course.duration===""||course.isopen===""||
+     course.discount===""||course.feature===""||course.ytvideo===""||course.startdate===""||
+     course.content===""){
+    toast.error("Please fill all fields");
+    return;
+  }
+  }
+  else{
     if(course.title===""||course.desc===""||course.skills===""||course.price===""||course.img===""||
-       course.grouplink===""||course.seats===""||course.duration===""||course.isopen===""||
-       course.discount===""||course.feature===""||course.ytvideo===""||course.startdate===""||
-       course.content===""){
-      toast.error("Please fill all fields");
-      return;
-    }
+      course.grouplink===""||course.seats===""||course.duration===""||course.isopen===""||
+      course.discount===""||course.feature===""||course.ytvideo===""||course.startdate===""||
+      course.content===""||course.batch===""){
+     toast.error("Please fill all fields");
+     return;
+   }
+  }
     
     try {
       setLoading(true);
