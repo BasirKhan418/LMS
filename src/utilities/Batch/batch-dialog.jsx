@@ -3,7 +3,6 @@
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 import {
@@ -17,9 +16,8 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -34,6 +32,9 @@ const formSchema = z.object({
 })
 
 export default function BatchDialog({ open, onOpenChange, onSubmit, title, defaultValues }) {
+  // State to track whether calendar is visible
+  const [calendarVisible, setCalendarVisible] = useState(false);
+  
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,12 +56,16 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
         domain: defaultValues.domain,
         date: localDate,
       })
+      // Hide calendar initially when editing
+      setCalendarVisible(false);
     } else if (open && !defaultValues) {
       form.reset({
         name: "",
         domain: "",
         date: new Date(),
       })
+      // Hide calendar initially when creating new
+      setCalendarVisible(false);
     }
   }, [open, defaultValues, form])
 
@@ -81,16 +86,16 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
     }
   }
 
-  // Add this function to prevent calendar click events from closing the dialog
-  const handleCalendarSelect = (date, field) => {
-    field.onChange(date);
-    // This stops event propagation to prevent the dialog from closing
-    return false;
-  };
+  // Function to toggle calendar visibility
+  const toggleCalendar = (e) => {
+    e.preventDefault(); // Prevent form submission
+    e.stopPropagation(); // Stop event bubbling
+    setCalendarVisible(!calendarVisible);
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>Fill in the details for the batch. Click save when you're done.</DialogDescription>
@@ -141,27 +146,41 @@ export default function BatchDialog({ open, onOpenChange, onSubmit, title, defau
               render={({ field }) => (
                 <FormItem className="flex flex-col">
                   <FormLabel>Batch Date</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={"outline"}
-                          className={`w-full pl-3 text-left font-normal ${!field.value ? "text-muted-foreground" : ""}`}
-                        >
-                          {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start" onClick={(e) => e.stopPropagation()}>
-                      <Calendar 
-                        mode="single" 
-                        selected={field.value} 
-                        onSelect={(date) => handleCalendarSelect(date, field)}
-                        initialFocus 
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <div className="space-y-2">
+                    {/* Date display button */}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full text-left justify-between font-normal"
+                      onClick={toggleCalendar}
+                    >
+                      {field.value ? format(field.value, "PPP") : "Select a date"}
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 opacity-50">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                        <line x1="16" x2="16" y1="2" y2="6" />
+                        <line x1="8" x2="8" y1="2" y2="6" />
+                        <line x1="3" x2="21" y1="10" y2="10" />
+                      </svg>
+                    </Button>
+                    
+                    {/* Inline calendar */}
+                    {calendarVisible && (
+                      <div className="rounded-md border shadow-sm p-1 bg-white">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={(date) => {
+                            if (date) {
+                              field.onChange(date);
+                              setCalendarVisible(false);
+                            }
+                          }}
+                          disabled={false}
+                          initialFocus
+                        />
+                      </div>
+                    )}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
