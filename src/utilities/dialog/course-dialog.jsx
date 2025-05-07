@@ -269,10 +269,10 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                       <Clock className="w-4 h-4 mr-1" />
                       <span>{course.duration}</span>
                     </div>
-                    <div className="flex items-center">
+                  {  !course.coursetype=="live"&&<div className="flex items-center">
                       <Users className="w-4 h-4 mr-1" />
                       <span>{course.seats} seats</span>
-                    </div>
+                    </div>}
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-1" />
                       <span>Starts {new Date(course.startdate).toLocaleDateString()}</span>
@@ -542,7 +542,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                 </div>
                 
                 {/* Price section */}
-                <div className="mb-6">
+               {user&&course && batchdetails && course.batch !== batchdetails._id &&user.domain!=course.domain&& <div className="mb-6">
                   <div className="flex items-center gap-2 mb-1">
                     {discountPercent > 0 ? (
                       <>
@@ -560,7 +560,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                       <span className="text-xs text-slate-500 ml-2">Limited time offer</span>
                     </div>
                   )}
-                </div>
+                </div>}
                 
                 {/* Enrollment buttons */}
                 {user&&course && batchdetails && course.batch !== batchdetails._id &&user.domain!=course.domain&& (
@@ -605,7 +605,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                     )}
                   </Button>
                 )}
-                {user&& course && course.domain === user.domain && (
+                {user&& course && course.coursetype=="recording" && course.domain == user.domain && (
                   <Button 
                     className="w-full mb-4"
                     size="lg"

@@ -304,7 +304,7 @@ export default function TrainerSidebar({ children }) {
           {/* Breadcrumb */}
           <div className="flex-1">
             <div className="flex items-center">
-              <h1 className="text-lg font-semibold text-gray-800">{getCurrentPageTitle()}</h1>
+              <h1 className="text-lg font-semibold text-gray-800 hidden md:block">{getCurrentPageTitle()}</h1>
               {pathname !== "/trainer" && (
                 <div className="flex items-center ml-2">
                   <ChevronRight className="h-4 w-4 text-gray-400" />

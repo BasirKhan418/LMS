@@ -520,7 +520,7 @@ toast.error("Something went wrong! try again later"+err)
                 <FolderIcon className="h-5 w-5 text-muted-foreground" />
                 <span className="font-medium">{item.name}</span>
               </div>
-              <div className="flex items-center gap-2 ">
+              <div className="flex items-center gap-2 hidden md:flex ">
               {item.type&&item.type.split(",").map((item,index)=>(<Badge variant="" className={"bg-black"} key={index}>{item}</Badge>))}
               </div>
             </AccordionTrigger>
@@ -555,13 +555,13 @@ toast.error("Something went wrong! try again later"+err)
               </div>))}
              
              
-              <div className="flex justify-start items-center w-full">
-              <Button className="bg-black rounded-full px-6 mx-2" size="sm" onClick={()=>{
+              <div className="flex justify-start items-center w-full flex-wrap ">
+              <Button className="bg-black rounded-full px-6 mx-2 my-2" size="sm" onClick={()=>{
                 setcreatecontentbool(true)
                 setindex(index) 
               }}>Create Content</Button>
-              <Button className="bg-black rounded-full px-6 mx-2" size="sm" onClick={()=>updateweek(index)}>Update Week</Button>
-              <Button className="bg-black rounded-full px-6 mx-2" size="sm" onClick={()=>{deleteweek(index)}}>Delete Week</Button>
+              <Button className="bg-black rounded-full px-6 mx-2 my-2" size="sm" onClick={()=>updateweek(index)}>Update Week</Button>
+              <Button className="bg-black rounded-full px-6 mx-2 my-2" size="sm" onClick={()=>{deleteweek(index)}}>Delete Week</Button>
               </div>
             </AccordionContent>
           </AccordionItem>))}

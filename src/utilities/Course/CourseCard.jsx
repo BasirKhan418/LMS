@@ -4,17 +4,16 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import { toast } from "sonner"
-import { Clock, Users, BookOpen, Check, CheckCircle2, Loader2, Tag } from 'lucide-react'
+import { Clock, Users, BookOpen, Check, CheckCircle2, Loader2, Tag, Video, Monitor } from 'lucide-react'
 import { useState, useEffect } from "react"
 import CourseEnrollmentDialog from "../dialog/course-dialog"
-export function CourseCard({ course, user, data,batchdetails }) {
+export function CourseCard({ course, user, data, batchdetails }) {
   const [loading, setLoading] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [showDialog, setShowDialog] = useState(false); // State to control dialog visibility
 
   const handleEnrollment = async() => {
-    
-      setShowDialog(true);
+    setShowDialog(true);
   }
 
   const handleDirectEnroll = async() => {
@@ -42,7 +41,6 @@ export function CourseCard({ course, user, data,batchdetails }) {
         toast.error(res.message);
       }
     } catch(err) {
-      
       setLoading(false);
       toast.error("Internal server error");
     }
@@ -66,6 +64,14 @@ export function CourseCard({ course, user, data,batchdetails }) {
   const isFree = course.price === 'Free';
   // Get price value if not free
   const priceValue = !isFree ? `₹${course.price}` : "Free";
+  
+  // Check if the course type is live
+  const isLive = course.coursetype === 'live';
+  
+  // Check if batchdetails ID and domain match the course
+  const shouldHidePrice = batchdetails && 
+    batchdetails.id === course.batchId && 
+    batchdetails.domain === course.domain;
 
   return (
     <>
@@ -80,23 +86,46 @@ export function CourseCard({ course, user, data,batchdetails }) {
             className="transition-transform duration-500 group-hover:scale-105"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-50"></div>
-          
+          <div>
+            
+          </div>
           {/* Status badge */}
           <Badge
-            className={`absolute top-3 left-3 text-xs font-medium py-1 px-3 ${
+            className={`absolute top-1 left-1 text-xs font-medium py-1 px-3 ${
               course.isopen ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-rose-500 hover:bg-rose-600'
             }`}
           >
             {course.isopen ? 'Open for Enrollment' : 'Enrollment Closed'}
           </Badge>
+          
+          {/* Course Type Badge */}
+          <Badge
+            className={`absolute top-1 right-1 text-xs font-medium py-1 px-3 flex items-center ${
+              isLive ? 'bg-red-500 hover:bg-red-600' : 'bg-blue-500 hover:bg-blue-600'
+            }`}
+          >
+            {isLive ? (
+              <>
+                <Monitor className="w-3 h-3 mr-1" />
+                Live
+              </>
+            ) : (
+              <>
+                <Video className="w-3 h-3 mr-1" />
+                Recording
+              </>
+            )}
+          </Badge>
 
-          {/* Price tag */}
-          <div className="absolute bottom-0 right-0 bg-slate-900/85 text-white px-4 py-2 rounded-tl-lg flex items-center">
-            <Tag className="w-4 h-4 mr-2" />
-            <span className={`font-bold ${isFree ? 'text-emerald-400' : 'text-amber-400'}`}>
-              {isFree ? 'Free' : priceValue}
-            </span>
-          </div>
+          {/* Price tag - only show if not matching batch details */}
+          {!shouldHidePrice && (
+            <div className="absolute bottom-0 right-0 bg-slate-900/85 text-white px-4 py-2 rounded-tl-lg flex items-center">
+              <Tag className="w-4 h-4 mr-2" />
+              <span className={`font-bold ${isFree ? 'text-emerald-400' : 'text-amber-400'}`}>
+                {isFree ? 'Free' : priceValue}
+              </span>
+            </div>
+          )}
         </div>
 
         <CardContent className="flex-grow p-5">
@@ -126,10 +155,13 @@ export function CourseCard({ course, user, data,batchdetails }) {
               <Clock className="w-4 h-4 mr-1.5 text-slate-400" />
               <span>{course.duration}</span>
             </div>
-            <div className="flex items-center">
-              <Users className="w-4 h-4 mr-1.5 text-slate-400" />
-              <span>{course.seats} seats</span>
-            </div>
+            {/* Only show seats for non-live courses */}
+            {!isLive && (
+              <div className="flex items-center">
+                <Users className="w-4 h-4 mr-1.5 text-slate-400" />
+                <span>{course.seats} seats</span>
+              </div>
+            )}
           </div>
           
           {/* Features section */}
