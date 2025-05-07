@@ -269,7 +269,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                       <Clock className="w-4 h-4 mr-1" />
                       <span>{course.duration}</span>
                     </div>
-                  {  !course.coursetype=="live"&&<div className="flex items-center">
+                  {  course.coursetype=="recording"&&<div className="flex items-center">
                       <Users className="w-4 h-4 mr-1" />
                       <span>{course.seats} seats</span>
                     </div>}
@@ -605,7 +605,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                     )}
                   </Button>
                 )}
-                {user&& course && course.coursetype=="recording" && course.domain == user.domain && (
+                {user&& course && course.domain == user.domain && (
                   <Button 
                     className="w-full mb-4"
                     size="lg"

@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { LiaCertificateSolid } from "react-icons/lia";
+
 export default function Component({
   title,
   description,
@@ -23,7 +24,7 @@ export default function Component({
   
   return (
     <div 
-      className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl border border-gray-100 dark:border-gray-700 relative"
+      className="w-full max-w-sm bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-lg transition-all duration-300 ease-in-out hover:shadow-2xl border border-gray-100 dark:border-gray-700 relative h-[31rem]"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -34,13 +35,13 @@ export default function Component({
         </div>
       )}
       
-      {/* Image container */}
-      <div className="relative overflow-hidden">
+      {/* Image container - Fixed height */}
+      <div className="relative h-56 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
         <img
           src={img || "/api/placeholder/500/300"}
           alt={title}
-          className={`w-full h-56 object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
+          className={`w-full h-full object-cover transition-transform duration-700 ${isHovered ? 'scale-110' : 'scale-100'}`}
         />
         
         {/* Overlay content */}
@@ -77,8 +78,8 @@ export default function Component({
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-5 bg-white dark:bg-gray-800">
+      {/* Content - Fixed height regardless of progress bar */}
+      <div className="p-5 bg-white dark:bg-gray-800 flex flex-col h-[calc(28rem-14rem)]">
         {/* Title and rating */}
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-lg font-bold text-gray-900 dark:text-white line-clamp-2">{title}</h3>
@@ -110,19 +111,23 @@ export default function Component({
           </div>
         </div>
         
-        {/* Progress tracker (for students) */}
-        {!isadmin && !assignment && (
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Course progress</span>
-              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{progress}%</span>
-            </div>
-            <Progress 
-              value={progress} 
-              className="h-2 bg-gray-200 dark:bg-gray-700"
-            />
-          </div>
-        )}
+        {/* Progress tracker (for students) - with placeholder div for consistent height */}
+        <div className="mb-4">
+          {(!isadmin && !assignment && !project&& course.coursetype !== "live") ? (
+            <>
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Course progress</span>
+                <span className="text-xs font-medium text-gray-700 dark:text-gray-300">{progress}%</span>
+              </div>
+              <Progress 
+                value={progress} 
+                className="h-2 bg-gray-200 dark:bg-gray-700"
+              />
+            </>
+          ) : (
+            <div className="h-6"></div> // Placeholder to maintain consistent height
+          )}
+        </div>
         
         {/* Skills tags */}
         <div className="flex flex-wrap gap-1 mb-4">
@@ -145,26 +150,31 @@ export default function Component({
           )}
         </div>
         
-        {/* Action buttons */}
-        <div className="flex items-center justify-between mt-4">
-          {!project&&!assignment&&isadmin && (
-            <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <PlusIcon className="w-4 h-4 mr-2" /> {view?"View":"Manage"} Course
-            </Button>
-          )}
-          {!isadmin && !assignment && !project && (
-            <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <PlayIcon className="w-4 h-4 mr-2" /> Continue Learning
-            </Button>
-          )}
-          
-           { assignment &&<Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <ClipboardIcon className="w-4 h-4 mr-2" /> {isadmin?"Manage":"View"} {project?"Project":"Assignment"}
-            </Button>}
-            { project &&<Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <ClipboardIcon className="w-4 h-4 mr-2" /> {isadmin?"Manage":"View"} {project?"Project":"Assignment"}
-            </Button>}
-         
+        {/* Action buttons - pushed to bottom with flex spacer */}
+        <div className="mt-auto">
+          <div className="flex items-center justify-between">
+            {!project && !assignment && isadmin && (
+              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <PlusIcon className="w-4 h-4 mr-2" /> {view ? "View" : "Manage"} Course
+              </Button>
+            )}
+            {!isadmin && !assignment && !project && (
+              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <PlayIcon className="w-4 h-4 mr-2" /> Continue Learning
+              </Button>
+            )}
+            
+            {assignment && (
+              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <ClipboardIcon className="w-4 h-4 mr-2" /> {isadmin ? "Manage" : "View"} {project ? "Project" : "Assignment"}
+              </Button>
+            )}
+            {project && (
+              <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <ClipboardIcon className="w-4 h-4 mr-2" /> {isadmin ? "Manage" : "View"} {project ? "Project" : "Assignment"}
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -293,25 +303,6 @@ function CalendarIcon(props) {
       <line x1="16" x2="16" y1="2" y2="6" />
       <line x1="8" x2="8" y1="2" y2="6" />
       <line x1="3" x2="21" y1="10" y2="10" />
-    </svg>
-  );
-}
-
-function CheckIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
