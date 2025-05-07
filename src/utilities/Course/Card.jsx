@@ -147,7 +147,7 @@ export default function Component({
         
         {/* Action buttons */}
         <div className="flex items-center justify-between mt-4">
-          {isadmin && (
+          {!project&&!assignment&&isadmin && (
             <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
               <PlusIcon className="w-4 h-4 mr-2" /> {view?"View":"Manage"} Course
             </Button>
@@ -157,9 +157,9 @@ export default function Component({
               <PlayIcon className="w-4 h-4 mr-2" /> Continue Learning
             </Button>
           )}
-          {assignment && (
+          {assignment || project && (
             <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <ClipboardIcon className="w-4 h-4 mr-2" /> View {project?"Project":"Assignment"}
+              <ClipboardIcon className="w-4 h-4 mr-2" /> {isadmin?"Manage":"View"} {project?"Project":"Assignment"}
             </Button>
           )}
         </div>

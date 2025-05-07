@@ -362,9 +362,11 @@ export default function AdminSidebar({ children }) {
                 </div>
                 
                 <DropdownMenuSeparator />
+                <Link href="/admininappnotification">
                 <Button variant="ghost" className="w-full justify-center text-primary text-sm h-9">
                   View all notifications
                 </Button>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
             
@@ -398,11 +400,12 @@ export default function AdminSidebar({ children }) {
                     <span>Profile</span>
                   </DropdownMenuItem>
                 </Link>
-                
+                <Link href="/adminprofile">
                 <DropdownMenuItem className="cursor-pointer focus:bg-gray-100 dark:focus:bg-gray-800">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Settings</span>
                 </DropdownMenuItem>
+                </Link>
                 
                 <DropdownMenuSeparator />
                 

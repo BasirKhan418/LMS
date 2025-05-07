@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLab
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card"
 import { formatDate } from 'date-fns'
-
+import { BookOpen, BarChart2, Calendar, Bell } from 'lucide-react';
 const Home = ({name, analytics, sentNotifications}) => {
   const formatDateToIST = (isoString) => new Date(isoString).toLocaleString('en-GB', {day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true, timeZone: 'Asia/Kolkata'}).replace(',', '').replace(' at', '');
   
@@ -102,33 +102,54 @@ const Home = ({name, analytics, sentNotifications}) => {
           </Card>
         </div>
 
+        
         {/* Welcome and Announcements Section */}
         <div className="mt-6 sm:mt-8 grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-3">
-          <div className="lg:col-span-2 bg-white rounded-lg p-4 sm:p-6 lg:p-8 shadow-lg">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 text-gray-800">Welcome Back! {name}</h2>
-            <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
-              <div className="bg-blue-100 p-3 sm:p-4 rounded-lg shadow-sm">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-700">New Courses</h3>
-                <p className="text-sm sm:text-base text-gray-600">Check out the latest courses added to our platform.</p>
-                <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">View Courses</Button>
-              </div>
-              <div className="bg-green-100 p-3 sm:p-4 rounded-lg shadow-sm">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Student Progress</h3>
-                <p className="text-sm sm:text-base text-gray-600">Track your progress and achievements.</p>
-                <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">View Progress</Button>
-              </div>
-              <div className="bg-yellow-100 p-3 sm:p-4 rounded-lg shadow-sm">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Upcoming Events</h3>
-                <p className="text-sm sm:text-base text-gray-600">Stay updated with the latest events and webinars.</p>
-                <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">View Events</Button>
-              </div>
-              <div className="bg-purple-100 p-3 sm:p-4 rounded-lg shadow-sm">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Community Forum</h3>
-                <p className="text-sm sm:text-base text-gray-600">Join discussions with peers and instructors.</p>
-                <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">Visit Forum</Button>
-              </div>
+      <div className="lg:col-span-2 bg-white rounded-lg p-4 sm:p-6 lg:p-8 shadow-lg">
+        <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 text-gray-800">Welcome Back! {name}</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+          <div className="bg-blue-100 p-3 sm:p-4 rounded-lg shadow-sm transition-transform hover:scale-105">
+            <div className="flex items-start mb-2">
+              <BookOpen className="text-blue-600 mr-2" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Courses</h3>
             </div>
+            <p className="text-sm sm:text-base text-gray-600">View and manage courses currently in progress.</p>
+            <Link href="/adminviewcourse">
+            <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">View Courses</Button>
+            </Link>
           </div>
+          <div className="bg-green-100 p-3 sm:p-4 rounded-lg shadow-sm transition-transform hover:scale-105">
+            <div className="flex items-start mb-2">
+              <BarChart2 className="text-green-600 mr-2" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Analytics</h3>
+            </div>
+            <p className="text-sm sm:text-base text-gray-600">Track student performance and learning outcomes.</p>
+            <Link href="/adminresults">
+            <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">Manage Student Results</Button>
+            </Link>
+          </div>
+          <div className="bg-yellow-100 p-3 sm:p-4 rounded-lg shadow-sm transition-transform hover:scale-105">
+            <div className="flex items-start mb-2">
+              <Calendar className="text-yellow-600 mr-2" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Projects</h3>
+            </div>
+            <p className="text-sm sm:text-base text-gray-600">Organize and track ongoing educational projects.</p>
+            <Link href="/adminprojects">
+            <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">Manage Projects</Button>
+            </Link>
+          </div>
+          <div className="bg-purple-100 p-3 sm:p-4 rounded-lg shadow-sm transition-transform hover:scale-105">
+            <div className="flex items-start mb-2">
+              <Bell className="text-purple-600 mr-2" />
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700">Notifications</h3>
+            </div>
+            <p className="text-sm sm:text-base text-gray-600">Stay updated with important announcements.</p>
+            <Link href="/admininappnotification">
+            <Button size="sm" className="mt-2 sm:mt-4 w-full sm:w-auto">Manage Notifications</Button>
+            </Link>
+          </div>
+        </div>
+      </div>
           <div className="bg-white rounded-lg p-4 sm:p-6 lg:p-8 shadow-lg">
             <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 text-gray-800">Recent Announcements</h2>
             <div className="space-y-3 sm:space-y-4 max-h-96 overflow-y-auto">

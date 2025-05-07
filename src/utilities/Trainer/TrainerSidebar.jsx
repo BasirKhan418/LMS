@@ -102,11 +102,6 @@ export default function TrainerSidebar({ children }) {
       icon: <MdOutlineLeaderboard className="h-5 w-5" />
     },
     {
-      href: "/trainernotification",
-      label: "Send Notification",
-      icon: <AiOutlineNotification className="h-5 w-5" />
-    },
-    {
       href: "/trainerinappnotification",
       label: "Manage Notifications",
       icon: <Send className="h-5 w-5" />
@@ -393,7 +388,7 @@ export default function TrainerSidebar({ children }) {
                 
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="cursor-pointer">
-                  <Link href="/trainernotification" className="text-sm text-center w-full text-primary hover:text-primary/90">
+                  <Link href="/trainerinappnotification" className="text-sm text-center w-full text-primary hover:text-primary/90">
                     View all notifications
                   </Link>
                 </DropdownMenuItem>
@@ -432,8 +427,11 @@ export default function TrainerSidebar({ children }) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                 
+                  <Link href="/trainerprofile" className="cursor-pointer flex items-center gap-2">
                   <Settings className="h-4 w-4" />
-                  <span>Settings</span>
+                    <span>Settings</span>
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 

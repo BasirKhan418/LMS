@@ -86,9 +86,9 @@ const handleSubmit = async (e) => {
             <TabsTrigger value="previouslySent">Previously Sent</TabsTrigger>
           </TabsList>
           <TabsContent value="sent">
-            <Card>
+            <Card className="mt-6">
               <CardContent className="grid gap-6">
-                <div className="grid gap-2">
+                <div className="grid gap-2 py-2">
                   <Label htmlFor="subject">Subject</Label>
                   <Input id="subject" placeholder="Enter notification Title" name="title" value={notificationData.title} onChange={handleChange}/>
                 </div>

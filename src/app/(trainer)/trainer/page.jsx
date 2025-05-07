@@ -97,7 +97,7 @@ const Page = () => {
         <Toaster position='top-center' expand={false}/>
        { loading?<HomePageSkl/>:<>
         {isansession&&<SessionDetected/>}
-     { !isansession&&<TrainerHome name={data&&data[0].name} analytics={analytics} sentNotifications={sentNotifications}/>}
+     { !isansession&&<TrainerHome name={data&&data[0].name} analytics={analytics} sentNotifications={sentNotifications} batch={data&&data[0]}/>}
    
     </>}
     </div>

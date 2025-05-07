@@ -360,7 +360,7 @@ function getRelativeTime(dateTimeString) {
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <Link
-                    href="/poject"
+                    href="/project"
                     className=" hover:underline"
                     prefetch={false}
                   >
