@@ -152,16 +152,19 @@ export default function Component({
               <PlusIcon className="w-4 h-4 mr-2" /> {view?"View":"Manage"} Course
             </Button>
           )}
-          {!isadmin && !assignment && (
+          {!isadmin && !assignment && !project && (
             <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
               <PlayIcon className="w-4 h-4 mr-2" /> Continue Learning
             </Button>
           )}
-          {assignment || project && (
-            <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+          
+           { assignment &&<Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
               <ClipboardIcon className="w-4 h-4 mr-2" /> {isadmin?"Manage":"View"} {project?"Project":"Assignment"}
-            </Button>
-          )}
+            </Button>}
+            { project &&<Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <ClipboardIcon className="w-4 h-4 mr-2" /> {isadmin?"Manage":"View"} {project?"Project":"Assignment"}
+            </Button>}
+         
         </div>
       </div>
     </div>
