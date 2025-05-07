@@ -76,6 +76,10 @@ export default function ResultsPage() {
     setLoading(true)
     setResultData(null)
     try{
+      if(batchdetails==null){
+        toast.error("Batch details not found.")
+        return
+      }
      const response = await fetch("/api/findresult", {
         method: "POST",
         headers: {
