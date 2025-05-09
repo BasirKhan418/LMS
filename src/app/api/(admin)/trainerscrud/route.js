@@ -134,7 +134,7 @@ const transporter = await nodemailer.createTransport({
               <p>To proceed, click the button below to login. Use this email (<strong>${email}</strong>) and you will receive a One-Time Password (OTP) to complete the secure login process.</p>
       
               <div style="text-align: center; margin: 30px 0;">
-                <a href="${process.env.LOGIN_URL || 'https://infotactlearning.in/login'}" target="_blank" style="background-color: #0d6efd; color: white; padding: 14px 28px; text-decoration: none; font-weight: 600; border-radius: 6px; display: inline-block;">Login to Training Panel</a>
+                <a href="${process.env.TRAINER_LOGIN_URL || 'https://infotactlearning.in/trainerlogin'}" target="_blank" style="background-color: #0d6efd; color: white; padding: 14px 28px; text-decoration: none; font-weight: 600; border-radius: 6px; display: inline-block;">Login to Training Panel</a>
               </div>
       
               <p><strong>Note:</strong> An OTP will be sent to your email each time you log in. The OTP is valid for 10 minutes and should not be shared with anyone.</p>
