@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,10 +12,48 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination"
 import { Badge } from "@/components/ui/badge"
-import { Pencil, Trash2, Users } from "lucide-react"
+import { Pencil, Trash2, Users, Search } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Input } from "@/components/ui/input"
 
-export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit, onDelete, isLoading }) {
+export function UserTable({ 
+  users, 
+  currentPage, 
+  totalPages, 
+  onPageChange, 
+  onEdit, 
+  onDelete, 
+  isLoading,
+  onSearch = null // Optional prop to handle server-side search
+}) {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [filteredUsers, setFilteredUsers] = useState(users)
+  
+  // Update filtered users when search term or users change
+  useEffect(() => {
+    if (onSearch) {
+      // If server-side search is provided, use the original users
+      setFilteredUsers(users)
+    } else {
+      // Client-side filtering
+      const filtered = users.filter(user => 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+      setFilteredUsers(filtered)
+    }
+  }, [searchTerm, users, onSearch])
+  
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    const value = e.target.value
+    setSearchTerm(value)
+    
+    // If server-side search function is provided, call it
+    if (onSearch) {
+      onSearch(value)
+    }
+  }
+
   const renderPagination = () => {
     const pages = []
     const maxVisiblePages = 5
@@ -59,7 +98,6 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Domain</TableHead>
                 <TableHead className="font-semibold">Paid</TableHead>
-               
                 <TableHead className="font-semibold">Gender</TableHead>
                 <TableHead className="font-semibold">Phone</TableHead>
                 <TableHead className="font-semibold">Duration</TableHead>
@@ -87,9 +125,25 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
     <div className="space-y-4">
       <div className="rounded-xl border bg-white shadow-md overflow-hidden">
         <div className="p-6 border-b bg-slate-50">
-          <h2 className="text-xl font-semibold flex items-center gap-2 text-slate-800">
-            <Users className="h-5 w-5" /> User Data
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-semibold flex items-center gap-2 text-slate-800">
+              <Users className="h-5 w-5" /> User Data
+            </h2>
+            
+            {/* Search Bar */}
+            <div className="relative max-w-sm">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Search className="h-4 w-4 text-slate-400" />
+              </div>
+              <Input
+                type="text"
+                placeholder="Search by name..."
+                className="pl-10 pr-4 py-2 border-slate-200 focus-visible:ring-slate-400"
+                value={searchTerm}
+                onChange={handleSearchChange}
+              />
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <Table>
@@ -99,7 +153,6 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Domain</TableHead>
                 <TableHead className="font-semibold">Paid</TableHead>
-               
                 <TableHead className="font-semibold">Gender</TableHead>
                 <TableHead className="font-semibold">Phone</TableHead>
                 <TableHead className="font-semibold">Duration</TableHead>
@@ -107,14 +160,14 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-10 text-slate-500">
-                    No users found. Try adjusting your filters.
+                    {searchTerm ? `No users found matching "${searchTerm}"` : "No users found. Try adjusting your filters."}
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user) => (
+                filteredUsers.map((user) => (
                   <TableRow key={user._id} className="hover:bg-slate-50 transition-colors">
                     <TableCell className="font-medium">{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
@@ -184,4 +237,3 @@ export function UserTable({ users, currentPage, totalPages, onPageChange, onEdit
     </div>
   )
 }
-

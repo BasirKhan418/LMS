@@ -542,7 +542,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                 </div>
                 
                 {/* Price section */}
-               {user&&course && batchdetails && course.batch !== batchdetails._id &&user.domain!=course.domain&& <div className="mb-6">
+               {(user&&course && batchdetails && course.batch !== batchdetails._id || user.domain!=course.domain)&& <div className="mb-6">
                   <div className="flex items-center gap-2 mb-1">
                     {discountPercent > 0 ? (
                       <>
@@ -563,7 +563,7 @@ export default function CourseEnrollmentDialog({ course, isOpen, onClose, onEnro
                 </div>}
                 
                 {/* Enrollment buttons */}
-                {user&&course && batchdetails && course.batch !== batchdetails._id &&user.domain!=course.domain&& (
+                {(user&&course && batchdetails && course.batch !== batchdetails._id || user.domain!=course.domain)&& (
                   <Button 
                     className="w-full mb-4"
                     size="lg"

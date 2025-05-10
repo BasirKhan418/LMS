@@ -27,8 +27,8 @@ export function CourseCard({ course, user, data, batchdetails }) {
         },
         body: JSON.stringify({
           courseid: course._id,
-          id: user._id,
-          email: user.email,
+          id: user?._id,
+          email: user?.email,
           title: course.title
         })
       });
@@ -55,23 +55,36 @@ export function CourseCard({ course, user, data, batchdetails }) {
 
   useEffect(() => {
     if (data) {
-      const enrolled = data.some((item) => item.courseid._id === course._id);
+      const enrolled = data.some((item) => item.courseid?._id === course?._id);
       setIsEnrolled(enrolled);
     }
-  }, [data, course._id]);
+  }, [data, course?._id]);
 
   // Determine if course is free or paid
-  const isFree = course.price === 'Free';
+  let isFree = false;
+  if (course?.price === 0) {
+    isFree = true;
+  }
+  else if (batchdetails && course?.batch === batchdetails?._id) {
+    isFree = true;
+  }
+  else if (course?.domain && user?.domain) {
+    if(course.domain === user.domain) {
+      isFree = true;
+    }
+  }
+
+   
   // Get price value if not free
-  const priceValue = !isFree ? `₹${course.price}` : "Free";
+  const priceValue = !isFree ? `₹${course?.price || 0}` : "Free";
   
   // Check if the course type is live
-  const isLive = course.coursetype === 'live';
+  const isLive = course?.coursetype === 'live';
   
-  // Check if batchdetails ID and domain match the course
-  const shouldHidePrice = batchdetails && 
-    batchdetails.id === course.batchId && 
-    batchdetails.domain === course.domain;
+  // Check if batchdetails ID and domain match the course - with null checks
+  const shouldHidePrice = batchdetails && user && 
+    batchdetails._id === course?.batch && 
+    user.domain === course?.domain;
 
   return (
     <>
@@ -79,8 +92,8 @@ export function CourseCard({ course, user, data, batchdetails }) {
         {/* Image container with overlay on hover */}
         <div className="relative h-52 sm:h-48 md:h-56 lg:h-60 overflow-hidden">
           <Image
-            src={course.img}
-            alt={course.title}
+            src={course?.img || "/placeholder.jpg"}
+            alt={course?.title || "Course"}
             layout="fill"
             objectFit="cover"
             className="transition-transform duration-500 group-hover:scale-105"
@@ -92,10 +105,10 @@ export function CourseCard({ course, user, data, batchdetails }) {
           {/* Status badge */}
           <Badge
             className={`absolute top-1 left-1 text-xs font-medium py-1 px-3 ${
-              course.isopen ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-rose-500 hover:bg-rose-600'
+              course?.isopen ? 'bg-emerald-500 hover:bg-emerald-600' : 'bg-rose-500 hover:bg-rose-600'
             }`}
           >
-            {course.isopen ? 'Open for Enrollment' : 'Enrollment Closed'}
+            {course?.isopen ? 'Open for Enrollment' : 'Enrollment Closed'}
           </Badge>
           
           {/* Course Type Badge */}
@@ -130,16 +143,16 @@ export function CourseCard({ course, user, data, batchdetails }) {
 
         <CardContent className="flex-grow p-5">
           {/* Title */}
-          <h3 className="text-xl font-bold mb-3 line-clamp-2 text-slate-800">{course.title}</h3>
+          <h3 className="text-xl font-bold mb-3 line-clamp-2 text-slate-800">{course?.title || "Course Title"}</h3>
           
           {/* Skills badges */}
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {course.skills.split(",").slice(0, 4).map((skill) => (
+            {course?.skills && course.skills.split(",").slice(0, 4).map((skill) => (
               <Badge key={skill} variant="secondary" className="px-2 py-0.5 text-xs">
                 {skill.trim()}
               </Badge>
             ))}
-            {course.skills.split(",").length > 4 && (
+            {course?.skills && course.skills.split(",").length > 4 && (
               <Badge variant="outline" className="px-2 py-0.5 text-xs">
                 +{course.skills.split(",").length - 4} more
               </Badge>
@@ -147,19 +160,19 @@ export function CourseCard({ course, user, data, batchdetails }) {
           </div>
           
           {/* Description */}
-          <p className="text-sm text-slate-600 mb-4 line-clamp-2">{course.desc}</p>
+          <p className="text-sm text-slate-600 mb-4 line-clamp-2">{course?.desc || "No description available"}</p>
           
           {/* Course stats */}
           <div className="flex justify-between text-sm text-slate-500 mb-4">
             <div className="flex items-center">
               <Clock className="w-4 h-4 mr-1.5 text-slate-400" />
-              <span>{course.duration}</span>
+              <span>{course?.duration || "N/A"}</span>
             </div>
             {/* Only show seats for non-live courses */}
             {!isLive && (
               <div className="flex items-center">
                 <Users className="w-4 h-4 mr-1.5 text-slate-400" />
-                <span>{course.seats} seats</span>
+                <span>{course?.seats || 0} seats</span>
               </div>
             )}
           </div>
@@ -168,13 +181,13 @@ export function CourseCard({ course, user, data, batchdetails }) {
           <div className="bg-slate-50 p-3 rounded-lg">
             <h4 className="font-semibold text-sm mb-2 text-slate-700">What you'll get:</h4>
             <ul className="space-y-2">
-              {course.feature.split(",").slice(0, 3).map((feature, index) => (
+              {course?.feature && course.feature.split(",").slice(0, 3).map((feature, index) => (
                 <li key={index} className="flex items-start">
                   <CheckCircle2 className="w-4 h-4 text-emerald-500 mr-2 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-slate-600">{feature.trim()}</span>
                 </li>
               ))}
-              {course.feature.split(",").length > 3 && (
+              {course?.feature && course.feature.split(",").length > 3 && (
                 <li className="text-sm text-slate-500 italic pl-6">
                   +{course.feature.split(",").length - 3} more features
                 </li>
@@ -185,11 +198,11 @@ export function CourseCard({ course, user, data, batchdetails }) {
 
         <CardFooter className="px-5 py-4 bg-slate-50 border-t border-slate-100">
           <Button
-            disabled={!course.isopen || isEnrolled || loading}
+            disabled={!course?.isopen || isEnrolled || loading}
             className={`w-full py-2 transition-all ${
               isEnrolled 
                 ? 'bg-emerald-500 hover:bg-emerald-600' 
-                : course.isopen 
+                : course?.isopen 
                   ? 'bg-blue-600 hover:bg-blue-700' 
                   : 'bg-slate-400'
             }`}
@@ -207,7 +220,7 @@ export function CourseCard({ course, user, data, batchdetails }) {
                     <CheckCircle2 className="w-4 h-4 mr-2" />
                     <span>Enrolled</span>
                   </>
-                ) : course.isopen ? (
+                ) : course?.isopen ? (
                   <>
                     <BookOpen className="w-4 h-4 mr-2" />
                     <span>Enroll Now</span>

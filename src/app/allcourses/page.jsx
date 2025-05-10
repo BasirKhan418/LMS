@@ -34,6 +34,7 @@ const Page = () => {
       setLoading(false)
       
       if (res.success) {
+        console.log("user is inside",res.user)  
         setUser(res.user)
         setData(res.data)
         setBatchdetails(res.batch)
