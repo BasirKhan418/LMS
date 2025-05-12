@@ -17,14 +17,7 @@ export const GET = async (req, res) => {
     if (!a) {
       return NextResponse.json({ success: false, message: "You are not authorized to access this route", status: 401 });
     }
-let admin = await Admin.findOne({ email: a.email });
-    if (admin == null) {
-      return NextResponse.json({
-        message: "You are not authorized to access this route",
-        status: 401,
-        success: false,
-      });
-    }
+
     let assdata = await SubmittedAssignments.find({ crid: id });
     if (!assdata) {
       return NextResponse.json({ success: false, message: "No data found", status: 404 });

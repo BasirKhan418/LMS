@@ -32,14 +32,6 @@ export const POST = async (req, res) => {
         if(!a){
             return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" ,success:false});
         }
-        let admin = await Admin.findOne({ email: a.email });
-            if (admin == null) {
-              return NextResponse.json({
-                message: "You are not authorized to access this route",
-                status: 401,
-                success: false,
-              });
-            }
 
         let addData = new Assignments(reqdata);
         await addData.save();
@@ -60,14 +52,7 @@ export const PUT = async (req, res) => {
         if(!a){
             return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" });
         }
-        let admin = await Admin.findOne({ email: a.email });
-            if (admin == null) {
-              return NextResponse.json({
-                message: "You are not authorized to access this route",
-                status: 401,
-                success: false,
-              });
-            }
+        
         let assignment = await Assignments.findByIdAndUpdate({_id:reqdata.id},reqdata,{new:true});
         return NextResponse.json({message:"Assignment updated successfully",status: "200",success:true});
         }
@@ -85,14 +70,6 @@ export const DELETE = async (req, res) => {
         if(!a){
             return NextResponse.json({message:"Unauthorized route cant handle request",status: "401" });
         }
-        let admin = await Admin.findOne({ email: a.email });
-            if (admin == null) {
-              return NextResponse.json({
-                message: "You are not authorized to access this route",
-                status: 401,
-                success: false,
-              });
-            }
         let assignment = await Assignments.findByIdAndDelete({_id:reqdata.id});
         return NextResponse.json({message:"Assignment deleted successfully",status: "200",success:true});
         }
