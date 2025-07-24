@@ -55,14 +55,6 @@
 - **Storage**: Cloud Object Store (S3/GCS/Azure Blob)  
 - **Auth**: JWT / Firebase / OAuth 2.0
 
----
-
-## 📸 LMS Dashboard Preview (Image Placeholder)
-
-> *(Add dashboard screenshot here)*  
-> `![Dashboard Screenshot](./assets/dashboard-preview.png)`
-
----
 
 ## 📦 Setup & Deployment
 
