@@ -2,8 +2,6 @@
 
 **MyLMS** is a cloud-native Learning Management System built for educators, institutions, and enterprises. With Zoom-like live streaming powered by **Mux**, AI-driven learning recommendations, and full course and student management — MyLMS empowers you to deliver engaging, scalable, and personalized education.
 
-🌐 **Live Site**: [https://mylms.tech](https://mylms.tech)
-
 📽 **Product Demo Video**:  
 ▶️ [Click to Watch](https://player.mux.com/qvuIa00dYcvYgXPR5v8b6Y6xZAzxaSvy5gcp799iV5No)
 
